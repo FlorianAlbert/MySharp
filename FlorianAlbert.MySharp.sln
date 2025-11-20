@@ -5,7 +5,7 @@ VisualStudioVersion = 18.0.11217.181 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlorianAlbert.MySharp.Compiler", "FlorianAlbert.MySharp.Compiler\FlorianAlbert.MySharp.Compiler.csproj", "{6DCCAA65-F8EF-4901-891E-4D1F0CC5641C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlorianAlbert.MySharp.Sdk.Parser", "FlorianAlbert.MySharp\FlorianAlbert.MySharp.Sdk.Parser.csproj", "{07500B00-297B-463B-9884-72CA6C60B355}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlorianAlbert.MySharp.Sdk.Parser", "FlorianAlbert.MySharp.Sdk.Parser\FlorianAlbert.MySharp.Sdk.Parser.csproj", "{07500B00-297B-463B-9884-72CA6C60B355}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlorianAlbert.MySharp.Sdk.Evaluator", "FlorianAlbert.MySharp.Sdk.Evaluator\FlorianAlbert.MySharp.Sdk.Evaluator.csproj", "{A316B5CD-8F0E-41D2-B6E2-43E56889051F}"
 EndProject
