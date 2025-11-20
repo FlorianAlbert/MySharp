@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="FlorianAlbert.MySharp.Compiler/FlorianAlbert.MySharp.Compiler.csproj" />
+  <Project Path="FlorianAlbert.MySharp.Sdk.Evaluator/FlorianAlbert.MySharp.Sdk.Evaluator.csproj" />
+  <Project Path="FlorianAlbert.MySharp.Sdk.Parser/FlorianAlbert.MySharp.Sdk.Parser.csproj" />
+</Solution>
