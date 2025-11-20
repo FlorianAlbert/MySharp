@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FlorianAlbert.MySharp.Sdk.Evaluator\FlorianAlbert.MySharp.Sdk.Evaluator.csproj" />
+    <ProjectReference Include="..\FlorianAlbert.MySharp\FlorianAlbert.MySharp.Sdk.Parser.csproj" />
+  </ItemGroup>
+
+</Project>
