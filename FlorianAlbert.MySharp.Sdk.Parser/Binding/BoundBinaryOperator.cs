@@ -39,7 +39,7 @@ internal sealed class BoundBinaryOperator
         new(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int)),
         new(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int)),
         new(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int)),
-        new(SyntaxKind.PercentToken, BoundBinaryOperatorKind.Module, typeof(int)),
+        new(SyntaxKind.PercentToken, BoundBinaryOperatorKind.Modulo, typeof(int)),
         new(SyntaxKind.CaretToken, BoundBinaryOperatorKind.BitwiseExclusiveOr, typeof(int)),
         new(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
         new(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),

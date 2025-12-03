@@ -53,7 +53,7 @@ internal sealed class Evaluator
                     return (int?) leftValue * (int?) rightValue;
                 case BoundBinaryOperatorKind.Division:
                     return (int?) leftValue / (int?) rightValue;
-                case BoundBinaryOperatorKind.Module:
+                case BoundBinaryOperatorKind.Modulo:
                     return (int?) leftValue % (int?) rightValue;
                 case BoundBinaryOperatorKind.LogicalAnd:
                     return (bool) leftValue! && (bool) rightValue!;
