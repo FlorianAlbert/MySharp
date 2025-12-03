@@ -1,6 +1,7 @@
-﻿using FlorianAlbert.MySharp;
-using FlorianAlbert.MySharp.Binding;
-using FlorianAlbert.MySharp.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Evaluator;
+using FlorianAlbert.MySharp.Sdk.Parser;
+using FlorianAlbert.MySharp.Sdk.Parser.Binding;
+using FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 bool showParseTree = false;
 
@@ -36,7 +37,7 @@ while (true)
         Binder binder = new();
         BoundExpression boundExpression = binder.BindExpression(syntaxTree.Root);
 
-        IReadOnlyList<string> diagnostics = [.. syntaxTree.Diagnostics, .. binder.Diagnostics];
+        IReadOnlyList<Diagnostic> diagnostics = [.. syntaxTree.Diagnostics, .. binder.Diagnostics];
 
         if (showParseTree)
         {
@@ -49,7 +50,7 @@ while (true)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
 
-            foreach (string diagnostic in diagnostics)
+            foreach (Diagnostic diagnostic in diagnostics)
             {
                 Console.WriteLine(diagnostic);
             }

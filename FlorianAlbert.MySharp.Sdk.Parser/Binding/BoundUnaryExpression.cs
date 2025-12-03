@@ -1,15 +1,15 @@
-﻿namespace FlorianAlbert.MySharp.Binding;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 public sealed class BoundUnaryExpression : BoundExpression
 {
-    public BoundUnaryExpression(BoundUnaryOperatorKind operatorKind, BoundExpression operand)
+    public BoundUnaryExpression(BoundUnaryOperator @operator, BoundExpression operand)
     {
-        OperatorKind = operatorKind;
+        Operator = @operator;
         Operand = operand;
     }
 
-    public override Type Type => Operand.Type;
+    public override Type Type => Operator.ResultType;
     public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
-    public BoundUnaryOperatorKind OperatorKind { get; }
+    public BoundUnaryOperator Operator { get; }
     public BoundExpression Operand { get; }
 }

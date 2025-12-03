@@ -1,4 +1,4 @@
-﻿namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 public enum SyntaxKind
 {
@@ -12,6 +12,12 @@ public enum SyntaxKind
     StarToken,
     SlashToken,
     PercentToken,
+    BangToken,
+    AmpersandAmpersandToken,
+    PipePipeToken,
+    CaretToken,
+    EqualsEqualsToken,
+    BangEqualsToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
     IdentifierToken,

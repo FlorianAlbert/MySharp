@@ -1,4 +1,4 @@
-﻿namespace FlorianAlbert.MySharp.Binding;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 public sealed class BoundLiteralExpression : BoundExpression
 {

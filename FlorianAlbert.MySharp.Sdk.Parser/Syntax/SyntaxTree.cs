@@ -1,15 +1,15 @@
-﻿namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 public sealed class SyntaxTree
 {
-    public SyntaxTree(IEnumerable<string> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+    public SyntaxTree(IEnumerable<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
     {
-        Diagnostics = diagnostics.ToArray();
+        Diagnostics = [.. diagnostics];
         Root = root;
         EndOfFileToken = endOfFileToken;
     }
 
-    public IReadOnlyList<string> Diagnostics { get; }
+    public IReadOnlyList<Diagnostic> Diagnostics { get; }
     public ExpressionSyntax Root { get; }
     public SyntaxToken EndOfFileToken { get; }
 

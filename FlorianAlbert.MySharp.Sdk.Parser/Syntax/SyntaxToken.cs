@@ -1,4 +1,4 @@
-﻿namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 public sealed class SyntaxToken : SyntaxNode
 {
@@ -22,5 +22,5 @@ public sealed class SyntaxToken : SyntaxNode
 
     public int End => Start + Length;
 
-    public override IEnumerable<SyntaxNode> GetChildren() => Enumerable.Empty<SyntaxNode>();
+    public override IEnumerable<SyntaxNode> GetChildren() => [];
 }

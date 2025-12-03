@@ -1,7 +1,6 @@
-﻿using FlorianAlbert.MySharp.Binding;
-using FlorianAlbert.MySharp.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-namespace FlorianAlbert.MySharp;
+namespace FlorianAlbert.MySharp.Sdk.Evaluator;
 
 public sealed class Evaluator
 {
@@ -27,38 +26,63 @@ public sealed class Evaluator
 
         if (expression is BoundUnaryExpression boundUnaryExpression)
         {
-            int? operand = (int?) EvaluateExpression(boundUnaryExpression.Operand);
+            object? operand = EvaluateExpression(boundUnaryExpression.Operand);
 
-            return boundUnaryExpression.OperatorKind switch
+            return boundUnaryExpression.Operator.Kind switch
             {
                 BoundUnaryOperatorKind.Identity => operand,
-                BoundUnaryOperatorKind.Negation => -operand,
-                _ => throw new Exception($"Unexpected unary operator {boundUnaryExpression.OperatorKind}"),
+                BoundUnaryOperatorKind.Negation => -(int?) operand,
+                BoundUnaryOperatorKind.LogicalNegation => !(bool?) operand,
+                _ => throw new Exception($"Unexpected unary operator {boundUnaryExpression.Operator.Kind}"),
             };
         }
 
         if (expression is BoundBinaryExpression boundBinaryExpression)
         {
-            int? leftValue = (int?) EvaluateExpression(boundBinaryExpression.Left);
-            int? rightValue = (int?) EvaluateExpression(boundBinaryExpression.Right);
+            object? leftValue = EvaluateExpression(boundBinaryExpression.Left);
+            object? rightValue = EvaluateExpression(boundBinaryExpression.Right);
 
-            switch (boundBinaryExpression.OperatorKind)
+#pragma warning disable IDE0066 // Convert switch statement to expression
+            switch (boundBinaryExpression.Operator.Kind)
             {
                 case BoundBinaryOperatorKind.Addition:
-                    return leftValue + rightValue;
+                    return (int?) leftValue + (int?) rightValue;
                 case BoundBinaryOperatorKind.Subtraction:
-                    return leftValue - rightValue;
+                    return (int?) leftValue - (int?) rightValue;
                 case BoundBinaryOperatorKind.Multiplication:
-                    return leftValue * rightValue;
+                    return (int?) leftValue * (int?) rightValue;
                 case BoundBinaryOperatorKind.Division:
-                    return leftValue / rightValue;
+                    return (int?) leftValue / (int?) rightValue;
                 case BoundBinaryOperatorKind.Module:
-                    return leftValue % rightValue;
+                    return (int?) leftValue % (int?) rightValue;
+                case BoundBinaryOperatorKind.LogicalAnd:
+                    return (bool) leftValue! && (bool) rightValue!;
+                case BoundBinaryOperatorKind.LogicalOr:
+                    return (bool) leftValue! || (bool) rightValue!;
+                case BoundBinaryOperatorKind.BitwiseExclusiveOr:
+                    return EvaluateBitwiseExclusiveOr(leftValue, rightValue);
+                case BoundBinaryOperatorKind.Equals:
+                    return Equals(leftValue, rightValue);
+                case BoundBinaryOperatorKind.NotEquals:
+                    return !Equals(leftValue, rightValue);
                 default:
-                    throw new Exception($"Unexpected binary operator {boundBinaryExpression.OperatorKind}");
+                    throw new Exception($"Unexpected binary operator {boundBinaryExpression.Operator.Kind}");
             }
+#pragma warning restore IDE0066 // Convert switch statement to expression
         }
 
         throw new Exception($"Unexpected node {expression.Kind}");
+    }
+
+    private static object? EvaluateBitwiseExclusiveOr(object? leftValue, object? rightValue)
+    {
+#pragma warning disable IDE0038 // Use pattern matching
+        if (leftValue is int && rightValue is int)
+        {
+            return (int) leftValue ^ (int) rightValue;
+        }
+#pragma warning restore IDE0038 // Use pattern matching
+
+        return (bool) leftValue! ^ (bool) rightValue!;
     }
 }

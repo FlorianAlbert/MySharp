@@ -1,7 +1,8 @@
-﻿namespace FlorianAlbert.MySharp.Binding;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 public enum BoundUnaryOperatorKind
 {
     Identity,
-    Negation
+    Negation,
+    LogicalNegation
 }

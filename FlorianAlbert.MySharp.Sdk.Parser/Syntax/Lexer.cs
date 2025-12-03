@@ -1,28 +1,30 @@
-﻿namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 internal sealed class Lexer
 {
     private readonly string _text;
     private int _position;
 
-    private readonly List<string> _diagnostics;
+    private readonly List<Diagnostic> _diagnostics;
 
     public Lexer(string text)
     {
         _text = text;
         _position = 0;
 
-        _diagnostics = new List<string>();
+        _diagnostics = [];
     }
 
-    public IEnumerable<string> Diagnostics => _diagnostics;
+    public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
 
-    private char _Current
+    private char _Current => Peek(0);
+
+    private char _Lookahead => Peek(1);
+
+    private char Peek(int offset)
     {
-        get
-        {
-            return _position >= _text.Length ? '\0' : _text[_position];
-        }
+        int index = _position + offset;
+        return index >= _text.Length ? '\0' : _text[index];
     }
 
     public SyntaxToken Lex()
@@ -46,7 +48,10 @@ internal sealed class Lexer
 
             if (!int.TryParse(tokenText, out int value))
             {
-                _diagnostics.Add($"The number {tokenText} isn't a valid Int32");
+                Diagnostic intDiagnostic = new($"The number {tokenText} isn't a valid Int32.",
+                    start,
+                    length);
+                _diagnostics.Add(intDiagnostic);
             }
 
             return new SyntaxToken(SyntaxKind.NumberToken, start, tokenText, value);
@@ -78,7 +83,7 @@ internal sealed class Lexer
 
             int length = _position - start;
             string tokenText = _text.Substring(start, length);
-            var kind = SyntaxFacts.GetKeywordKind(tokenText);
+            SyntaxKind kind = SyntaxFacts.GetKeywordKind(tokenText);
 
             return new SyntaxToken(kind, start, tokenText, null);
         }
@@ -99,10 +104,44 @@ internal sealed class Lexer
                 return new SyntaxToken(SyntaxKind.OpenParenthesisToken, _position++, "(", null);
             case ')':
                 return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
+            case '!':
+                if (_Lookahead == '=')
+                {
+                    _position += 2;
+                    return new SyntaxToken(SyntaxKind.BangEqualsToken, _position - 2, "!=", null);
+                }
+                return new SyntaxToken(SyntaxKind.BangToken, _position++, "!", null);
+            case '&':
+                if (_Lookahead == '&')
+                {
+                    _position += 2;
+                    return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, _position - 2, "&&", null);
+                }
+                break;
+            case '|':
+                if (_Lookahead == '|')
+                {
+                    _position += 2;
+                    return new SyntaxToken(SyntaxKind.PipePipeToken, _position - 2, "||", null);
+                }
+                break;
+            case '^':
+                return new SyntaxToken(SyntaxKind.CaretToken, _position++, "^", null);
+            case '=':
+                if (_Lookahead == '=')
+                {
+                    _position += 2;
+                    return new SyntaxToken(SyntaxKind.EqualsEqualsToken, _position - 2, "==", null);
+                }
+                break;
             default:
-                char badCharacter = _Current;
-                _diagnostics.Add($"Bad character input: {badCharacter}");
-                return new SyntaxToken(SyntaxKind.BadCharacterToken, _position++, badCharacter.ToString(), null);
+                break;
         }
+
+        char badCharacter = _Current;
+        Diagnostic badCharDiagnostic = new($"Bad character input: {badCharacter}", 
+            _position);
+        _diagnostics.Add(badCharDiagnostic);
+        return new SyntaxToken(SyntaxKind.BadCharacterToken, _position++, badCharacter.ToString(), null);
     }
 }

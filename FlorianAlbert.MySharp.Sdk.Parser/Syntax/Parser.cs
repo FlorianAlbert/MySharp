@@ -1,18 +1,16 @@
-﻿using System.Diagnostics.Metrics;
-
-namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 internal sealed class Parser
 {
     private readonly SyntaxToken[] _tokens;
     private int _position;
 
-    private readonly List<string> _diagnostics;
+    private readonly List<Diagnostic> _diagnostics;
 
     public Parser(string text)
     {
         _position = 0;
-        _diagnostics = new List<string>();
+        _diagnostics = [];
 
         var tokens = new List<SyntaxToken>();
 
@@ -29,7 +27,7 @@ internal sealed class Parser
             }
         } while (token.Kind is not SyntaxKind.EndOfFileToken);
 
-        _tokens = tokens.ToArray();
+        _tokens = [.. tokens];
         _diagnostics.AddRange(lexer.Diagnostics);
     }
 
@@ -56,7 +54,10 @@ internal sealed class Parser
             return token;
         }
 
-        _diagnostics.Add($"Unexpected token <{token.Kind}>, expected <{kind}>");
+        Diagnostic diagnostic = new($"Unexpected token <{token.Kind}>, expected <{kind}>",
+            token.Start,
+            token.Length);
+        _diagnostics.Add(diagnostic);
         return new SyntaxToken(kind, _Current.Start, null, null);
     }
 

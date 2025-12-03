@@ -1,21 +1,27 @@
-﻿namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 internal static class SyntaxFacts
 {
     public static int GetBinaryOperatorPrecedence(this SyntaxKind kind) => kind switch
     {
-        SyntaxKind.StarToken => 2,
-        SyntaxKind.SlashToken => 2,
-        SyntaxKind.PercentToken => 2,
-        SyntaxKind.PlusToken => 1,
-        SyntaxKind.MinusToken => 1,
+        SyntaxKind.StarToken => 6,
+        SyntaxKind.SlashToken => 6,
+        SyntaxKind.PercentToken => 6,
+        SyntaxKind.PlusToken => 5,
+        SyntaxKind.MinusToken => 5,
+        SyntaxKind.CaretToken => 4,
+        SyntaxKind.EqualsEqualsToken => 3,
+        SyntaxKind.BangEqualsToken => 3,
+        SyntaxKind.AmpersandAmpersandToken => 2,
+        SyntaxKind.PipePipeToken => 1,
         _ => 0
     };
 
     public static int GetUnaryOperatorPrecedence(this SyntaxKind kind) => kind switch
     {
-        SyntaxKind.PlusToken => 3,
-        SyntaxKind.MinusToken => 3,
+        SyntaxKind.PlusToken => 7,
+        SyntaxKind.MinusToken => 7,
+        SyntaxKind.BangToken => 7,
         _ => 0
     };
 

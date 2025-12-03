@@ -1,4 +1,4 @@
-﻿namespace FlorianAlbert.MySharp.Binding;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 public enum BoundBinaryOperatorKind
 {
@@ -6,5 +6,10 @@ public enum BoundBinaryOperatorKind
     Subtraction,
     Multiplication,
     Division,
-    Module
+    Module,
+    LogicalAnd,
+    LogicalOr,
+    BitwiseExclusiveOr,
+    Equals,
+    NotEquals
 }

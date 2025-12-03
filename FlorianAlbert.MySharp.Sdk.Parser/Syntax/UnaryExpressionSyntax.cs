@@ -1,4 +1,4 @@
-﻿namespace FlorianAlbert.MySharp.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 public sealed class UnaryExpressionSyntax : ExpressionSyntax
 {
@@ -6,6 +6,9 @@ public sealed class UnaryExpressionSyntax : ExpressionSyntax
     {
         OperatorToken = operatorToken;
         Operand = operand;
+
+        Start = operatorToken.Start;
+        Length = operand.Start + operand.Length - Start;
     }
 
     public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
