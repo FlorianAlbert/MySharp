@@ -2,7 +2,7 @@
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public sealed class BoundUnaryOperator
+internal sealed class BoundUnaryOperator
 {
     private BoundUnaryOperator(SyntaxKind syntaxKind, BoundUnaryOperatorKind kind, Type operandType) 
         : this(syntaxKind, kind, operandType, operandType)

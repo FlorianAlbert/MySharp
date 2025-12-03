@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FlorianAlbert.MySharp.Sdk.Evaluator\FlorianAlbert.MySharp.Sdk.Evaluator.csproj" />
     <ProjectReference Include="..\FlorianAlbert.MySharp.Sdk.Parser\FlorianAlbert.MySharp.Sdk.Parser.csproj" />
   </ItemGroup>
 

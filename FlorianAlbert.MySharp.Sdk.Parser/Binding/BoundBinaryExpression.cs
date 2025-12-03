@@ -1,6 +1,6 @@
 ﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public sealed class BoundBinaryExpression : BoundExpression
+internal sealed class BoundBinaryExpression : BoundExpression
 {
     public BoundBinaryExpression(BoundExpression left, BoundBinaryOperator @operator, BoundExpression right)
     {

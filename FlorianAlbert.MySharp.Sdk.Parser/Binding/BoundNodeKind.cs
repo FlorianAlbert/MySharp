@@ -1,6 +1,6 @@
 ﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public enum BoundNodeKind
+internal enum BoundNodeKind
 {
     UnaryExpression,
     LiteralExpression,

@@ -1,6 +1,6 @@
 ﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public sealed class BoundUnaryExpression : BoundExpression
+internal sealed class BoundUnaryExpression : BoundExpression
 {
     public BoundUnaryExpression(BoundUnaryOperator @operator, BoundExpression operand)
     {

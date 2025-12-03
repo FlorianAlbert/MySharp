@@ -2,7 +2,7 @@
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public sealed class BoundBinaryOperator
+internal sealed class BoundBinaryOperator
 {
     private BoundBinaryOperator(SyntaxKind syntaxKind, BoundBinaryOperatorKind kind, Type operandsType)
         : this(syntaxKind, kind, operandsType, operandsType)

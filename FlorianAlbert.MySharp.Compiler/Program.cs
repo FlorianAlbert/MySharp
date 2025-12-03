@@ -1,6 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Evaluator;
-using FlorianAlbert.MySharp.Sdk.Parser;
-using FlorianAlbert.MySharp.Sdk.Parser.Binding;
+﻿using FlorianAlbert.MySharp.Sdk.Parser;
 using FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 bool showParseTree = false;
@@ -34,23 +32,21 @@ while (true)
     {
         var syntaxTree = SyntaxTree.Parse(input);
 
-        Binder binder = new();
-        BoundExpression boundExpression = binder.BindExpression(syntaxTree.Root);
-
-        IReadOnlyList<Diagnostic> diagnostics = [.. syntaxTree.Diagnostics, .. binder.Diagnostics];
-
         if (showParseTree)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
             PrettyPrint(syntaxTree.Root);
         }
 
+        Compilation compilation = new(syntaxTree);
+        EvaluationResult result = compilation.Evaluate();
+
         Console.WriteLine();
-        if (diagnostics.Any())
+        if (result.Diagnostics.Count > 0)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
 
-            foreach (Diagnostic diagnostic in diagnostics)
+            foreach (Diagnostic diagnostic in result.Diagnostics)
             {
                 Console.WriteLine(diagnostic);
             }
@@ -61,10 +57,7 @@ while (true)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
 
-            Evaluator evaluator = new(boundExpression);
-            object? result = evaluator.Evaluate();
-
-            Console.WriteLine(result);
+            Console.WriteLine(result.Value);
         }
 
         Console.ResetColor();

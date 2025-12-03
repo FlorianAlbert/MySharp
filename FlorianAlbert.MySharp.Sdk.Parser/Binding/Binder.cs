@@ -2,10 +2,10 @@
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public sealed class Binder
+internal sealed class Binder
 {
     private readonly List<Diagnostic> _diagnostics = [];
-    public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
+    public IReadOnlyCollection<Diagnostic> Diagnostics => _diagnostics;
 
     public BoundExpression BindExpression(ExpressionSyntax expressionSyntax)
     {

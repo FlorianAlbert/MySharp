@@ -1,6 +1,6 @@
 ﻿namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-public enum BoundBinaryOperatorKind
+internal enum BoundBinaryOperatorKind
 {
     Addition,
     Subtraction,

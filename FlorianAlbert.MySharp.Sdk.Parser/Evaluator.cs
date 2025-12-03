@@ -1,8 +1,8 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
-namespace FlorianAlbert.MySharp.Sdk.Evaluator;
+namespace FlorianAlbert.MySharp.Sdk.Parser;
 
-public sealed class Evaluator
+internal sealed class Evaluator
 {
     private readonly BoundExpression _root;
 

@@ -2,14 +2,14 @@
 
 public sealed class SyntaxTree
 {
-    public SyntaxTree(IEnumerable<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+    public SyntaxTree(IReadOnlyCollection<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
     {
-        Diagnostics = [.. diagnostics];
+        Diagnostics = diagnostics;
         Root = root;
         EndOfFileToken = endOfFileToken;
     }
 
-    public IReadOnlyList<Diagnostic> Diagnostics { get; }
+    public IReadOnlyCollection<Diagnostic> Diagnostics { get; }
     public ExpressionSyntax Root { get; }
     public SyntaxToken EndOfFileToken { get; }
 
