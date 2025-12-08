@@ -2,21 +2,18 @@
 
 public sealed class Diagnostic
 {
-    public Diagnostic(string message, int position, int length = 1)
+    public Diagnostic(TextSpan span, string message)
     {
+        Span = span;
         Message = message;
-        Position = position;
-        Length = length;
     }
+
+    public TextSpan Span { get; }
 
     public string Message { get; }
 
-    public int Position { get; }
-
-    public int Length { get; }
-
     public override string ToString()
     {
-        return $"({Position}, {Length}): {Message}";
+        return $"({Span.Start}, {Span.End}): {Message}";
     }
 }

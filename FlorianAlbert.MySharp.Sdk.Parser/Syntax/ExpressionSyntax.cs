@@ -2,7 +2,4 @@
 
 public abstract class ExpressionSyntax : SyntaxNode
 {
-    public int Start { get; protected init; }
-
-    public int Length { get; protected init; }
 }

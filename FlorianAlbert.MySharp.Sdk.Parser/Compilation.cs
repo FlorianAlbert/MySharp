@@ -17,7 +17,7 @@ public sealed class Compilation
         Binder binder = new();
         BoundExpression boundExpression = binder.BindExpression(SyntaxTree.Root);
 
-        IReadOnlyCollection<Diagnostic> diagnostics = [.. SyntaxTree.Diagnostics, .. binder.Diagnostics];
+        DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. binder.Diagnostics];
         if (diagnostics.Count > 0)
         {
             return new EvaluationResult(diagnostics, null);

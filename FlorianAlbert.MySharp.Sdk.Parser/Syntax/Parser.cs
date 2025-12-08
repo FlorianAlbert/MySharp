@@ -5,12 +5,12 @@ internal sealed class Parser
     private readonly SyntaxToken[] _tokens;
     private int _position;
 
-    private readonly List<Diagnostic> _diagnostics;
+    private readonly DiagnosticBag _diagnosticBag;
 
     public Parser(string text)
     {
         _position = 0;
-        _diagnostics = [];
+        _diagnosticBag = [];
 
         var tokens = new List<SyntaxToken>();
 
@@ -28,7 +28,7 @@ internal sealed class Parser
         } while (token.Kind is not SyntaxKind.EndOfFileToken);
 
         _tokens = [.. tokens];
-        _diagnostics.AddRange(lexer.Diagnostics);
+        _diagnosticBag.AddRange(lexer.Diagnostics);
     }
 
     private SyntaxToken _Current => Peek(0);
@@ -54,11 +54,8 @@ internal sealed class Parser
             return token;
         }
 
-        Diagnostic diagnostic = new($"Unexpected token <{token.Kind}>, expected <{kind}>",
-            token.Start,
-            token.Length);
-        _diagnostics.Add(diagnostic);
-        return new SyntaxToken(kind, _Current.Start, null, null);
+        _diagnosticBag.ReportUnexpectedToken(token.Span, token.Kind, kind);
+        return new SyntaxToken(kind, token.Span.Start, null, null);
     }
 
     public SyntaxTree Parse()
@@ -67,7 +64,7 @@ internal sealed class Parser
 
         SyntaxToken endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
 
-        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
+        return new SyntaxTree(_diagnosticBag, expression, endOfFileToken);
     }
 
     private ExpressionSyntax ParseExpression(int parentPrecedence = 0)

@@ -44,11 +44,21 @@ while (true)
         Console.WriteLine();
         if (result.Diagnostics.Count > 0)
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-
             foreach (Diagnostic diagnostic in result.Diagnostics)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine(diagnostic);
+                Console.ResetColor();
+
+                string prefix = input[..diagnostic.Span.Start];
+                string error = input[diagnostic.Span.Start..diagnostic.Span.End];
+                string suffix = input[diagnostic.Span.End..];
+
+                Console.Write($"\t{prefix}");
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write(error);
+                Console.ResetColor();
+                Console.WriteLine(suffix);
             }
 
             Console.WriteLine();

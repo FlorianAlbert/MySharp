@@ -5,17 +5,17 @@ internal sealed class Lexer
     private readonly string _text;
     private int _position;
 
-    private readonly List<Diagnostic> _diagnostics;
+    private readonly DiagnosticBag _diagnosticBag;
 
     public Lexer(string text)
     {
         _text = text;
         _position = 0;
 
-        _diagnostics = [];
+        _diagnosticBag = [];
     }
 
-    public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
+    public DiagnosticBag Diagnostics => _diagnosticBag;
 
     private char _Current => Peek(0);
 
@@ -34,10 +34,10 @@ internal sealed class Lexer
             return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
         }
 
+        int start = _position;
+
         if (char.IsDigit(_Current))
         {
-            int start = _position;
-
             while (char.IsDigit(_Current))
             {
                 _position++;
@@ -48,10 +48,7 @@ internal sealed class Lexer
 
             if (!int.TryParse(tokenText, out int value))
             {
-                Diagnostic intDiagnostic = new($"The number {tokenText} isn't a valid Int32.",
-                    start,
-                    length);
-                _diagnostics.Add(intDiagnostic);
+                _diagnosticBag.ReportInvalidNumber(new TextSpan(start, length), tokenText, typeof(int));
             }
 
             return new SyntaxToken(SyntaxKind.NumberToken, start, tokenText, value);
@@ -59,8 +56,6 @@ internal sealed class Lexer
 
         if (char.IsWhiteSpace(_Current))
         {
-            int start = _position;
-
             while (char.IsWhiteSpace(_Current))
             {
                 _position++;
@@ -74,8 +69,6 @@ internal sealed class Lexer
 
         if (char.IsLetter(_Current))
         {
-            int start = _position;
-
             while (char.IsLetter(_Current))
             {
                 _position++;
@@ -108,21 +101,21 @@ internal sealed class Lexer
                 if (_Lookahead == '=')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.BangEqualsToken, _position - 2, "!=", null);
+                    return new SyntaxToken(SyntaxKind.BangEqualsToken, start, "!=", null);
                 }
                 return new SyntaxToken(SyntaxKind.BangToken, _position++, "!", null);
             case '&':
                 if (_Lookahead == '&')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, _position - 2, "&&", null);
+                    return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, start, "&&", null);
                 }
                 break;
             case '|':
                 if (_Lookahead == '|')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.PipePipeToken, _position - 2, "||", null);
+                    return new SyntaxToken(SyntaxKind.PipePipeToken, start, "||", null);
                 }
                 break;
             case '^':
@@ -131,7 +124,7 @@ internal sealed class Lexer
                 if (_Lookahead == '=')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.EqualsEqualsToken, _position - 2, "==", null);
+                    return new SyntaxToken(SyntaxKind.EqualsEqualsToken, start, "==", null);
                 }
                 break;
             default:
@@ -139,9 +132,7 @@ internal sealed class Lexer
         }
 
         char badCharacter = _Current;
-        Diagnostic badCharDiagnostic = new($"Bad character input: {badCharacter}", 
-            _position);
-        _diagnostics.Add(badCharDiagnostic);
+        _diagnosticBag.ReportBadCharacter(_position, badCharacter);
         return new SyntaxToken(SyntaxKind.BadCharacterToken, _position++, badCharacter.ToString(), null);
     }
 }

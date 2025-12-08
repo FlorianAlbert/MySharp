@@ -4,8 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 internal sealed class Binder
 {
-    private readonly List<Diagnostic> _diagnostics = [];
-    public IReadOnlyCollection<Diagnostic> Diagnostics => _diagnostics;
+    private readonly DiagnosticBag _diagnosticBag = [];
+    public DiagnosticBag Diagnostics => _diagnosticBag;
 
     public BoundExpression BindExpression(ExpressionSyntax expressionSyntax)
     {
@@ -29,10 +29,7 @@ internal sealed class Binder
 
         if (boundBinaryOperator is null)
         {
-            Diagnostic diagnostic = new($"Binary operator {expressionSyntax.OperatorToken.Kind} is not defined for type {boundLeftExpression.Type} and type {boundRightExpression.Type}",
-                expressionSyntax.Start,
-                expressionSyntax.Length);
-            _diagnostics.Add(diagnostic);
+            _diagnosticBag.ReportUndefindedBinaryOperator(expressionSyntax.OperatorToken.Span, expressionSyntax.OperatorToken.Text, boundLeftExpression.Type, boundRightExpression.Type);
             return boundLeftExpression;
         }
 
@@ -46,10 +43,7 @@ internal sealed class Binder
 
         if (boundUnaryOperator is null)
         {
-            Diagnostic diagnostic = new($"Unary operator {expressionSyntax.OperatorToken.Kind} is not defined for type {boundOperandExpression.Type}",
-                expressionSyntax.Start,
-                expressionSyntax.Length);
-            _diagnostics.Add(diagnostic);
+            _diagnosticBag.ReportUndefindedUnaryOperator(expressionSyntax.OperatorToken.Span, expressionSyntax.OperatorToken.Text, boundOperandExpression.Type);
             return boundOperandExpression;
         }
 

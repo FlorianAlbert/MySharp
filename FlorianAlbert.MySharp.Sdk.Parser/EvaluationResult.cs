@@ -2,7 +2,7 @@
 
 public sealed class EvaluationResult
 {
-    public EvaluationResult(IReadOnlyCollection<Diagnostic> diagnostics, object? value)
+    internal EvaluationResult(IReadOnlyCollection<Diagnostic> diagnostics, object? value)
     {
         Diagnostics = diagnostics;
         Value = value;

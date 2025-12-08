@@ -7,9 +7,6 @@ public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
         OpenParenthesisToken = openParenthesisToken;
         ExpressionSyntax = expressionSyntax;
         CloseParenthesisToken = closeParenthesisToken;
-
-        Start = openParenthesisToken.Start;
-        Length = closeParenthesisToken.Start + closeParenthesisToken.Length - Start;
     }
 
     public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;

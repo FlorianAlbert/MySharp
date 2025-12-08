@@ -11,9 +11,6 @@ public sealed class LiteralExpressionSyntax : ExpressionSyntax
     {
         LiteralToken = literalToken;
         Value = value;
-
-        Start = literalToken.Start;
-        Length = literalToken.Length;
     }
 
     public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
