@@ -3,9 +3,9 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 internal sealed class BoundAssignmentExpression : BoundExpression
 {
-    public BoundAssignmentExpression(string name, BoundExpression expression)
+    public BoundAssignmentExpression(VariableSymbol variableSymbol, BoundExpression expression)
     {
-        Name = name;
+        VariableSymbol = variableSymbol;
         Expression = expression;
     }
 
@@ -13,7 +13,7 @@ internal sealed class BoundAssignmentExpression : BoundExpression
 
     public override Type? Type => Expression.Type;
 
-    public string Name { get; }
+    public VariableSymbol VariableSymbol { get; }
 
     public BoundExpression Expression { get; }
 }

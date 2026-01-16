@@ -2,7 +2,7 @@
 using FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 bool showParseTree = false;
-Dictionary<string, object> variables = [];
+Dictionary<VariableSymbol, object?> variables = [];
 
 while (true)
 {

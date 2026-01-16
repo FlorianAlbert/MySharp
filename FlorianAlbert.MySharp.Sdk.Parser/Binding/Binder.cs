@@ -4,9 +4,9 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 internal sealed class Binder
 {
-    private readonly Dictionary<string, object> _variables;
+    private readonly Dictionary<VariableSymbol, object?> _variables;
 
-    public Binder(Dictionary<string, object> variables)
+    public Binder(Dictionary<VariableSymbol, object?> variables)
     {
         _variables = variables;
     }
@@ -34,19 +34,19 @@ internal sealed class Binder
         string? name = expressionSyntax.IdentifierToken.Text;
         ArgumentNullException.ThrowIfNull(name);
 
-        object? defaultValue =
-            boundExpression.Type == typeof(int) ? 0 :
-            boundExpression.Type == typeof(bool) ? false :
-            null;
+        Type? type = boundExpression.Type;
+        ArgumentNullException.ThrowIfNull(type);
 
-        if (defaultValue is null)
+        VariableSymbol? existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
+        if (existingVariable is not null)
         {
-            throw new Exception($"Type {boundExpression.Type} is not supported.");
+            _variables.Remove(existingVariable);
         }
 
-        _variables[name] = defaultValue;
+        VariableSymbol variableSymbol = new(name, type);
+        _variables[variableSymbol] = null;
 
-        return new BoundAssignmentExpression(name, boundExpression);
+        return new BoundAssignmentExpression(variableSymbol, boundExpression);
     }
 
     private BoundExpression BindNameExpression(NameExpressionSyntax expressionSyntax)
@@ -54,15 +54,15 @@ internal sealed class Binder
         string? name = expressionSyntax.IdentifierToken.Text;
         ArgumentNullException.ThrowIfNull(name);
 
-        if (!_variables.TryGetValue(name, out object? value))
+        VariableSymbol? variableSymbol = _variables.Keys.FirstOrDefault(v => v.Name == name);
+
+        if (variableSymbol is null)
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
             return new BoundLiteralExpression(0);
         }
 
-        Type type = value.GetType();
-
-        return new BoundVariableExpression(name, type);
+        return new BoundVariableExpression(variableSymbol);
     }
 
     private BoundExpression BindParenthesizedExpression(ParenthesizedExpressionSyntax expressionSyntax) => BindExpression(expressionSyntax.ExpressionSyntax);
