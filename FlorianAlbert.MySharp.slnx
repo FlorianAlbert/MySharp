@@ -3,5 +3,6 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="FlorianAlbert.MySharp.Interpreter/FlorianAlbert.MySharp.Interpreter.csproj" />
+  <Project Path="FlorianAlbert.MySharp.Sdk.Parser.Test/FlorianAlbert.MySharp.Sdk.Parser.Test.csproj" Id="03b0e905-a203-4800-9b78-2c177dbaa064" />
   <Project Path="FlorianAlbert.MySharp.Sdk.Parser/FlorianAlbert.MySharp.Sdk.Parser.csproj" />
 </Solution>
