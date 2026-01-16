@@ -1,5 +1,5 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser;
-using FlorianAlbert.MySharp.Sdk.Parser.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 bool showParseTree = false;
 Dictionary<VariableSymbol, object?> variables = [];
