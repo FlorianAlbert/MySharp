@@ -31,4 +31,25 @@ internal static class SyntaxFacts
         "false" => SyntaxKind.FalseKeyword,
         _ => SyntaxKind.IdentifierToken
     };
+
+    public static string? GetText(this SyntaxKind kind) => kind switch
+    {
+        SyntaxKind.PlusToken => "+",
+        SyntaxKind.MinusToken => "-",
+        SyntaxKind.StarToken => "*",
+        SyntaxKind.SlashToken => "/",
+        SyntaxKind.PercentToken => "%",
+        SyntaxKind.BangToken => "!",
+        SyntaxKind.AmpersandAmpersandToken => "&&",
+        SyntaxKind.PipePipeToken => "||",
+        SyntaxKind.CaretToken => "^",
+        SyntaxKind.EqualsEqualsToken => "==",
+        SyntaxKind.BangEqualsToken => "!=",
+        SyntaxKind.OpenParenthesisToken => "(",
+        SyntaxKind.CloseParenthesisToken => ")",
+        SyntaxKind.EqualsToken => "=",
+        SyntaxKind.TrueKeyword => "true",
+        SyntaxKind.FalseKeyword => "false",
+        _ => null
+    };
 }
