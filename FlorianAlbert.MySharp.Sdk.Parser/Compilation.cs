@@ -12,7 +12,7 @@ public sealed class Compilation
 
     public SyntaxTree SyntaxTree { get; }
 
-    public EvaluationResult Evaluate(Dictionary<string, object?> variables)
+    public EvaluationResult Evaluate(Dictionary<string, object> variables)
     {
         Binder binder = new(variables);
         BoundExpression boundExpression = binder.BindExpression(SyntaxTree.Root);

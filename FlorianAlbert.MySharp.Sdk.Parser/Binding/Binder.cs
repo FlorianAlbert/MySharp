@@ -4,9 +4,9 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.Binding;
 
 internal sealed class Binder
 {
-    private readonly Dictionary<string, object?> _variables;
+    private readonly Dictionary<string, object> _variables;
 
-    public Binder(Dictionary<string, object?> variables)
+    public Binder(Dictionary<string, object> variables)
     {
         _variables = variables;
     }
@@ -34,7 +34,17 @@ internal sealed class Binder
         string? name = expressionSyntax.IdentifierToken.Text;
         ArgumentNullException.ThrowIfNull(name);
 
-        _variables[name] = null;
+        object? defaultValue =
+            boundExpression.Type == typeof(int) ? 0 :
+            boundExpression.Type == typeof(bool) ? false :
+            null;
+
+        if (defaultValue is null)
+        {
+            throw new Exception($"Type {boundExpression.Type} is not supported.");
+        }
+
+        _variables[name] = defaultValue;
 
         return new BoundAssignmentExpression(name, boundExpression);
     }
@@ -44,13 +54,13 @@ internal sealed class Binder
         string? name = expressionSyntax.IdentifierToken.Text;
         ArgumentNullException.ThrowIfNull(name);
 
-        if (!_variables.TryGetValue(name, out _))
+        if (!_variables.TryGetValue(name, out object? value))
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
             return new BoundLiteralExpression(0);
         }
 
-        Type type = typeof(int);
+        Type type = value.GetType();
 
         return new BoundVariableExpression(name, type);
     }
