@@ -1,6 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.Binding;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 

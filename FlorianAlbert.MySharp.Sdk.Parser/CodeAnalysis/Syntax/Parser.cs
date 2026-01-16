@@ -1,7 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
-using FlorianAlbert.MySharp.Sdk.Parser.Syntax;
-
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 internal sealed class Parser
 {
