@@ -27,7 +27,7 @@ internal sealed class Binder
         };
     }
 
-    private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax expressionSyntax)
+    private BoundAssignmentExpression BindAssignmentExpression(AssignmentExpressionSyntax expressionSyntax)
     {
         BoundExpression boundExpression = BindExpression(expressionSyntax.Expression);
 
