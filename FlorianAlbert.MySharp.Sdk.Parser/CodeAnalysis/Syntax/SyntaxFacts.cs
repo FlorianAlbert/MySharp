@@ -1,6 +1,6 @@
 ﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
-internal static class SyntaxFacts
+public static class SyntaxFacts
 {
     public static int GetBinaryOperatorPrecedence(this SyntaxKind kind) => kind switch
     {
