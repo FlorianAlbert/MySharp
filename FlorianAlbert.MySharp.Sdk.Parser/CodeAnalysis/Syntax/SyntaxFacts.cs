@@ -17,6 +17,17 @@ public static class SyntaxFacts
         _ => 0
     };
 
+    public static IEnumerable<SyntaxKind> GetBinaryOperatorKinds()
+    {
+        foreach (SyntaxKind kind in Enum.GetValues<SyntaxKind>())
+        {
+            if (GetBinaryOperatorPrecedence(kind) > 0)
+            {
+                yield return kind;
+            }
+        }
+    }
+
     public static int GetUnaryOperatorPrecedence(this SyntaxKind kind) => kind switch
     {
         SyntaxKind.PlusToken => 7,
@@ -24,6 +35,17 @@ public static class SyntaxFacts
         SyntaxKind.BangToken => 7,
         _ => 0
     };
+
+    public static IEnumerable<SyntaxKind> GetUnaryOperatorKinds()
+    {
+        foreach (SyntaxKind kind in Enum.GetValues<SyntaxKind>())
+        {
+            if (GetUnaryOperatorPrecedence(kind) > 0)
+            {
+                yield return kind;
+            }
+        }
+    }
 
     public static SyntaxKind GetKeywordKind(string text) => text switch
     {
