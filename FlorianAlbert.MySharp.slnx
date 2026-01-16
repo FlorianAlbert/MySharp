@@ -2,6 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="FlorianAlbert.MySharp.Compiler/FlorianAlbert.MySharp.Compiler.csproj" />
+  <Project Path="FlorianAlbert.MySharp.Interpreter/FlorianAlbert.MySharp.Interpreter.csproj" />
   <Project Path="FlorianAlbert.MySharp.Sdk.Parser/FlorianAlbert.MySharp.Sdk.Parser.csproj" />
 </Solution>
