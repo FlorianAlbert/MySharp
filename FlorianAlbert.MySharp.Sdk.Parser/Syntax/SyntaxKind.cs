@@ -21,6 +21,7 @@ public enum SyntaxKind
     OpenParenthesisToken,
     CloseParenthesisToken,
     IdentifierToken,
+    EqualsToken,
 
     // Keywords
     FalseKeyword,
@@ -28,6 +29,8 @@ public enum SyntaxKind
 
     // Expressions
     LiteralExpression,
+    NameExpression,
+    AssignmentExpression,
     UnaryExpression,
     BinaryExpression,
     ParenthesizedExpression

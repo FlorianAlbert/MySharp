@@ -5,10 +5,12 @@ namespace FlorianAlbert.MySharp.Sdk.Parser;
 internal sealed class Evaluator
 {
     private readonly BoundExpression _root;
+    private readonly Dictionary<string, object?> _variables;
 
-    public Evaluator(BoundExpression root)
+    public Evaluator(BoundExpression root, Dictionary<string, object?> variables)
     {
         _root = root;
+        _variables = variables;
     }
 
     public object? Evaluate()
@@ -22,6 +24,20 @@ internal sealed class Evaluator
             boundLiteralExpression.Value is not null)
         {
             return boundLiteralExpression.Value;
+        }
+
+
+        if (expression is BoundVariableExpression boundVariableExpression)
+        {
+            return _variables[boundVariableExpression.Name];
+        }
+
+        if (expression is BoundAssignmentExpression boundAssignmentExpression)
+        {
+            object? value = EvaluateExpression(boundAssignmentExpression.Expression);
+            _variables[boundAssignmentExpression.Name] = value;
+
+            return value;
         }
 
         if (expression is BoundUnaryExpression boundUnaryExpression)

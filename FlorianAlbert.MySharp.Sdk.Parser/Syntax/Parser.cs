@@ -67,7 +67,22 @@ internal sealed class Parser
         return new SyntaxTree(_diagnosticBag, expression, endOfFileToken);
     }
 
-    private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
+    private ExpressionSyntax ParseExpression() => ParseAssignmentExpression();
+
+    private ExpressionSyntax ParseAssignmentExpression()
+    {
+        if (_Current.Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.EqualsToken)
+        {
+            SyntaxToken identifierToken = NextToken();
+            SyntaxToken equalsToken = NextToken();
+            ExpressionSyntax right = ParseAssignmentExpression();
+            return new AssignmentExpressionSyntax(identifierToken, equalsToken, right);
+        }
+
+        return ParseBinaryExpression();
+    }
+
+    private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
     {
         ExpressionSyntax left;
 
@@ -75,7 +90,7 @@ internal sealed class Parser
         if (unaryOperatorPrecedence is not 0 && unaryOperatorPrecedence >= parentPrecedence)
         {
             SyntaxToken operatorToken = NextToken();
-            ExpressionSyntax operand = ParseExpression(unaryOperatorPrecedence);
+            ExpressionSyntax operand = ParseBinaryExpression(unaryOperatorPrecedence);
 
             left = new UnaryExpressionSyntax(operatorToken, operand);
         }
@@ -94,7 +109,7 @@ internal sealed class Parser
             }
 
             SyntaxToken operatorToken = NextToken();
-            ExpressionSyntax right = ParseExpression(precedence);
+            ExpressionSyntax right = ParseBinaryExpression(precedence);
 
             left = new BinaryExpressionSyntax(left, operatorToken, right);
         }
@@ -118,6 +133,9 @@ internal sealed class Parser
                 bool value = keywordToken.Kind == SyntaxKind.TrueKeyword;
 
                 return new LiteralExpressionSyntax(keywordToken, value);
+            case SyntaxKind.IdentifierToken:
+                SyntaxToken identifierToken = NextToken();
+                return new NameExpressionSyntax(identifierToken);
             default:
                 SyntaxToken nextNumberToken = MatchToken(SyntaxKind.NumberToken);
 

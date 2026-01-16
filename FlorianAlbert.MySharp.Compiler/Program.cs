@@ -2,6 +2,7 @@
 using FlorianAlbert.MySharp.Sdk.Parser.Syntax;
 
 bool showParseTree = false;
+Dictionary<string, object?> variables = [];
 
 while (true)
 {
@@ -39,7 +40,7 @@ while (true)
         }
 
         Compilation compilation = new(syntaxTree);
-        EvaluationResult result = compilation.Evaluate();
+        EvaluationResult result = compilation.Evaluate(variables);
 
         Console.WriteLine();
         if (result.Diagnostics.Count > 0)

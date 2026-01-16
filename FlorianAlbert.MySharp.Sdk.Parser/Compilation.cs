@@ -12,9 +12,9 @@ public sealed class Compilation
 
     public SyntaxTree SyntaxTree { get; }
 
-    public EvaluationResult Evaluate()
+    public EvaluationResult Evaluate(Dictionary<string, object?> variables)
     {
-        Binder binder = new();
+        Binder binder = new(variables);
         BoundExpression boundExpression = binder.BindExpression(SyntaxTree.Root);
 
         DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. binder.Diagnostics];
@@ -23,7 +23,7 @@ public sealed class Compilation
             return new EvaluationResult(diagnostics, null);
         }
 
-        Evaluator evaluator = new(boundExpression);
+        Evaluator evaluator = new(boundExpression, variables);
         object? result = evaluator.Evaluate();
 
         return new EvaluationResult([], result);

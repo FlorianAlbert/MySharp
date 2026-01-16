@@ -59,4 +59,10 @@ public sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Unary operator '{text}' is not defined for type '{type}'.";
         Report(span, message);
     }
+
+    internal void ReportUndefinedName(TextSpan span, string name)
+    {
+        string message = $"Undefined name '{name}'.";
+        Report(span, message);
+    }
 }

@@ -5,17 +5,15 @@ internal sealed class Lexer
     private readonly string _text;
     private int _position;
 
-    private readonly DiagnosticBag _diagnosticBag;
-
     public Lexer(string text)
     {
         _text = text;
         _position = 0;
 
-        _diagnosticBag = [];
+        Diagnostics = [];
     }
 
-    public DiagnosticBag Diagnostics => _diagnosticBag;
+    public DiagnosticBag Diagnostics { get; }
 
     private char _Current => Peek(0);
 
@@ -48,7 +46,7 @@ internal sealed class Lexer
 
             if (!int.TryParse(tokenText, out int value))
             {
-                _diagnosticBag.ReportInvalidNumber(new TextSpan(start, length), tokenText, typeof(int));
+                Diagnostics.ReportInvalidNumber(new TextSpan(start, length), tokenText, typeof(int));
             }
 
             return new SyntaxToken(SyntaxKind.NumberToken, start, tokenText, value);
@@ -126,13 +124,13 @@ internal sealed class Lexer
                     _position += 2;
                     return new SyntaxToken(SyntaxKind.EqualsEqualsToken, start, "==", null);
                 }
-                break;
+                return new SyntaxToken(SyntaxKind.EqualsToken, _position++, "=", null);
             default:
                 break;
         }
 
         char badCharacter = _Current;
-        _diagnosticBag.ReportBadCharacter(_position, badCharacter);
+        Diagnostics.ReportBadCharacter(_position, badCharacter);
         return new SyntaxToken(SyntaxKind.BadCharacterToken, _position++, badCharacter.ToString(), null);
     }
 }
