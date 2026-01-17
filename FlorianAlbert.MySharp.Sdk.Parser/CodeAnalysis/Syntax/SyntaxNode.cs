@@ -1,4 +1,6 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 public abstract class SyntaxNode
 {

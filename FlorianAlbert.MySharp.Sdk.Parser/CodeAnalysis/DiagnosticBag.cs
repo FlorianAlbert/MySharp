@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Collections;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;

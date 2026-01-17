@@ -1,5 +1,4 @@
-﻿
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
 public sealed class TextSpan
 {

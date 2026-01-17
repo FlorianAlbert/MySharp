@@ -1,4 +1,6 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
 public sealed class Diagnostic
 {
