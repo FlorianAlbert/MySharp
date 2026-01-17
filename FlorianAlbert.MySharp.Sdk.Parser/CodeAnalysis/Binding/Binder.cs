@@ -51,8 +51,7 @@ internal sealed class Binder
 
     private BoundExpression BindNameExpression(NameExpressionSyntax expressionSyntax)
     {
-        string? name = expressionSyntax.IdentifierToken.Text;
-        ArgumentNullException.ThrowIfNull(name);
+        string name = expressionSyntax.IdentifierToken.Text;
 
         VariableSymbol? variableSymbol = _variables.Keys.FirstOrDefault(v => v.Name == name);
 

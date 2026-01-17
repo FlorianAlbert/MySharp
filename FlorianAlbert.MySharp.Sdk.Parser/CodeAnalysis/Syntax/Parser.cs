@@ -61,7 +61,7 @@ internal sealed class Parser
         }
 
         _diagnosticBag.ReportUnexpectedToken(token.Span, token.Kind, kind);
-        return new SyntaxToken(kind, token.Span.Start, null, null);
+        return new SyntaxToken(kind, token.Span.Start, string.Empty, null);
     }
 
     public SyntaxTree Parse()
