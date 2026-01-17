@@ -16,6 +16,6 @@ public sealed class Diagnostic
 
     public override string ToString()
     {
-        return $"({Span.Start}, {Span.End}): {Message}";
+        return Message;
     }
 }

@@ -1,16 +1,20 @@
-﻿using System.Collections.Immutable;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 internal sealed class Parser
 {
+    private readonly SourceText _sourceText;
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private int _position;
 
     private readonly DiagnosticBag _diagnosticBag;
 
-    public Parser(string text)
+    public Parser(SourceText text)
     {
+        _sourceText = text;
+
         _position = 0;
         _diagnosticBag = [];
 
@@ -66,7 +70,7 @@ internal sealed class Parser
 
         SyntaxToken endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
 
-        return new SyntaxTree([.. _diagnosticBag], expression, endOfFileToken);
+        return new SyntaxTree(_sourceText, [.. _diagnosticBag], expression, endOfFileToken);
     }
 
     private ExpressionSyntax ParseExpression() => ParseAssignmentExpression();

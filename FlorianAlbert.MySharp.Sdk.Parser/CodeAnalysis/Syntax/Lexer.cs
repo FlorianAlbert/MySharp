@@ -4,13 +4,13 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 internal sealed class Lexer
 {
-    private readonly string _text;
+    private readonly SourceText _text;
     private int _position;
     private int _start;
     private SyntaxKind _kind;
     private object? _value;
 
-    public Lexer(string text)
+    public Lexer(SourceText text)
     {
         _text = text;
         _position = 0;
@@ -210,7 +210,7 @@ internal sealed class Lexer
         if (tokenText is null)
         {
             int length = _position - _start;
-            tokenText = _text.Substring(_start, length);
+            tokenText = _text.ToString(_start, length);
         }
 
         return new SyntaxToken(_kind, _start, tokenText, _value);
@@ -234,7 +234,7 @@ internal sealed class Lexer
         }
 
         int length = _position - _start;
-        string tokenText = _text.Substring(_start, length);
+        string tokenText = _text.ToString(_start, length);
 
         if (!int.TryParse(tokenText, out int value))
         {
@@ -253,7 +253,7 @@ internal sealed class Lexer
         }
 
         int length = _position - _start;
-        string tokenText = _text.Substring(_start, length);
+        string tokenText = _text.ToString(_start, length);
 
         _kind = SyntaxFacts.GetKeywordKind(tokenText);
     }

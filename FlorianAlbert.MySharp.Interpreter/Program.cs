@@ -1,5 +1,6 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
 bool showParseTree = false;
 Dictionary<VariableSymbol, object?> variables = [];
@@ -47,7 +48,13 @@ while (true)
         {
             foreach (Diagnostic diagnostic in result.Diagnostics)
             {
+                int lineIndex = syntaxTree.SourceText.GetLineIndex(diagnostic.Span.Start);
+                int lineNumber = lineIndex + 1;
+                TextLine line = syntaxTree.SourceText.Lines[lineIndex];
+                int characterLineIndex = diagnostic.Span.Start - line.Start + 1;
+
                 Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write($"({lineNumber}, {characterLineIndex}): ");
                 Console.WriteLine(diagnostic);
                 Console.ResetColor();
 
