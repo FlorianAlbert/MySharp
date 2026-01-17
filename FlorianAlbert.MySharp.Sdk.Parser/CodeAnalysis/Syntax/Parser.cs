@@ -4,7 +4,7 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 internal sealed class Parser
 {
-    private readonly SyntaxToken[] _tokens;
+    private readonly ImmutableArray<SyntaxToken> _tokens;
     private int _position;
 
     private readonly DiagnosticBag _diagnosticBag;
