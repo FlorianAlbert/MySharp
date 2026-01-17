@@ -121,19 +121,13 @@ internal sealed class Parser
 
     private ExpressionSyntax ParseNextPrimaryExpression()
     {
-        switch (_Current.Kind)
+        return _Current.Kind switch
         {
-            case SyntaxKind.OpenParenthesisToken:
-                return ParseParenthesizedExpression();
-            case SyntaxKind.FalseKeyword:
-            case SyntaxKind.TrueKeyword:
-                return ParseBooleanLiteral();
-            case SyntaxKind.NumberToken:
-                return ParseNumberLiteral();
-            case SyntaxKind.IdentifierToken:
-            default:
-                return ParseNameExpression();
-        }
+            SyntaxKind.OpenParenthesisToken => ParseParenthesizedExpression(),
+            SyntaxKind.FalseKeyword or SyntaxKind.TrueKeyword => ParseBooleanLiteral(),
+            SyntaxKind.NumberToken => ParseNumberLiteral(),
+            _ => ParseNameExpression(),
+        };
     }
 
     private LiteralExpressionSyntax ParseNumberLiteral()
