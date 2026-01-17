@@ -30,8 +30,7 @@ internal sealed class Lexer
 
     public SyntaxToken Lex()
     {
-
-        int start = _position;
+        _start = _position;
 
         if (char.IsDigit(_Current))
         {
@@ -40,15 +39,15 @@ internal sealed class Lexer
                 _position++;
             }
 
-            int length = _position - start;
-            string tokenText = _text.Substring(start, length);
+            int length = _position - _start;
+            string tokenText = _text.Substring(_start, length);
 
             if (!int.TryParse(tokenText, out int value))
             {
-                Diagnostics.ReportInvalidNumber(new TextSpan(start, length), tokenText, typeof(int));
+                Diagnostics.ReportInvalidNumber(new TextSpan(_start, length), tokenText, typeof(int));
             }
 
-            return new SyntaxToken(SyntaxKind.NumberToken, start, tokenText, value);
+            return new SyntaxToken(SyntaxKind.NumberToken, _start, tokenText, value);
         }
 
         if (char.IsWhiteSpace(_Current))
@@ -58,10 +57,10 @@ internal sealed class Lexer
                 _position++;
             }
 
-            int length = _position - start;
-            string tokenText = _text.Substring(start, length);
+            int length = _position - _start;
+            string tokenText = _text.Substring(_start, length);
 
-            return new SyntaxToken(SyntaxKind.WhitespaceToken, start, tokenText, null);
+            return new SyntaxToken(SyntaxKind.WhitespaceToken, _start, tokenText, null);
         }
 
         if (char.IsLetter(_Current))
@@ -71,11 +70,11 @@ internal sealed class Lexer
                 _position++;
             }
 
-            int length = _position - start;
-            string tokenText = _text.Substring(start, length);
+            int length = _position - _start;
+            string tokenText = _text.Substring(_start, length);
             SyntaxKind kind = SyntaxFacts.GetKeywordKind(tokenText);
 
-            return new SyntaxToken(kind, start, tokenText, null);
+            return new SyntaxToken(kind, _start, tokenText, null);
         }
 
         switch (_Current)
@@ -100,21 +99,21 @@ internal sealed class Lexer
                 if (_Lookahead == '=')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.BangEqualsToken, start, "!=", null);
+                    return new SyntaxToken(SyntaxKind.BangEqualsToken, _start, "!=", null);
                 }
                 return new SyntaxToken(SyntaxKind.BangToken, _position++, "!", null);
             case '&':
                 if (_Lookahead == '&')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, start, "&&", null);
+                    return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, _start, "&&", null);
                 }
                 break;
             case '|':
                 if (_Lookahead == '|')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.PipePipeToken, start, "||", null);
+                    return new SyntaxToken(SyntaxKind.PipePipeToken, _start, "||", null);
                 }
                 break;
             case '^':
@@ -123,7 +122,7 @@ internal sealed class Lexer
                 if (_Lookahead == '=')
                 {
                     _position += 2;
-                    return new SyntaxToken(SyntaxKind.EqualsEqualsToken, start, "==", null);
+                    return new SyntaxToken(SyntaxKind.EqualsEqualsToken, _start, "==", null);
                 }
                 return new SyntaxToken(SyntaxKind.EqualsToken, _position++, "=", null);
             default:
