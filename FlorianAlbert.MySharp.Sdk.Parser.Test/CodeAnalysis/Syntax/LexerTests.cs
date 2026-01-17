@@ -56,29 +56,23 @@ public class LexerTests
 
     public static TheoryData<SyntaxKind, string> GetTokens()
     {
+
         TheoryData<SyntaxKind, string> data = new()
         {
-            { SyntaxKind.PlusToken, "+" },
-            { SyntaxKind.MinusToken, "-" },
-            { SyntaxKind.StarToken, "*" },
-            { SyntaxKind.SlashToken, "/" },
-            { SyntaxKind.PercentToken, "%" },
-            { SyntaxKind.BangToken, "!" },
-            { SyntaxKind.AmpersandAmpersandToken, "&&" },
-            { SyntaxKind.PipePipeToken, "||" },
-            { SyntaxKind.CaretToken, "^" },
-            { SyntaxKind.EqualsEqualsToken, "==" },
-            { SyntaxKind.BangEqualsToken, "!=" },
-            { SyntaxKind.OpenParenthesisToken, "(" },
-            { SyntaxKind.CloseParenthesisToken, ")" },
-            { SyntaxKind.EqualsToken, "=" },
-            { SyntaxKind.TrueKeyword, "true" },
-            { SyntaxKind.FalseKeyword, "false" },
             { SyntaxKind.NumberToken, "1" },
             { SyntaxKind.NumberToken, "123" },
             { SyntaxKind.IdentifierToken, "a" },
             { SyntaxKind.IdentifierToken, "abc" },
         };
+
+        IEnumerable<(SyntaxKind, string)> fixedTokens = Enum.GetValues<SyntaxKind>()
+            .Select(kind => (kind, text: SyntaxFacts.GetText(kind)))
+            .Where(t => t.text is not null)!;
+
+        foreach ((SyntaxKind tokenKind, string tokenText) in fixedTokens)
+        {
+            data.Add(tokenKind, tokenText);
+        }
 
         return data;
     }
