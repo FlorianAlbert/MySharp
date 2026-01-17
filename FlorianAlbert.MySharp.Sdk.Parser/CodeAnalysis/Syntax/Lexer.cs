@@ -1,6 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
-
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 internal sealed class Lexer
 {
