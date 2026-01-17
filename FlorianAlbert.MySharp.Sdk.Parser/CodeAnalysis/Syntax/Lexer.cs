@@ -4,6 +4,9 @@ internal sealed class Lexer
 {
     private readonly string _text;
     private int _position;
+    private int _start;
+    private SyntaxKind _kind;
+    private object? _value;
 
     public Lexer(string text)
     {
@@ -27,10 +30,6 @@ internal sealed class Lexer
 
     public SyntaxToken Lex()
     {
-        if (_position >= _text.Length)
-        {
-            return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
-        }
 
         int start = _position;
 
@@ -81,6 +80,8 @@ internal sealed class Lexer
 
         switch (_Current)
         {
+            case '\0':
+                return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
             case '+':
                 return new SyntaxToken(SyntaxKind.PlusToken, _position++, "+", null);
             case '-':
