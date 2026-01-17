@@ -1,6 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
-
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 public sealed class SyntaxToken : SyntaxNode
 {
@@ -18,7 +16,7 @@ public sealed class SyntaxToken : SyntaxNode
 
     public object? Value { get; }
 
-    public TextSpan Span { get; }
+    public override TextSpan Span { get; }
 
     public override IEnumerable<SyntaxNode> GetChildren() => [];
 }

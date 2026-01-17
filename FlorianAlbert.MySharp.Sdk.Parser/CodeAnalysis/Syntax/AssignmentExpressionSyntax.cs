@@ -11,6 +11,8 @@ public sealed class AssignmentExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.AssignmentExpression;
 
+    public override TextSpan Span => TextSpan.FromBounds(IdentifierToken.Span.Start, Expression.Span.End);
+
     public SyntaxToken IdentifierToken { get; }
 
     public SyntaxToken EqualsToken { get; }

@@ -15,6 +15,8 @@ public sealed class LiteralExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
 
+    public override TextSpan Span => LiteralToken.Span;
+
     public SyntaxToken LiteralToken { get; }
 
     public object? Value { get; }

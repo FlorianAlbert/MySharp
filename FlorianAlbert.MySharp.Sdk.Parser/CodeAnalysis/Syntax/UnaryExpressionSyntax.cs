@@ -10,6 +10,8 @@ public sealed class UnaryExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
 
+    public override TextSpan Span => TextSpan.FromBounds(OperatorToken.Span.Start, Operand.Span.End);
+
     public SyntaxToken OperatorToken { get; }
     
     public ExpressionSyntax Operand { get; }

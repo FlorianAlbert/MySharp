@@ -9,6 +9,8 @@ public sealed class NameExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.NameExpression;
 
+    override public TextSpan Span => IdentifierToken.Span;
+
     public SyntaxToken IdentifierToken { get; }
 
     public override IEnumerable<SyntaxNode> GetChildren()

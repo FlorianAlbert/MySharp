@@ -11,6 +11,8 @@ public sealed class BinaryExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.BinaryExpression;
 
+    public override TextSpan Span => TextSpan.FromBounds(LeftExpression.Span.Start, RightExpression.Span.End);
+
     public ExpressionSyntax LeftExpression { get; }
 
     public SyntaxToken OperatorToken { get; }

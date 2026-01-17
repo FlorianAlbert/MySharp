@@ -11,6 +11,8 @@ public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
 
+    public override TextSpan Span => TextSpan.FromBounds(OpenParenthesisToken.Span.Start, CloseParenthesisToken.Span.End);
+
     public SyntaxToken OpenParenthesisToken { get; }
 
     public ExpressionSyntax ExpressionSyntax { get; }
