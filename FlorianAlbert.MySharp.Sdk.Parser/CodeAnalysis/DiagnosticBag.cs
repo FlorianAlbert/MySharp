@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
-public sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
+internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
 {
     private readonly List<Diagnostic> _diagnostics = [];
 

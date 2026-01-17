@@ -1,14 +1,16 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+﻿using System.Collections.Immutable;
+
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
 public sealed class EvaluationResult
 {
-    internal EvaluationResult(IReadOnlyCollection<Diagnostic> diagnostics, object? value)
+    internal EvaluationResult(ImmutableArray<Diagnostic> diagnostics, object? value)
     {
         Diagnostics = diagnostics;
         Value = value;
     }
 
-    public IReadOnlyCollection<Diagnostic> Diagnostics { get; }
+    public ImmutableArray<Diagnostic> Diagnostics { get; }
 
     public object? Value { get; }
 }

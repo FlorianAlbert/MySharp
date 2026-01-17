@@ -1,4 +1,6 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using System.Collections.Immutable;
+
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 internal sealed class Parser
 {
@@ -64,7 +66,7 @@ internal sealed class Parser
 
         SyntaxToken endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
 
-        return new SyntaxTree(_diagnosticBag, expression, endOfFileToken);
+        return new SyntaxTree([.. _diagnosticBag], expression, endOfFileToken);
     }
 
     private ExpressionSyntax ParseExpression() => ParseAssignmentExpression();

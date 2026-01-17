@@ -43,7 +43,7 @@ while (true)
         EvaluationResult result = compilation.Evaluate(variables);
 
         Console.WriteLine();
-        if (result.Diagnostics.Count > 0)
+        if (result.Diagnostics.Length > 0)
         {
             foreach (Diagnostic diagnostic in result.Diagnostics)
             {

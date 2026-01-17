@@ -1,17 +1,18 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    public SyntaxTree(IReadOnlyCollection<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+    public SyntaxTree(ImmutableArray<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
     {
         Diagnostics = diagnostics;
         Root = root;
         EndOfFileToken = endOfFileToken;
     }
 
-    public IReadOnlyCollection<Diagnostic> Diagnostics { get; }
+    public ImmutableArray<Diagnostic> Diagnostics { get; }
     public ExpressionSyntax Root { get; }
     public SyntaxToken EndOfFileToken { get; }
 
