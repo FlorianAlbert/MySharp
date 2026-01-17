@@ -5,6 +5,19 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.Test.CodeAnalysis.Syntax;
 
 public class LexerTests
 {
+    [Fact]
+    public void Lexer_Tests_AllTokenKinds()
+    {
+        SyntaxKind[] tokenKinds = [.. Enum.GetValues<SyntaxKind>().Where(k => k.ToString().EndsWith("Token") || k.ToString().EndsWith("Keyword"))];
+        IEnumerable<SyntaxKind> testedTokenKinds = GetAllTokens().GetTuples().Select(t => t.Item1).Distinct();
+
+        HashSet<SyntaxKind> missingTokenKinds = [.. tokenKinds.Except(testedTokenKinds)];
+        missingTokenKinds.Remove(SyntaxKind.BadCharacterToken);
+        missingTokenKinds.Remove(SyntaxKind.EndOfFileToken);
+
+        Assert.Empty(missingTokenKinds);
+    }
+
     [Theory]
     [MemberData(nameof(GetAllTokens))]
     public void Lexer_LexesTokens_ReturnsCorrectSyntaxToken(SyntaxKind tokenKind, string tokenText)
