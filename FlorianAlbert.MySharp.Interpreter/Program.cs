@@ -36,7 +36,7 @@ while (true)
         if (showParseTree)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            PrettyPrint(syntaxTree.Root);
+            syntaxTree.Root.WriteTo(Console.Out);
         }
 
         Compilation compilation = new(syntaxTree);
@@ -74,37 +74,5 @@ while (true)
         Console.ResetColor();
 
         Console.WriteLine();
-    }
-}
-
-static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
-{
-    string indentToWrite = indent;
-    if (isLast)
-    {
-        indentToWrite += "└── ";
-        indent += "    ";
-    }
-    else
-    {
-        indentToWrite += "├── ";
-        indent += "│   ";
-    }
-
-    Console.Write(indentToWrite);
-    Console.Write(node.Kind);
-
-    if (node is SyntaxToken token && token.Value is not null)
-    {
-        Console.Write("    ");
-        Console.Write(token.Value);
-    }
-
-    Console.WriteLine();
-
-    SyntaxNode? lastChild = node.GetChildren().LastOrDefault();
-    foreach (SyntaxNode child in node.GetChildren())
-    {
-        PrettyPrint(child, indent, child == lastChild);
     }
 }
