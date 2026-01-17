@@ -26,7 +26,6 @@ internal sealed class Evaluator
             return boundLiteralExpression.Value;
         }
 
-
         if (expression is BoundVariableExpression boundVariableExpression)
         {
             return _variables[boundVariableExpression.VariableSymbol];
