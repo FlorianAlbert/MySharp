@@ -136,14 +136,14 @@ internal sealed class Parser
         }
     }
 
-    private ExpressionSyntax ParseNumberLiteral()
+    private LiteralExpressionSyntax ParseNumberLiteral()
     {
         SyntaxToken nextNumberToken = MatchToken(SyntaxKind.NumberToken);
 
         return new LiteralExpressionSyntax(nextNumberToken);
     }
 
-    private ExpressionSyntax ParseParenthesizedExpression()
+    private ParenthesizedExpressionSyntax ParseParenthesizedExpression()
     {
         SyntaxToken openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
         ExpressionSyntax expression = ParseExpression();
@@ -152,7 +152,7 @@ internal sealed class Parser
         return new ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken);
     }
 
-    private ExpressionSyntax ParseBooleanLiteral()
+    private LiteralExpressionSyntax ParseBooleanLiteral()
     {
         bool isTrue = _Current.Kind == SyntaxKind.TrueKeyword;
 
@@ -161,7 +161,7 @@ internal sealed class Parser
         return new LiteralExpressionSyntax(keywordToken, isTrue);
     }
 
-    private ExpressionSyntax ParseNameExpression()
+    private NameExpressionSyntax ParseNameExpression()
     {
         SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
         return new NameExpressionSyntax(identifierToken);
