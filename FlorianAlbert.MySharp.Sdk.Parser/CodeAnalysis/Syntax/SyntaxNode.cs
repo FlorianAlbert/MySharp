@@ -17,19 +17,33 @@ public abstract class SyntaxNode
 
     private static void PrettyPrint(TextWriter textWriter, SyntaxNode node, string indent = "", bool isLast = true)
     {
+        bool isConsole = textWriter == Console.Out;
+
         string indentToWrite = indent;
+        string marker;
         if (isLast)
         {
-            indentToWrite += "└── ";
-            indent += "    ";
+            marker = "└── ";
         }
         else
         {
-            indentToWrite += "├── ";
-            indent += "│   ";
+            marker = "├── ";
         }
 
-        textWriter.Write(indentToWrite);
+        textWriter.Write(indent);
+        
+        if (isConsole)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            textWriter.Write(marker);
+            Console.ResetColor();
+        }
+
+        if (isConsole)
+        {
+            Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Cyan : ConsoleColor.Yellow;
+        }
+
         textWriter.Write(node.Kind);
 
         if (node is SyntaxToken token && token.Value is not null)
@@ -38,7 +52,21 @@ public abstract class SyntaxNode
             textWriter.Write(token.Value);
         }
 
+        if (isConsole)
+        {
+            Console.ResetColor();
+        }
+
         textWriter.WriteLine();
+
+        if (isLast)
+        {
+            indent += "    ";
+        }
+        else
+        {
+            indent += "│   ";
+        }
 
         SyntaxNode? lastChild = node.GetChildren().LastOrDefault();
         foreach (SyntaxNode child in node.GetChildren())

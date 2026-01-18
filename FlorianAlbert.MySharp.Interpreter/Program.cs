@@ -56,9 +56,7 @@ while (true)
 
     if (showParseTree)
     {
-        Console.ForegroundColor = ConsoleColor.DarkGray;
         syntaxTree.Root.WriteTo(Console.Out);
-        Console.ResetColor();
     }
 
     if (result.Diagnostics.Length > 0)
