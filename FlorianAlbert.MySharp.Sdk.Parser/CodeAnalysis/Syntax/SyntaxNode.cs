@@ -31,13 +31,13 @@ public abstract class SyntaxNode
         }
 
         textWriter.Write(indent);
-        
+
         if (isConsole)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            textWriter.Write(marker);
-            Console.ResetColor();
         }
+        
+        textWriter.Write(marker);
 
         if (isConsole)
         {
