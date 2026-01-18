@@ -9,14 +9,16 @@ StringBuilder textBuilder = new();
 
 while (true)
 {
+    Console.ForegroundColor = ConsoleColor.Green;
     if (textBuilder.Length == 0)
     {
-        Console.Write("> ");
+        Console.Write("\u00BB ");
     }
     else
     {
-        Console.Write("| ");
+        Console.Write("\u00B7 ");
     }
+    Console.ResetColor();
 
     string? input = Console.ReadLine();
 
