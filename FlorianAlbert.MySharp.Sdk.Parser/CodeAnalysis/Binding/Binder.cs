@@ -54,6 +54,22 @@ internal sealed class Binder
         };
     }
 
+    private BoundStatement BindBlockStatement(BlockStatementSyntax statementSyntax)
+    {
+        ImmutableArray<BoundStatement>.Builder boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
+        _scope = new(_scope);
+
+        foreach (StatementSyntax statement in statementSyntax.Statements)
+        {
+            BoundStatement boundStatement = BindStatement(statement);
+            boundStatements.Add(boundStatement);
+        }
+
+        _scope = _scope.Parent!;
+
+        return new BoundBlockStatement(boundStatements.ToImmutable());
+    }
+
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
     {
         BoundExpression boundExpression = BindExpression(statementSyntax.Expression);
@@ -148,18 +164,5 @@ internal sealed class Binder
         object? value = expressionSyntax.Value ?? 0;
 
         return new BoundLiteralExpression(value);
-    }
-
-    private BoundStatement BindBlockStatement(BlockStatementSyntax statementSyntax)
-    {
-        ImmutableArray<BoundStatement>.Builder boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
-
-        foreach (var statement in statementSyntax.Statements)
-        {
-            BoundStatement boundStatement = BindStatement(statement);
-            boundStatements.Add(boundStatement);
-        }
-
-        return new BoundBlockStatement(boundStatements.ToImmutable());
     }
 }
