@@ -11,6 +11,8 @@ internal sealed class Parser
 
     private readonly DiagnosticBag _diagnosticBag;
 
+    public ImmutableArray<Diagnostic> Diagnostics => [.. _diagnosticBag];
+
     public Parser(SourceText text)
     {
         _sourceText = text;
@@ -64,13 +66,13 @@ internal sealed class Parser
         return new SyntaxToken(kind, token.Span.Start, string.Empty, null);
     }
 
-    public SyntaxTree Parse()
+    public CompilationUnitSyntax ParseCompilationUnit()
     {
         ExpressionSyntax expression = ParseExpression();
 
         SyntaxToken endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
 
-        return new SyntaxTree(_sourceText, [.. _diagnosticBag], expression, endOfFileToken);
+        return new CompilationUnitSyntax(expression, endOfFileToken);
     }
 
     private ExpressionSyntax ParseExpression() => ParseAssignmentExpression();

@@ -1,6 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
-using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
@@ -16,7 +15,7 @@ public sealed class Compilation
     public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)
     {
         Binder binder = new(variables);
-        BoundExpression boundExpression = binder.BindExpression(SyntaxTree.Root);
+        BoundExpression boundExpression = binder.BindExpression(SyntaxTree.Root.Expression);
 
         DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. binder.Diagnostics];
         if (diagnostics.Count > 0)

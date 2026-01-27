@@ -1,26 +1,24 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    public SyntaxTree(SourceText sourceText, ImmutableArray<Diagnostic> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+    private SyntaxTree(SourceText sourceText)
     {
         SourceText = sourceText;
-        Diagnostics = diagnostics;
-        Root = root;
-        EndOfFileToken = endOfFileToken;
+
+        var parser = new Parser(sourceText);
+        Root = parser.ParseCompilationUnit();
+        Diagnostics = parser.Diagnostics;
     }
 
     public SourceText SourceText { get; }
 
     public ImmutableArray<Diagnostic> Diagnostics { get; }
 
-    public ExpressionSyntax Root { get; }
-
-    public SyntaxToken EndOfFileToken { get; }
+    public CompilationUnitSyntax Root { get; }
 
     public static SyntaxTree Parse(string text)
     {
@@ -31,9 +29,7 @@ public sealed class SyntaxTree
 
     public static SyntaxTree Parse(SourceText text)
     {
-        var parser = new Parser(text);
-
-        return parser.Parse();
+        return new SyntaxTree(text);
     }
 
     public static IEnumerable<SyntaxToken> ParseTokens(string text)

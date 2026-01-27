@@ -16,7 +16,7 @@ public class ParserTests
 
         string text = $"a {firstOperatorText} b {secondOperatorText} c";
 
-        ExpressionSyntax expression = SyntaxTree.Parse(text).Root;
+        ExpressionSyntax expression = SyntaxTree.Parse(text).Root.Expression;
 
         if (firstOperatorPrecedence >= secondOperatorPrecedence)
         {
@@ -74,7 +74,7 @@ public class ParserTests
 
         string text = $"{unaryOperatorText}a {binaryOperatorText} b";
 
-        ExpressionSyntax expression = SyntaxTree.Parse(text).Root;
+        ExpressionSyntax expression = SyntaxTree.Parse(text).Root.Expression;
 
         if (unaryOperatorPrecedence >= binaryOperatorPrecedence)
         {
