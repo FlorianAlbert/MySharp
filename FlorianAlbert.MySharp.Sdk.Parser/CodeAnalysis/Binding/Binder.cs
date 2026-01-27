@@ -70,7 +70,6 @@ internal sealed class Binder
 
         if (!_scope.TryLookup(name, out VariableSymbol? existingVariableSymbol))
         {
-
             existingVariableSymbol = new(name, type);
             _scope.TryDeclare(existingVariableSymbol);
         }
