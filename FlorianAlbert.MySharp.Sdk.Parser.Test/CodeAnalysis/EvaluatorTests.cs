@@ -44,7 +44,7 @@ public class EvaluatorTests
     [InlineData("false != false;", false)]
     [InlineData("true != false;", true)]
     [InlineData("false != true;", true)]
-    [InlineData("(a = 4) * a / 2;", 8)]
+    [InlineData("{ var a = 10; (a = 4) * a / 2; }", 8)]
     public void Evaluator_EvaluatesExpression_Correctly(string expression, object expectedResult)
     {
         var syntaxTree = SyntaxTree.Parse(expression);
