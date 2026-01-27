@@ -72,4 +72,10 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Undefined name '{name}'.";
         Report(span, message);
     }
+
+    internal void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
+    {
+        string message = $"Cannot convert type '{fromType}' to '{toType}'.";
+        Report(span, message);
+    }
 }

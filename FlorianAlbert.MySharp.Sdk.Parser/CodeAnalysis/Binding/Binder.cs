@@ -58,7 +58,7 @@ internal sealed class Binder
         };
     }
 
-    private BoundAssignmentExpression BindAssignmentExpression(AssignmentExpressionSyntax expressionSyntax)
+    private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax expressionSyntax)
     {
         BoundExpression boundExpression = BindExpression(expressionSyntax.Expression);
 
@@ -68,14 +68,20 @@ internal sealed class Binder
         Type? type = boundExpression.Type;
         ArgumentNullException.ThrowIfNull(type);
 
-        VariableSymbol variableSymbol = new(name, type);
-
-        if (!_scope.TryDeclare(variableSymbol))
+        if (!_scope.TryLookup(name, out VariableSymbol? existingVariableSymbol))
         {
-            Diagnostics.ReportVariableAlreadyDeclared(expressionSyntax.IdentifierToken.Span, name);
+
+            existingVariableSymbol = new(name, type);
+            _scope.TryDeclare(existingVariableSymbol);
         }
 
-        return new BoundAssignmentExpression(variableSymbol, boundExpression);
+        if (existingVariableSymbol.Type != type)
+        {
+            Diagnostics.ReportCannotConvert(expressionSyntax.EqualsToken.Span, type, existingVariableSymbol.Type);
+            return boundExpression;
+        }
+
+        return new BoundAssignmentExpression(existingVariableSymbol, boundExpression);
     }
 
     private BoundExpression BindNameExpression(NameExpressionSyntax expressionSyntax)
