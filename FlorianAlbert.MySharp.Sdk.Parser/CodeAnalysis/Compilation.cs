@@ -46,7 +46,7 @@ public sealed class Compilation
             return new EvaluationResult([.. diagnostics], null);
         }
 
-        Evaluator evaluator = new(GlobalScope.Expression, variables);
+        Evaluator evaluator = new(GlobalScope.Statement, variables);
         object? result = evaluator.Evaluate();
 
         return new EvaluationResult([], result);

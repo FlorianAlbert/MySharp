@@ -2,6 +2,11 @@
 
 internal enum BoundNodeKind
 {
+    // Statements
+    ExpressionStatement,
+    BlockStatement,
+
+    // Expressions
     UnaryExpression,
     LiteralExpression,
     BinaryExpression,

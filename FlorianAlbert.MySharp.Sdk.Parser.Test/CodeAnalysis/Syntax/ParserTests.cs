@@ -16,7 +16,7 @@ public class ParserTests
 
         string text = $"a {firstOperatorText} b {secondOperatorText} c";
 
-        ExpressionSyntax expression = SyntaxTree.Parse(text).Root.Expression;
+        ExpressionSyntax expression = ParseExpression(text);
 
         if (firstOperatorPrecedence >= secondOperatorPrecedence)
         {
@@ -74,7 +74,7 @@ public class ParserTests
 
         string text = $"{unaryOperatorText}a {binaryOperatorText} b";
 
-        ExpressionSyntax expression = SyntaxTree.Parse(text).Root.Expression;
+        ExpressionSyntax expression = ParseExpression(text);
 
         if (unaryOperatorPrecedence >= binaryOperatorPrecedence)
         {
@@ -114,6 +114,14 @@ public class ParserTests
             enumerator.AssertNode(SyntaxKind.NameExpression);
             enumerator.AssertToken(SyntaxKind.IdentifierToken, "b");
         }
+    }
+
+    private static ExpressionSyntax ParseExpression(string text)
+    {
+        SyntaxTree syntaxTree = SyntaxTree.Parse(text);
+        CompilationUnitSyntax root = syntaxTree.Root;
+        StatementSyntax statement = root.Statement;
+        return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
     }
 
     public static TheoryData<SyntaxKind, SyntaxKind> GetBinaryOperatorPairs()

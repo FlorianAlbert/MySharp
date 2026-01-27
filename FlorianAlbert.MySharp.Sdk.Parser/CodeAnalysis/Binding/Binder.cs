@@ -18,12 +18,12 @@ internal sealed class Binder
     {
         BoundScope? parentScope = CreateParentScope(previous);
         Binder binder = new(parentScope);
-        BoundExpression boundExpression = binder.BindExpression(compilationUnitSyntax.Expression);
+        BoundStatement boundStatement = binder.BindStatement(compilationUnitSyntax.Statement);
 
         ImmutableArray<VariableSymbol> variables = binder._scope.GetDeclaredVariables();
         ImmutableArray<Diagnostic> diagnostics = [.. binder.Diagnostics];
 
-        return new BoundGlobalScope(previous, diagnostics, variables, boundExpression);
+        return new BoundGlobalScope(previous, diagnostics, variables, boundStatement);
     }
 
     private static BoundScope? CreateParentScope(BoundGlobalScope? previousGlobalScope)
@@ -44,7 +44,23 @@ internal sealed class Binder
         return scope;
     }
 
-    public BoundExpression BindExpression(ExpressionSyntax expressionSyntax)
+    private BoundStatement BindStatement(StatementSyntax statementSyntax)
+    {
+        return statementSyntax.Kind switch
+        {
+            SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
+            SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax) statementSyntax),
+            _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
+        };
+    }
+
+    private BoundStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
+    {
+        BoundExpression boundExpression = BindExpression(statementSyntax.Expression);
+        return new BoundExpressionStatement(boundExpression);
+    }
+
+    private BoundExpression BindExpression(ExpressionSyntax expressionSyntax)
     {
         return expressionSyntax.Kind switch
         {
@@ -132,5 +148,18 @@ internal sealed class Binder
         object? value = expressionSyntax.Value ?? 0;
 
         return new BoundLiteralExpression(value);
+    }
+
+    private BoundStatement BindBlockStatement(BlockStatementSyntax statementSyntax)
+    {
+        ImmutableArray<BoundStatement>.Builder boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
+
+        foreach (var statement in statementSyntax.Statements)
+        {
+            BoundStatement boundStatement = BindStatement(statement);
+            boundStatements.Add(boundStatement);
+        }
+
+        return new BoundBlockStatement(boundStatements.ToImmutable());
     }
 }

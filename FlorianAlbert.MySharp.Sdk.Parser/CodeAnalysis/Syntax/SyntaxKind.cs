@@ -20,8 +20,11 @@ public enum SyntaxKind
     BangEqualsToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+    OpenBraceToken,
+    CloseBraceToken,
     IdentifierToken,
     EqualsToken,
+    SemicolonToken,
 
     // Keywords
     FalseKeyword,
@@ -29,6 +32,10 @@ public enum SyntaxKind
 
     // Nodes
     CompilationUnit,
+
+    // Statements
+    ExpressionStatement,
+    BlockStatement,
 
     // Expressions
     LiteralExpression,

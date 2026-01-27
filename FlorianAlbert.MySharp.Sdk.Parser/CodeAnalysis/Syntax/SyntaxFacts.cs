@@ -69,9 +69,12 @@ public static class SyntaxFacts
         SyntaxKind.BangEqualsToken => "!=",
         SyntaxKind.OpenParenthesisToken => "(",
         SyntaxKind.CloseParenthesisToken => ")",
+        SyntaxKind.OpenBraceToken => "{",
+        SyntaxKind.CloseBraceToken => "}",
         SyntaxKind.EqualsToken => "=",
         SyntaxKind.TrueKeyword => "true",
         SyntaxKind.FalseKeyword => "false",
+        SyntaxKind.SemicolonToken => ";",
         _ => null
     };
 }

@@ -69,6 +69,14 @@ internal sealed class Lexer
                 _kind = SyntaxKind.CloseParenthesisToken;
                 _position++;
                 break;
+            case '{':
+                _kind = SyntaxKind.OpenBraceToken;
+                _position++;
+                break;
+            case '}':
+                _kind = SyntaxKind.CloseBraceToken;
+                _position++;
+                break;
             case '!':
                 _position++;
                 if (_Current != '=')
@@ -114,6 +122,10 @@ internal sealed class Lexer
                     _kind = SyntaxKind.EqualsEqualsToken;
                     _position++;
                 }
+                break;
+            case ';':
+                _kind = SyntaxKind.SemicolonToken;
+                _position++;
                 break;
             case '0':
             case '1':

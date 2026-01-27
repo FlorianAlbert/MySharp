@@ -4,10 +4,12 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
 internal sealed class Evaluator
 {
-    private readonly BoundExpression _root;
+    private readonly BoundStatement _root;
     private readonly Dictionary<VariableSymbol, object?> _variables;
 
-    public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object?> variables)
+    private object? _lastValue;
+
+    public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object?> variables)
     {
         _root = root;
         _variables = variables;
@@ -15,7 +17,36 @@ internal sealed class Evaluator
 
     public object? Evaluate()
     {
-        return EvaluateExpression(_root);
+        EvaluateStatement(_root);
+        return _lastValue;
+    }
+
+    private void EvaluateStatement(BoundStatement statement)
+    {
+        switch (statement.Kind)
+        {
+            case BoundNodeKind.ExpressionStatement:
+                EvaluateExpressionStatement((BoundExpressionStatement) statement);
+                break;
+            case BoundNodeKind.BlockStatement:
+                EvaluateBlockStatement((BoundBlockStatement) statement);
+                break;
+            default:
+                throw new Exception($"Unexpected node {statement.Kind}");
+        }
+    }
+
+    private void EvaluateExpressionStatement(BoundExpressionStatement expressionStatement)
+    {
+        _lastValue = EvaluateExpression(expressionStatement.Expression);
+    }
+
+    private void EvaluateBlockStatement(BoundBlockStatement blockStatement)
+    {
+        foreach (BoundStatement s in blockStatement.Statements)
+        {
+            EvaluateStatement(s);
+        }
     }
 
     private object? EvaluateExpression(BoundExpression expression)
