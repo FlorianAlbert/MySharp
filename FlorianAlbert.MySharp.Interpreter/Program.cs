@@ -35,9 +35,16 @@ while (true)
             Console.WriteLine(showParseTree ? "Showing parse trees" : "Not showing parse trees");
             continue;
         }
-        else if (input == "#cls")
+        else if (input.Equals("#cls", StringComparison.OrdinalIgnoreCase))
         {
             Console.Clear();
+            continue;
+        }
+        else if (input.Equals("#reset", StringComparison.OrdinalIgnoreCase))
+        {
+            previousCompilation = null;
+            variables.Clear();
+            Console.WriteLine("Resetting compilation.");
             continue;
         }
     }
