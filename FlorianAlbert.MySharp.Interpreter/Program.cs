@@ -6,6 +6,7 @@ using System.Text;
 bool showParseTree = false;
 Dictionary<VariableSymbol, object?> variables = [];
 StringBuilder textBuilder = new();
+Compilation? previousCompilation = null;
 
 while (true)
 {
@@ -51,7 +52,9 @@ while (true)
         continue;
     }
 
-    Compilation compilation = new(syntaxTree);
+    Compilation compilation = previousCompilation is null? 
+        new(syntaxTree) : 
+        previousCompilation.ContinueWith(syntaxTree);
     EvaluationResult result = compilation.Evaluate(variables);
 
     if (showParseTree)
@@ -94,11 +97,11 @@ while (true)
     else
     {
         Console.ForegroundColor = ConsoleColor.Magenta;
-
         Console.WriteLine(result.Value);
+        Console.ResetColor();
+
+        previousCompilation = compilation;
     }
 
     textBuilder.Clear();
-
-    Console.ResetColor();
 }

@@ -61,6 +61,12 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         Report(span, message);
     }
 
+    internal void ReportVariableAlreadyDeclared(TextSpan span, string name)
+    {
+        string message = $"Variable '{name}' is already declared.";
+        Report(span, message);
+    }
+
     internal void ReportUndefinedName(TextSpan span, string name)
     {
         string message = $"Undefined name '{name}'.";
