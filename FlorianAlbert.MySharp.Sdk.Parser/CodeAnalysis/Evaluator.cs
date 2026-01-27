@@ -31,6 +31,9 @@ internal sealed class Evaluator
             case BoundNodeKind.BlockStatement:
                 EvaluateBlockStatement((BoundBlockStatement) statement);
                 break;
+            case BoundNodeKind.VariableDeclarationStatement:
+                EvaluateVariableDeclarationStatement((BoundVariableDeclarationStatement) statement);
+                break;
             default:
                 throw new Exception($"Unexpected node {statement.Kind}");
         }
@@ -47,6 +50,13 @@ internal sealed class Evaluator
         {
             EvaluateStatement(s);
         }
+    }
+
+    private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement variableDeclarationStatement)
+    {
+        object? value = EvaluateExpression(variableDeclarationStatement.ValueExpression);
+        _variables[variableDeclarationStatement.Variable] = value;
+        _lastValue = value;
     }
 
     private object? EvaluateExpression(BoundExpression expression)

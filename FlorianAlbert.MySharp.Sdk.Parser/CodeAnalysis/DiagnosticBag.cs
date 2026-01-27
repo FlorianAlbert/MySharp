@@ -78,4 +78,10 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Cannot convert type '{fromType}' to '{toType}'.";
         Report(span, message);
     }
+
+    internal void ReportCannotAssignToReadOnlyVariable(TextSpan span, string name)
+    {
+        string message = $"Cannot assign to read-only variable '{name}'.";
+        Report(span, message);
+    }
 }

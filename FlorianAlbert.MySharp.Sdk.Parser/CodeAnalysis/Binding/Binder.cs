@@ -50,6 +50,7 @@ internal sealed class Binder
         {
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax) statementSyntax),
+            SyntaxKind.VariableDeclarationStatement => BindVariableDeclarationStatement((VariableDeclarationStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
     }
@@ -68,6 +69,25 @@ internal sealed class Binder
         _scope = _scope.Parent!;
 
         return new BoundBlockStatement(boundStatements.ToImmutable());
+    }
+
+    private BoundStatement BindVariableDeclarationStatement(VariableDeclarationStatementSyntax statementSyntax)
+    {
+        string name = statementSyntax.IdentifierToken.Text;
+        bool isReadOnly = statementSyntax.KeywordToken.Kind == SyntaxKind.LetKeyword;
+
+        BoundExpression boundValueExpression = BindExpression(statementSyntax.ValueExpression);
+
+        Type? type = boundValueExpression.Type;
+        ArgumentNullException.ThrowIfNull(type);
+
+        VariableSymbol variableSymbol = new(name, isReadOnly, type);
+        if (!_scope.TryDeclare(variableSymbol))
+        {
+            Diagnostics.ReportVariableAlreadyDeclared(statementSyntax.IdentifierToken.Span, name);
+        }
+
+        return new BoundVariableDeclarationStatement(variableSymbol, boundValueExpression);
     }
 
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
@@ -102,8 +122,14 @@ internal sealed class Binder
 
         if (!_scope.TryLookup(name, out VariableSymbol? existingVariableSymbol))
         {
-            existingVariableSymbol = new(name, type);
-            _scope.TryDeclare(existingVariableSymbol);
+            Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
+            return boundExpression;
+        }
+
+        if (existingVariableSymbol.IsReadOnly)
+        {
+            Diagnostics.ReportCannotAssignToReadOnlyVariable(expressionSyntax.Span, name);
+            return boundExpression;
         }
 
         if (existingVariableSymbol.Type != type)

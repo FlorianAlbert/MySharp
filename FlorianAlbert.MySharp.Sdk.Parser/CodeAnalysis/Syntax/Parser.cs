@@ -81,16 +81,12 @@ internal sealed class Parser
         {
             return ParseBlockStatement();
         }
-            
+        else if (_Current.Kind is SyntaxKind.LetKeyword or SyntaxKind.VarKeyword)
+        {
+            return ParseVariableDeclarationStatement();
+        }
+        
         return ParseExpressionStatement();
-    }
-
-    private StatementSyntax ParseExpressionStatement()
-    {
-        ExpressionSyntax expression = ParseExpression();
-        SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
-
-        return new ExpressionStatementSyntax(expression, semicolonToken);
     }
 
     private StatementSyntax ParseBlockStatement()
@@ -108,6 +104,30 @@ internal sealed class Parser
         return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
     }
 
+    private StatementSyntax ParseVariableDeclarationStatement()
+    {
+        SyntaxKind expectedKeywordKind = _Current.Kind is SyntaxKind.VarKeyword ? SyntaxKind.VarKeyword : SyntaxKind.LetKeyword;
+        SyntaxToken keywordToken = MatchToken(expectedKeywordKind);
+        SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
+        ExpressionSyntax valueExpression = ParseExpression();
+        SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
+        return new VariableDeclarationStatementSyntax(
+            keywordToken,
+            identifierToken,
+            equalsToken,
+            valueExpression,
+            semicolonToken);
+    }
+
+    private StatementSyntax ParseExpressionStatement()
+    {
+        ExpressionSyntax expression = ParseExpression();
+        SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
+
+        return new ExpressionStatementSyntax(expression, semicolonToken);
+    }
+
     private ExpressionSyntax ParseExpression() => ParseAssignmentExpression();
 
     private ExpressionSyntax ParseAssignmentExpression()
@@ -115,7 +135,7 @@ internal sealed class Parser
         if (_Current.Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.EqualsToken)
         {
             SyntaxToken identifierToken = NextToken();
-            SyntaxToken equalsToken = NextToken();
+            SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
             ExpressionSyntax right = ParseAssignmentExpression();
             return new AssignmentExpressionSyntax(identifierToken, equalsToken, right);
         }
