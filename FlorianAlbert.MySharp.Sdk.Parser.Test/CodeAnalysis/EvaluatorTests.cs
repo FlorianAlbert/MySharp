@@ -151,6 +151,18 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Fact]
+    public void Evaluator_BinaryOperator_Reports_Undefined()
+    {
+        string text = @"10 [+] true;";
+
+        string expectedDiagnosticTexts = @"
+            Binary operator '+' is not defined for types 'System.Int32' and 'System.Boolean'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
     {
         AnnotatedText annotatedText = AnnotatedText.Parse(text);
