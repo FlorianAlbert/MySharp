@@ -49,15 +49,7 @@ public class EvaluatorTests
     [InlineData("{ var a = 10; (a = 4) * a / 2; }", 8)]
     public void Evaluator_EvaluatesExpression_Correctly(string expression, object expectedResult)
     {
-        var syntaxTree = SyntaxTree.Parse(expression);
-        Compilation compilation = new(syntaxTree);
-
-        Dictionary<VariableSymbol, object?> variables = [];
-
-        EvaluationResult result = compilation.Evaluate(variables);
-
-        Assert.Empty(result.Diagnostics);
-        Assert.Equal(expectedResult, result.Value);
+        AssertValue(expression, expectedResult);
     }
 
     [Fact]
@@ -161,6 +153,19 @@ public class EvaluatorTests
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    private static void AssertValue(string expression, object expectedResult)
+    {
+        var syntaxTree = SyntaxTree.Parse(expression);
+        Compilation compilation = new(syntaxTree);
+
+        Dictionary<VariableSymbol, object?> variables = [];
+
+        EvaluationResult result = compilation.Evaluate(variables);
+
+        Assert.Empty(result.Diagnostics);
+        Assert.Equal(expectedResult, result.Value);
     }
 
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
