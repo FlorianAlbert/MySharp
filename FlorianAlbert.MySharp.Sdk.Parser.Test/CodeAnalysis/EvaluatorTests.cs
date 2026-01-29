@@ -110,6 +110,23 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Fact]
+    public void Evaluator_Assignment_Reports_CannotConvert()
+    {
+        string text = @"
+            {
+                var y = 100;
+                y [=] true;
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
     {
         AnnotatedText annotatedText = AnnotatedText.Parse(text);
