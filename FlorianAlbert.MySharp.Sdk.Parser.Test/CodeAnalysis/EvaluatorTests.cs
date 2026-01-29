@@ -139,6 +139,18 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Fact]
+    public void Evaluator_UnaryOperator_Reports_Undefined()
+    {
+        string text = @"[+]true;";
+
+        string expectedDiagnosticTexts = @"
+            Unary operator '+' is not defined for type 'System.Boolean'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
     {
         AnnotatedText annotatedText = AnnotatedText.Parse(text);
