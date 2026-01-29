@@ -30,12 +30,12 @@ public abstract class SyntaxNode
             marker = "├── ";
         }
 
-        textWriter.Write(indent);
-
         if (isConsole)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
         }
+
+        textWriter.Write(indent);
         
         textWriter.Write(marker);
 
