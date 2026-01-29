@@ -34,4 +34,9 @@ public sealed class TextSpan : IEquatable<TextSpan>
     {
         return Equals(obj as TextSpan);
     }
+
+    public override string ToString()
+    {
+        return $"[{Start}..{End})";
+    }
 }
