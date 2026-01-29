@@ -93,6 +93,23 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Fact]
+    public void Evaluator_Assignment_Reports_Readonly()
+    {
+        string text = @"
+            {
+                let y = 100;
+                [y = 5];
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Cannot assign to read-only variable 'y'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
     {
         AnnotatedText annotatedText = AnnotatedText.Parse(text);
