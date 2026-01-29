@@ -94,6 +94,18 @@ public class EvaluatorTests
     }
 
     [Fact]
+    public void Evaluator_Assignment_Reports_Undefined()
+    {
+        string text = @"[x] = 10;";
+
+        string expectedDiagnosticTexts = @"
+            Undefined name 'x'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
     public void Evaluator_Assignment_Reports_Readonly()
     {
         string text = @"
