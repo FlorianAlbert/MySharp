@@ -1,6 +1,8 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class IfStatementSyntax : StatementSyntax
 {

@@ -1,6 +1,7 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class ElseClauseSyntax : SyntaxNode
 {

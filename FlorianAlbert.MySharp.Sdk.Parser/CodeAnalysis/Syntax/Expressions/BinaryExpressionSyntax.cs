@@ -1,6 +1,6 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 
 public sealed class BinaryExpressionSyntax : ExpressionSyntax
 {
