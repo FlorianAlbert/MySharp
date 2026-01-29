@@ -59,6 +59,10 @@ public class EvaluatorTests
     [InlineData("10 >= 5;", true)]
     [InlineData("10 >= 10;", true)]
     [InlineData("{ var a = 10; (a = 4) * a / 2; }", 8)]
+    [InlineData("{ var a = 0; if (a == 0) a = 10; }", 10)]
+    [InlineData("{ var a = 0; if (a == 5) a = 10; }", 0)]
+    [InlineData("{ var a = 0; if (a == 0) a = 10; else a = -4; }", 10)]
+    [InlineData("{ var a = 0; if (a == 5) a = 10; else a = -4; }", -4)]
     public void Evaluator_EvaluatesExpression_Correctly(string expression, object expectedResult)
     {
         AssertValue(expression, expectedResult);

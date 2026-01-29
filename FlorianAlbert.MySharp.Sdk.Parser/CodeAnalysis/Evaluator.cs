@@ -34,14 +34,12 @@ internal sealed class Evaluator
             case BoundNodeKind.VariableDeclarationStatement:
                 EvaluateVariableDeclarationStatement((BoundVariableDeclarationStatement) statement);
                 break;
+            case BoundNodeKind.IfStatement:
+                EvaluateIfStatement((BoundIfStatement) statement);
+                break;
             default:
                 throw new Exception($"Unexpected node {statement.Kind}");
         }
-    }
-
-    private void EvaluateExpressionStatement(BoundExpressionStatement expressionStatement)
-    {
-        _lastValue = EvaluateExpression(expressionStatement.Expression);
     }
 
     private void EvaluateBlockStatement(BoundBlockStatement blockStatement)
@@ -57,6 +55,24 @@ internal sealed class Evaluator
         object? value = EvaluateExpression(variableDeclarationStatement.ValueExpression);
         _variables[variableDeclarationStatement.Variable] = value;
         _lastValue = value;
+    }
+
+    private void EvaluateIfStatement(BoundIfStatement statement)
+    {
+        bool conditionValue = (bool) EvaluateExpression(statement.Condition)!;
+        if (conditionValue)
+        {
+            EvaluateStatement(statement.ThenStatement);
+        }
+        else if (statement.ElseStatement is not null)
+        {
+            EvaluateStatement(statement.ElseStatement);
+        }
+    }
+
+    private void EvaluateExpressionStatement(BoundExpressionStatement expressionStatement)
+    {
+        _lastValue = EvaluateExpression(expressionStatement.Expression);
     }
 
     private object? EvaluateExpression(BoundExpression expression)

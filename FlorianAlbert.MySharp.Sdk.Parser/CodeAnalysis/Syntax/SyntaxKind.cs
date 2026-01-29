@@ -35,14 +35,18 @@ public enum SyntaxKind
     TrueKeyword,
     LetKeyword,
     VarKeyword,
+    IfKeyword,
+    ElseKeyword,
 
     // Nodes
     CompilationUnit,
+    ElseClause,
 
     // Statements
     ExpressionStatement,
     BlockStatement,
     VariableDeclarationStatement,
+    IfStatement,
 
     // Expressions
     LiteralExpression,

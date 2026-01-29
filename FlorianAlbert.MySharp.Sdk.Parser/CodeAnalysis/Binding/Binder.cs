@@ -48,9 +48,10 @@ internal sealed class Binder
     {
         return statementSyntax.Kind switch
         {
-            SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax) statementSyntax),
             SyntaxKind.VariableDeclarationStatement => BindVariableDeclarationStatement((VariableDeclarationStatementSyntax) statementSyntax),
+            SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax) statementSyntax),
+            SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
     }
@@ -90,10 +91,36 @@ internal sealed class Binder
         return new BoundVariableDeclarationStatement(variableSymbol, boundValueExpression);
     }
 
+    private BoundStatement BindIfStatement(IfStatementSyntax statementSyntax)
+    {
+        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, typeof(bool));
+
+        BoundStatement boundThenStatement = BindStatement(statementSyntax.ThenStatement);
+
+        BoundStatement? boundElseStatement = statementSyntax.ElseClause is null ? null : BindStatement(statementSyntax.ElseClause.ElseStatement);
+
+        return new BoundIfStatement(boundConditionExpression, boundThenStatement, boundElseStatement);
+    }
+
     private BoundStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
     {
         BoundExpression boundExpression = BindExpression(statementSyntax.Expression);
         return new BoundExpressionStatement(boundExpression);
+    }
+
+    private BoundExpression BindExpression(ExpressionSyntax expression, Type expectedType)
+    {
+        BoundExpression boundExpression = BindExpression(expression);
+
+        Type? type = boundExpression.Type;
+        ArgumentNullException.ThrowIfNull(type);
+
+        if (type != expectedType)
+        {
+            Diagnostics.ReportCannotConvert(expression.Span, type, expectedType);
+        }
+
+        return boundExpression;
     }
 
     private BoundExpression BindExpression(ExpressionSyntax expressionSyntax)
@@ -114,8 +141,7 @@ internal sealed class Binder
     {
         BoundExpression boundExpression = BindExpression(expressionSyntax.Expression);
 
-        string? name = expressionSyntax.IdentifierToken.Text;
-        ArgumentNullException.ThrowIfNull(name);
+        string name = expressionSyntax.IdentifierToken.Text;
 
         Type? type = boundExpression.Type;
         ArgumentNullException.ThrowIfNull(type);

@@ -77,16 +77,13 @@ internal sealed class Parser
 
     private StatementSyntax ParseStatement()
     {
-        if (_Current.Kind == SyntaxKind.OpenBraceToken)
+        return _Current.Kind switch
         {
-            return ParseBlockStatement();
-        }
-        else if (_Current.Kind is SyntaxKind.LetKeyword or SyntaxKind.VarKeyword)
-        {
-            return ParseVariableDeclarationStatement();
-        }
-        
-        return ParseExpressionStatement();
+            SyntaxKind.OpenBraceToken => ParseBlockStatement(),
+            SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclarationStatement(),
+            SyntaxKind.IfKeyword => ParseIfStatement(),
+            _ => ParseExpressionStatement(),
+        };
     }
 
     private StatementSyntax ParseBlockStatement()
@@ -118,6 +115,38 @@ internal sealed class Parser
             equalsToken,
             valueExpression,
             semicolonToken);
+    }
+
+    private IfStatementSyntax ParseIfStatement()
+    {
+        SyntaxToken ifKeyword = MatchToken(SyntaxKind.IfKeyword);
+        SyntaxToken openParenthesesToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+        ExpressionSyntax conditionExpression = ParseExpression();
+        SyntaxToken closeParenthesesToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+        StatementSyntax thenStatement = ParseStatement();
+        ElseClauseSyntax? elseClause = ParseOptionalElseClause();
+
+        return new IfStatementSyntax(
+            ifKeyword,
+            openParenthesesToken,
+            conditionExpression,
+            closeParenthesesToken,
+            thenStatement,
+            elseClause);
+    }
+
+    private ElseClauseSyntax? ParseOptionalElseClause()
+    {
+        if (_Current.Kind != SyntaxKind.ElseKeyword)
+        {
+            return null;
+        }
+
+        SyntaxToken elseKeyword = MatchToken(SyntaxKind.ElseKeyword);
+        StatementSyntax elseStatement = ParseStatement();
+        ElseClauseSyntax elseClause = new(elseKeyword, elseStatement);
+
+        return elseClause;
     }
 
     private StatementSyntax ParseExpressionStatement()
