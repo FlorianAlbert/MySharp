@@ -37,6 +37,9 @@ internal sealed class Evaluator
             case BoundNodeKind.IfStatement:
                 EvaluateIfStatement((BoundIfStatement) statement);
                 break;
+            case BoundNodeKind.WhileStatement:
+                EvaluateWhileStatement((BoundWhileStatement) statement);
+                break;
             default:
                 throw new Exception($"Unexpected node {statement.Kind}");
         }
@@ -67,6 +70,14 @@ internal sealed class Evaluator
         else if (statement.ElseStatement is not null)
         {
             EvaluateStatement(statement.ElseStatement);
+        }
+    }
+
+    private void EvaluateWhileStatement(BoundWhileStatement statement)
+    {
+        while ((bool) EvaluateExpression(statement.Condition)!)
+        {
+            EvaluateStatement(statement.Body);
         }
     }
 

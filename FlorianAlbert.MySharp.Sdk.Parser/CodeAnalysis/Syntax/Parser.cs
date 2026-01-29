@@ -82,6 +82,7 @@ internal sealed class Parser
             SyntaxKind.OpenBraceToken => ParseBlockStatement(),
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclarationStatement(),
             SyntaxKind.IfKeyword => ParseIfStatement(),
+            SyntaxKind.WhileKeyword => ParseWhileStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -147,6 +148,22 @@ internal sealed class Parser
         ElseClauseSyntax elseClause = new(elseKeyword, elseStatement);
 
         return elseClause;
+    }
+
+    private WhileStatementSyntax ParseWhileStatement()
+    {
+        SyntaxToken whileKeyword = MatchToken(SyntaxKind.WhileKeyword);
+        SyntaxToken openParenthesesToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+        ExpressionSyntax conditionExpression = ParseExpression();
+        SyntaxToken closeParenthesesToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+        StatementSyntax bodyStatement = ParseStatement();
+
+        return new WhileStatementSyntax(
+            whileKeyword,
+            openParenthesesToken,
+            conditionExpression,
+            closeParenthesesToken,
+            bodyStatement);
     }
 
     private StatementSyntax ParseExpressionStatement()
