@@ -1,6 +1,6 @@
 ﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
-public sealed class TextSpan
+public sealed class TextSpan : IEquatable<TextSpan>
 {
     public TextSpan(int start, int length)
     {
@@ -18,5 +18,20 @@ public sealed class TextSpan
     {
         int length = end - start;
         return new TextSpan(start, length);
+    }
+
+    public bool Equals(TextSpan? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+        
+        return Start == other.Start && Length == other.Length;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as TextSpan);
     }
 }
