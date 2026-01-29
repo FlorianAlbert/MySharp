@@ -79,7 +79,18 @@ public class EvaluatorTests
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
 
+    [Fact]
+    public void Evaluator_Name_Reports_Undefined()
+    {
+        string text = @"[x] * 10;";
+
+        string expectedDiagnosticTexts = @"
+            Undefined name 'x'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
