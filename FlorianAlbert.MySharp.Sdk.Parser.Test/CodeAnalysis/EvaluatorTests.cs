@@ -1,5 +1,7 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Test.CodeAnalysis;
 
@@ -56,5 +58,33 @@ public class EvaluatorTests
 
         Assert.Empty(result.Diagnostics);
         Assert.Equal(expectedResult, result.Value);
+    }
+
+    private void AssertDiagnostics(string text, string expectedDiagnosticsText)
+    {
+        AnnotatedText annotatedText = AnnotatedText.Parse(text);
+        SyntaxTree syntaxTree = SyntaxTree.Parse(annotatedText.Text);
+        Compilation compilation = new(syntaxTree);
+        EvaluationResult result = compilation.Evaluate([]);
+
+        ImmutableArray<string> expectedDiagnostics = AnnotatedText.UnindentLines(expectedDiagnosticsText);
+
+        if (annotatedText.Spans.Length != expectedDiagnostics.Length)
+        {
+            throw new Exception($"Expected {expectedDiagnostics.Length} diagnostics, but got {annotatedText.Spans.Length}.");
+        }
+
+        Assert.Equal(expectedDiagnostics.Length, result.Diagnostics.Length);
+
+        for (int i = 0; i < expectedDiagnostics.Length; i++)
+        {
+            Diagnostic diagnostic = result.Diagnostics[i];
+
+            string expectedMessage = expectedDiagnostics[i];
+            Assert.Equal(expectedMessage, diagnostic.Message);
+
+            TextSpan expectedSpan = annotatedText.Spans[i];
+            Assert.Equal(expectedSpan, diagnostic.Span);
+        }
     }
 }
