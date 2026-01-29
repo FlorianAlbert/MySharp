@@ -131,6 +131,15 @@ internal sealed class Evaluator
                 return Equals(leftValue, rightValue);
             case BoundBinaryOperatorKind.NotEquals:
                 return !Equals(leftValue, rightValue);
+            case BoundBinaryOperatorKind.LessThan:
+                return (int?) leftValue < (int?) rightValue;
+            case BoundBinaryOperatorKind.LessThanOrEquals:
+                return (int?) leftValue <= (int?) rightValue;
+            case BoundBinaryOperatorKind.GreaterThan:
+                return (int?) leftValue > (int?) rightValue;
+            case BoundBinaryOperatorKind.GreaterThanOrEquals:
+                return (int?) leftValue >= (int?) rightValue;
+
             default:
                 throw new Exception($"Unexpected binary operator {boundBinaryExpression.Operator.Kind}");
         }

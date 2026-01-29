@@ -123,6 +123,30 @@ internal sealed class Lexer
                     _position++;
                 }
                 break;
+            case '<':
+                _position++;
+                if (_Current != '=')
+                {
+                    _kind = SyntaxKind.LessToken;
+                }
+                else
+                {
+                    _kind = SyntaxKind.LessOrEqualsToken;
+                    _position++;
+                }
+                break;
+            case '>':
+                _position++;
+                if (_Current != '=')
+                {
+                    _kind = SyntaxKind.GreaterToken;
+                }
+                else
+                {
+                    _kind = SyntaxKind.GreaterOrEqualsToken;
+                    _position++;
+                }
+                break;
             case ';':
                 _kind = SyntaxKind.SemicolonToken;
                 _position++;

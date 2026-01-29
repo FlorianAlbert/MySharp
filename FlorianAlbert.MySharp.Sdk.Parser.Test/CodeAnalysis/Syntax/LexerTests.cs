@@ -158,42 +158,66 @@ public class LexerTests
         bool firstIsKeyword = first.ToString().EndsWith("Keyword");
         bool secondIsKeyword = second.ToString().EndsWith("Keyword");
 
+        // "x" & "y" => "xy"
         if (first is SyntaxKind.IdentifierToken && second is SyntaxKind.IdentifierToken)
         {
             return true;
         }
 
+        // "true" & "false" => "truefalse"
         if (firstIsKeyword && secondIsKeyword)
         {
             return true;
         }
 
+        // "let" & "x" => "letx"
         if (firstIsKeyword && second is SyntaxKind.IdentifierToken)
         {
             return true;
         }
 
+        // "x" & "let" => "xlet"
         if (secondIsKeyword && first is SyntaxKind.IdentifierToken)
         {
             return true;
         }
 
+        // " " & " " => "  "
         if (first is SyntaxKind.WhitespaceToken && second is SyntaxKind.WhitespaceToken)
         {
             return true;
         }
 
+        // "1" & "2" => "12"
         if (first is SyntaxKind.NumberToken && second is SyntaxKind.NumberToken)
         {
             return true;
         }
 
+        // "!" & "=" => "!="
+        // "!" & "==" => "!=="
         if (first is SyntaxKind.BangToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
         {
             return true;
         }
 
+        // "=" & "=" => "=="
+        // "=" & "==" => "==="
         if (first is SyntaxKind.EqualsToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
+        {
+            return true;
+        }
+
+        // "<" & "=" => "<="
+        // "<" & "==" => "<=="
+        if (first is SyntaxKind.LessToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
+        {
+            return true;
+        }
+
+        // ">" & "=" => ">="
+        // ">" & "==" => ">=="
+        if (first is SyntaxKind.GreaterToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
         {
             return true;
         }
