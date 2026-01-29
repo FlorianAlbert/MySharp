@@ -60,7 +60,7 @@ internal sealed class Binder
         };
     }
 
-    private BoundStatement BindBlockStatement(BlockStatementSyntax statementSyntax)
+    private BoundBlockStatement BindBlockStatement(BlockStatementSyntax statementSyntax)
     {
         ImmutableArray<BoundStatement>.Builder boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
         _scope = new(_scope);
@@ -76,7 +76,7 @@ internal sealed class Binder
         return new BoundBlockStatement(boundStatements.ToImmutable());
     }
 
-    private BoundStatement BindVariableDeclarationStatement(VariableDeclarationStatementSyntax statementSyntax)
+    private BoundVariableDeclarationStatement BindVariableDeclarationStatement(VariableDeclarationStatementSyntax statementSyntax)
     {
         string name = statementSyntax.IdentifierToken.Text;
         bool isReadOnly = statementSyntax.KeywordToken.Kind == SyntaxKind.LetKeyword;
@@ -95,7 +95,7 @@ internal sealed class Binder
         return new BoundVariableDeclarationStatement(variableSymbol, boundValueExpression);
     }
 
-    private BoundStatement BindIfStatement(IfStatementSyntax statementSyntax)
+    private BoundIfStatement BindIfStatement(IfStatementSyntax statementSyntax)
     {
         BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, typeof(bool));
 
@@ -106,7 +106,7 @@ internal sealed class Binder
         return new BoundIfStatement(boundConditionExpression, boundThenStatement, boundElseStatement);
     }
 
-    private BoundStatement BindWhileStatement(WhileStatementSyntax statementSyntax)
+    private BoundWhileStatement BindWhileStatement(WhileStatementSyntax statementSyntax)
     {
         BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, typeof(bool));
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.BodyStatement);
@@ -114,7 +114,7 @@ internal sealed class Binder
         return new BoundWhileStatement(boundConditionExpression, boundBodyStatement);
     }
 
-    private BoundStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
+    private BoundExpressionStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
     {
         BoundExpression boundExpression = BindExpression(statementSyntax.Expression);
         return new BoundExpressionStatement(boundExpression);

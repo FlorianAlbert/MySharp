@@ -90,7 +90,7 @@ internal sealed class Parser
         };
     }
 
-    private StatementSyntax ParseBlockStatement()
+    private BlockStatementSyntax ParseBlockStatement()
     {
         ImmutableArray<StatementSyntax>.Builder statements = ImmutableArray.CreateBuilder<StatementSyntax>();
 
@@ -105,14 +105,16 @@ internal sealed class Parser
         return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
     }
 
-    private StatementSyntax ParseVariableDeclarationStatement()
+    private VariableDeclarationStatementSyntax ParseVariableDeclarationStatement()
     {
         SyntaxKind expectedKeywordKind = _Current.Kind is SyntaxKind.VarKeyword ? SyntaxKind.VarKeyword : SyntaxKind.LetKeyword;
+
         SyntaxToken keywordToken = MatchToken(expectedKeywordKind);
         SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
         SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
         ExpressionSyntax valueExpression = ParseExpression();
         SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
+
         return new VariableDeclarationStatementSyntax(
             keywordToken,
             identifierToken,
@@ -169,7 +171,7 @@ internal sealed class Parser
             bodyStatement);
     }
 
-    private StatementSyntax ParseExpressionStatement()
+    private ExpressionStatementSyntax ParseExpressionStatement()
     {
         ExpressionSyntax expression = ParseExpression();
         SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
