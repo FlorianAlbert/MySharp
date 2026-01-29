@@ -39,4 +39,9 @@ public sealed class TextSpan : IEquatable<TextSpan>
     {
         return $"[{Start}..{End})";
     }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Start, Length);
+    }
 }
