@@ -60,6 +60,28 @@ public class EvaluatorTests
         Assert.Equal(expectedResult, result.Value);
     }
 
+    [Fact]
+    public void Evaluator_VariableDeclaration_Reports_Redaclaration()
+    {
+        string text = @"
+            {
+                var x = 10;
+                let y = 100;
+                {
+                    var x = 10;
+                }
+                var [x] = 5;
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Variable 'x' is already declared.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+
+    }
+
     private void AssertDiagnostics(string text, string expectedDiagnosticsText)
     {
         AnnotatedText annotatedText = AnnotatedText.Parse(text);
