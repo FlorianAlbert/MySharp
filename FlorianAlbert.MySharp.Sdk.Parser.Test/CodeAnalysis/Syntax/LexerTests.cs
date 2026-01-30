@@ -194,6 +194,20 @@ public class LexerTests
             return true;
         }
 
+        // "&" & "&" => "&&"
+        // "&" & "&&" => "&&&"
+        if (first is SyntaxKind.AmpersandToken && second is SyntaxKind.AmpersandToken or SyntaxKind.AmpersandAmpersandToken)
+        {
+            return true;
+        }
+
+        // "|" & "|" => "||"
+        // "|" & "||" => "|||"
+        if (first is SyntaxKind.PipeToken && second is SyntaxKind.PipeToken or SyntaxKind.PipePipeToken)
+        {
+            return true;
+        }
+
         // "!" & "=" => "!="
         // "!" & "==" => "!=="
         if (first is SyntaxKind.BangToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)

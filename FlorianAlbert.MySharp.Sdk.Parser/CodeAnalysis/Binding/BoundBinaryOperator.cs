@@ -40,18 +40,23 @@ internal sealed class BoundBinaryOperator
         new(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int)),
         new(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int)),
         new(SyntaxKind.PercentToken, BoundBinaryOperatorKind.Modulo, typeof(int)),
-        new(SyntaxKind.CaretToken, BoundBinaryOperatorKind.BitwiseExclusiveOr, typeof(int)),
-        new(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
-        new(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),
-        new(SyntaxKind.CaretToken, BoundBinaryOperatorKind.BitwiseExclusiveOr, typeof(bool)),
         new(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, typeof(int), typeof(bool)),
-        new(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, typeof(bool), typeof(bool)),
         new(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(int), typeof(bool)),
-        new(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(bool), typeof(bool)),
         new(SyntaxKind.LessToken, BoundBinaryOperatorKind.LessThan, typeof(int), typeof(bool)),
         new(SyntaxKind.LessOrEqualsToken, BoundBinaryOperatorKind.LessThanOrEquals, typeof(int), typeof(bool)),
         new(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.GreaterThan, typeof(int), typeof(bool)),
-        new(SyntaxKind.GreaterOrEqualsToken, BoundBinaryOperatorKind.GreaterThanOrEquals, typeof(int), typeof(bool))
+        new(SyntaxKind.GreaterOrEqualsToken, BoundBinaryOperatorKind.GreaterThanOrEquals, typeof(int), typeof(bool)),
+        new(SyntaxKind.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, typeof(int)),
+        new(SyntaxKind.PipeToken, BoundBinaryOperatorKind.BitwiseOr, typeof(int)),
+        new(SyntaxKind.CaretToken, BoundBinaryOperatorKind.BitwiseExclusiveOr, typeof(int)),
+
+        new(SyntaxKind.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, typeof(bool)),
+        new(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
+        new(SyntaxKind.PipeToken, BoundBinaryOperatorKind.BitwiseOr, typeof(bool)),
+        new(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),
+        new(SyntaxKind.CaretToken, BoundBinaryOperatorKind.BitwiseExclusiveOr, typeof(bool)),
+        new(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, typeof(bool), typeof(bool)),
+        new(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, typeof(bool), typeof(bool))
     ];
 
     public static BoundBinaryOperator? Bind(SyntaxKind syntaxKind, Type? leftType, Type? rightType)

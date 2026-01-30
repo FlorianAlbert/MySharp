@@ -9,14 +9,16 @@ public static class SyntaxFacts
         SyntaxKind.PercentToken => 6,
         SyntaxKind.PlusToken => 5,
         SyntaxKind.MinusToken => 5,
-        SyntaxKind.CaretToken => 4,
-        SyntaxKind.EqualsEqualsToken => 3,
-        SyntaxKind.BangEqualsToken => 3,
-        SyntaxKind.LessToken => 3,
-        SyntaxKind.LessOrEqualsToken => 3,
-        SyntaxKind.GreaterToken => 3,
-        SyntaxKind.GreaterOrEqualsToken => 3,
+        SyntaxKind.EqualsEqualsToken => 4,
+        SyntaxKind.BangEqualsToken => 4,
+        SyntaxKind.LessToken => 4,
+        SyntaxKind.LessOrEqualsToken => 4,
+        SyntaxKind.GreaterToken => 4,
+        SyntaxKind.GreaterOrEqualsToken => 4,
+        SyntaxKind.CaretToken => 3,
+        SyntaxKind.AmpersandToken => 2,
         SyntaxKind.AmpersandAmpersandToken => 2,
+        SyntaxKind.PipeToken => 1,
         SyntaxKind.PipePipeToken => 1,
         _ => 0
     };
@@ -37,6 +39,7 @@ public static class SyntaxFacts
         SyntaxKind.PlusToken => 7,
         SyntaxKind.MinusToken => 7,
         SyntaxKind.BangToken => 7,
+        SyntaxKind.TildeToken => 7,
         _ => 0
     };
 
@@ -76,6 +79,9 @@ public static class SyntaxFacts
         SyntaxKind.AmpersandAmpersandToken => "&&",
         SyntaxKind.PipePipeToken => "||",
         SyntaxKind.CaretToken => "^",
+        SyntaxKind.TildeToken => "~",
+        SyntaxKind.AmpersandToken => "&",
+        SyntaxKind.PipeToken => "|",
         SyntaxKind.EqualsEqualsToken => "==",
         SyntaxKind.BangEqualsToken => "!=",
         SyntaxKind.LessToken => "<",

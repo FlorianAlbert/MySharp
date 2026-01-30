@@ -140,6 +140,7 @@ internal sealed class Evaluator
             BoundUnaryOperatorKind.Identity => operand,
             BoundUnaryOperatorKind.Negation => -(int?) operand,
             BoundUnaryOperatorKind.LogicalNegation => !(bool?) operand,
+            BoundUnaryOperatorKind.BitwiseNegation => ~(int?) operand,
             _ => throw new Exception($"Unexpected unary operator {boundUnaryExpression.Operator.Kind}"),
         };
     }
@@ -149,52 +150,54 @@ internal sealed class Evaluator
         object? leftValue = EvaluateExpression(boundBinaryExpression.Left);
         object? rightValue = EvaluateExpression(boundBinaryExpression.Right);
 
-#pragma warning disable IDE0066 // Convert switch statement to expression
-        switch (boundBinaryExpression.Operator.Kind)
+        return boundBinaryExpression.Operator.Kind switch
         {
-            case BoundBinaryOperatorKind.Addition:
-                return (int?) leftValue + (int?) rightValue;
-            case BoundBinaryOperatorKind.Subtraction:
-                return (int?) leftValue - (int?) rightValue;
-            case BoundBinaryOperatorKind.Multiplication:
-                return (int?) leftValue * (int?) rightValue;
-            case BoundBinaryOperatorKind.Division:
-                return (int?) leftValue / (int?) rightValue;
-            case BoundBinaryOperatorKind.Modulo:
-                return (int?) leftValue % (int?) rightValue;
-            case BoundBinaryOperatorKind.LogicalAnd:
-                return (bool) leftValue! && (bool) rightValue!;
-            case BoundBinaryOperatorKind.LogicalOr:
-                return (bool) leftValue! || (bool) rightValue!;
-            case BoundBinaryOperatorKind.BitwiseExclusiveOr:
-                return EvaluateBitwiseExclusiveOr(leftValue, rightValue);
-            case BoundBinaryOperatorKind.Equals:
-                return Equals(leftValue, rightValue);
-            case BoundBinaryOperatorKind.NotEquals:
-                return !Equals(leftValue, rightValue);
-            case BoundBinaryOperatorKind.LessThan:
-                return (int?) leftValue < (int?) rightValue;
-            case BoundBinaryOperatorKind.LessThanOrEquals:
-                return (int?) leftValue <= (int?) rightValue;
-            case BoundBinaryOperatorKind.GreaterThan:
-                return (int?) leftValue > (int?) rightValue;
-            case BoundBinaryOperatorKind.GreaterThanOrEquals:
-                return (int?) leftValue >= (int?) rightValue;
+            BoundBinaryOperatorKind.Addition => (int?) leftValue + (int?) rightValue,
+            BoundBinaryOperatorKind.Subtraction => (int?) leftValue - (int?) rightValue,
+            BoundBinaryOperatorKind.Multiplication => (int?) leftValue * (int?) rightValue,
+            BoundBinaryOperatorKind.Division => (int?) leftValue / (int?) rightValue,
+            BoundBinaryOperatorKind.Modulo => (int?) leftValue % (int?) rightValue,
+            BoundBinaryOperatorKind.BitwiseAnd => EvaluateBitwiseAnd(leftValue, rightValue),
+            BoundBinaryOperatorKind.LogicalAnd => (bool) leftValue! && (bool) rightValue!,
+            BoundBinaryOperatorKind.BitwiseOr => EvaluateBitwiseOr(leftValue, rightValue),
+            BoundBinaryOperatorKind.LogicalOr => (bool) leftValue! || (bool) rightValue!,
+            BoundBinaryOperatorKind.BitwiseExclusiveOr => EvaluateBitwiseExclusiveOr(leftValue, rightValue),
+            BoundBinaryOperatorKind.Equals => Equals(leftValue, rightValue),
+            BoundBinaryOperatorKind.NotEquals => !Equals(leftValue, rightValue),
+            BoundBinaryOperatorKind.LessThan => (int?) leftValue < (int?) rightValue,
+            BoundBinaryOperatorKind.LessThanOrEquals => (int?) leftValue <= (int?) rightValue,
+            BoundBinaryOperatorKind.GreaterThan => (int?) leftValue > (int?) rightValue,
+            BoundBinaryOperatorKind.GreaterThanOrEquals => (int?) leftValue >= (int?) rightValue,
+            _ => throw new Exception($"Unexpected binary operator {boundBinaryExpression.Operator.Kind}"),
+        };
+    }
 
-            default:
-                throw new Exception($"Unexpected binary operator {boundBinaryExpression.Operator.Kind}");
+    private object? EvaluateBitwiseAnd(object? leftValue, object? rightValue)
+    {
+        if (leftValue is int leftInt && rightValue is int rightInt)
+        {
+            return leftInt & rightInt;
         }
-#pragma warning restore IDE0066 // Convert switch statement to expression
+
+        return (bool) leftValue! & (bool) rightValue!;
+    }
+
+    private object? EvaluateBitwiseOr(object? leftValue, object? rightValue)
+    {
+        if (leftValue is int leftInt && rightValue is int rightInt)
+        {
+            return leftInt | rightInt;
+        }
+
+        return (bool) leftValue! | (bool) rightValue!;
     }
 
     private static object? EvaluateBitwiseExclusiveOr(object? leftValue, object? rightValue)
     {
-#pragma warning disable IDE0038 // Use pattern matching
-        if (leftValue is int && rightValue is int)
+        if (leftValue is int leftInt && rightValue is int rightInt)
         {
-            return (int) leftValue ^ (int) rightValue;
+            return leftInt ^ rightInt;
         }
-#pragma warning restore IDE0038 // Use pattern matching
 
         return (bool) leftValue! ^ (bool) rightValue!;
     }

@@ -89,22 +89,32 @@ internal sealed class Lexer
                     _position++;
                 }
                 break;
+            case '~':
+                _kind = SyntaxKind.TildeToken;
+                _position++;
+                break;
             case '&':
                 _position++;
-                if (_Current == '&')
+                if (_Current != '&')
+                {
+                    _kind = SyntaxKind.AmpersandToken;
+                }
+                else
                 {
                     _kind = SyntaxKind.AmpersandAmpersandToken;
                     _position++;
-                    break;
                 }
                 break;
             case '|':
                 _position++;
-                if (_Current == '|')
+                if (_Current != '|')
+                {
+                    _kind = SyntaxKind.PipeToken;
+                }
+                else
                 {
                     _kind = SyntaxKind.PipePipeToken;
                     _position++;
-                    break;
                 }
                 break;
             case '^':
