@@ -1,4 +1,5 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+﻿
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal abstract class BoundExpression : BoundNode
 {

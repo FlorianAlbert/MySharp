@@ -1,6 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
-
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundVariableExpression : BoundExpression
 {
@@ -14,4 +12,15 @@ internal sealed class BoundVariableExpression : BoundExpression
     public override Type Type => VariableSymbol.Type;
 
     public VariableSymbol VariableSymbol { get; }
+
+    public override IEnumerable<BoundNode> GetChildren()
+    {
+        return [];
+    }
+
+    public override IEnumerable<(string name, object? value)> GetProperties()
+    {
+        yield return (nameof(Type), Type);
+        yield return (nameof(VariableSymbol), VariableSymbol);
+    }
 }

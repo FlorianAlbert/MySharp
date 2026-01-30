@@ -1,4 +1,5 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+﻿
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundBinaryExpression : BoundExpression
 {
@@ -15,4 +16,15 @@ internal sealed class BoundBinaryExpression : BoundExpression
     public BoundExpression Left { get; }
     public BoundBinaryOperator Operator { get; }
     public BoundExpression Right { get; }
+
+    public override IEnumerable<BoundNode> GetChildren()
+    {
+        yield return Left;
+        yield return Right;
+    }
+
+    public override IEnumerable<(string name, object? value)> GetProperties()
+    {
+        yield return (nameof(Type), Type);
+    }
 }

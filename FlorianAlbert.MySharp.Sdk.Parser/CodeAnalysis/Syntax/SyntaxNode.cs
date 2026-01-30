@@ -19,7 +19,6 @@ public abstract class SyntaxNode
     {
         bool isConsole = textWriter == Console.Out;
 
-        string indentToWrite = indent;
         string marker;
         if (isLast)
         {

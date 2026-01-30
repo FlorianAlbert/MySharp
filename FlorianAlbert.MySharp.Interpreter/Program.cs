@@ -4,6 +4,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Text;
 
 bool showParseTree = false;
+bool showBoundTree = false;
 Dictionary<VariableSymbol, object?> variables = [];
 StringBuilder textBuilder = new();
 Compilation? previousCompilation = null;
@@ -33,6 +34,12 @@ while (true)
         {
             showParseTree = !showParseTree;
             Console.WriteLine(showParseTree ? "Showing parse trees" : "Not showing parse trees");
+            continue;
+        }
+        else if (input.Equals("#showBoundTree", StringComparison.OrdinalIgnoreCase) || input.Equals("#sbt", StringComparison.OrdinalIgnoreCase))
+        {
+            showBoundTree = !showBoundTree;
+            Console.WriteLine(showBoundTree ? "Showing bound tree" : "Not showing bound tree");
             continue;
         }
         else if (input.Equals("#cls", StringComparison.OrdinalIgnoreCase))
@@ -66,7 +73,16 @@ while (true)
 
     if (showParseTree)
     {
+        Console.WriteLine();
+        Console.WriteLine("Parse tree:");
         syntaxTree.Root.WriteTo(Console.Out);
+    }
+
+    if (showBoundTree)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Bound tree:");
+        compilation.EmitTree(Console.Out);
     }
 
     if (result.Diagnostics.Length > 0)

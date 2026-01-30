@@ -51,4 +51,9 @@ public sealed class Compilation
 
         return new EvaluationResult([], result);
     }
+
+    public void EmitTree(TextWriter writer)
+    {
+        GlobalScope.Statement.WriteTo(writer);
+    }
 }

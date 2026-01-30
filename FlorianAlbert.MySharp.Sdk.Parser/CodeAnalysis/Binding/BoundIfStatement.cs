@@ -1,4 +1,5 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+﻿
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundIfStatement : BoundStatement
 {
@@ -16,4 +17,20 @@ internal sealed class BoundIfStatement : BoundStatement
     public BoundStatement ThenStatement { get; }
 
     public BoundStatement? ElseStatement { get; }
+
+    public override IEnumerable<BoundNode> GetChildren()
+    {
+        yield return Condition;
+        yield return ThenStatement;
+
+        if (ElseStatement is not null)
+        {
+            yield return ElseStatement;
+        }
+    }
+
+    public override IEnumerable<(string name, object? value)> GetProperties()
+    {
+        return [];
+    }
 }

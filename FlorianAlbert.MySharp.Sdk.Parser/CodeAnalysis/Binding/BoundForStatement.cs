@@ -1,4 +1,5 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+﻿
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundForStatement : BoundStatement
 {
@@ -22,4 +23,16 @@ internal sealed class BoundForStatement : BoundStatement
     public BoundExpression UpperBound { get; }
 
     public BoundStatement Body { get; }
+
+    public override IEnumerable<BoundNode> GetChildren()
+    {
+        yield return LowerBound;
+        yield return UpperBound;
+        yield return Body;
+    }
+
+    public override IEnumerable<(string name, object? value)> GetProperties()
+    {
+        yield return (nameof(IteratorSymbol), IteratorSymbol);
+    }
 }
