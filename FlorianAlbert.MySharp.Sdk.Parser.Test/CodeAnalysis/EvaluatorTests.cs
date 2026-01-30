@@ -173,6 +173,85 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Fact]
+    public void Evaluator_IfStatement_Reports_CannotConvert()
+    {
+        string text = @"
+            {
+                if ([10])
+                    let x = 10;
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Cannot convert type 'System.Int32' to 'System.Boolean'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_WhileStatement_Reports_CannotConvert()
+    {
+        string text = @"
+            {
+                var i = 0;
+                var result = 0;
+                while ([10])
+                {
+                    i = i + 1;
+                    result = result + i;
+                }
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Cannot convert type 'System.Int32' to 'System.Boolean'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_ForStatement_Reports_CannotConvert_OnLowerBound()
+    {
+        string text = @"
+            {
+                var result = 0;
+                for (let i = [true] to 5)
+                {
+                    result = result + i;
+                }
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_ForStatement_Reports_CannotConvert_OnUpperBound()
+    {
+        string text = @"
+            {
+                var result = 0;
+                for (let i = 0 to [true])
+                {
+                    result = result + i;
+                }
+            }
+        ";
+
+        string expectedDiagnosticTexts = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private static void AssertValue(string expression, object expectedResult)
     {
         var syntaxTree = SyntaxTree.Parse(expression);
