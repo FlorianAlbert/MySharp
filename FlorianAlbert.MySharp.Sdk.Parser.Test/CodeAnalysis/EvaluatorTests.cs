@@ -252,6 +252,19 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Fact]
+    public void Evaluator_EmptyInput_DoesNotReport_UndefinedName()
+    {
+        string text = @"[][]";
+
+        string expectedDiagnosticTexts = @"
+            Unexpected token <EndOfFileToken>, expected <IdentifierToken>.
+            Unexpected token <EndOfFileToken>, expected <SemicolonToken>.
+        ";
+
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private static void AssertValue(string expression, object expectedResult)
     {
         var syntaxTree = SyntaxTree.Parse(expression);

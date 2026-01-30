@@ -202,6 +202,12 @@ internal sealed class Binder
     {
         string name = expressionSyntax.IdentifierToken.Text;
 
+        if (name is "")
+        {
+            // The token got inserted by the parser due to an error.
+            return new BoundLiteralExpression(0);
+        }
+
         if (!_scope.TryLookup(name, out VariableSymbol? variableSymbol))
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
