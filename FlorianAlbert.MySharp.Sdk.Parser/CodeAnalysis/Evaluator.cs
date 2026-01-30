@@ -37,9 +37,6 @@ internal sealed class Evaluator
             case BoundNodeKind.WhileStatement:
                 EvaluateWhileStatement((BoundWhileStatement) statement);
                 break;
-            case BoundNodeKind.ForStatement:
-                EvaluateForStatement((BoundForStatement) statement);
-                break;
             case BoundNodeKind.ExpressionStatement:
                 EvaluateExpressionStatement((BoundExpressionStatement) statement);
                 break;
@@ -80,17 +77,6 @@ internal sealed class Evaluator
     {
         while ((bool) EvaluateExpression(statement.Condition)!)
         {
-            EvaluateStatement(statement.Body);
-        }
-    }
-
-    private void EvaluateForStatement(BoundForStatement statement)
-    {
-        int lowerBound = (int) EvaluateExpression(statement.LowerBound)!;
-        int upperBound = (int) EvaluateExpression(statement.UpperBound)!;
-        for (int i = lowerBound; i < upperBound; i++)
-        {
-            _variables[statement.IteratorSymbol] = i;
             EvaluateStatement(statement.Body);
         }
     }

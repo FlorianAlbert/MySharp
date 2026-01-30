@@ -101,6 +101,8 @@ internal abstract class BoundTreeRewriter
                     }
                 }
             }
+
+            rewrittenStatementsBuilder?.Add(rewrittenStatement);
         }
 
         if (rewrittenStatementsBuilder is null)
@@ -152,7 +154,7 @@ internal abstract class BoundTreeRewriter
         return new BoundWhileStatement(rewrittenCondition, rewrittenBody);
     }
 
-    protected virtual BoundForStatement RewriteForStatement(BoundForStatement forStatement)
+    protected virtual BoundStatement RewriteForStatement(BoundForStatement forStatement)
     {
         BoundExpression rewrittenLowerBound = RewriteExpression(forStatement.LowerBound);
         BoundExpression rewrittenUpperBound = RewriteExpression(forStatement.UpperBound);
