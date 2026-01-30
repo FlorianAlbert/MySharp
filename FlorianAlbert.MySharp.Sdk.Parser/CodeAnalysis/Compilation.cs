@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Lowering;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
@@ -46,7 +47,8 @@ public sealed class Compilation
             return new EvaluationResult([.. diagnostics], null);
         }
 
-        Evaluator evaluator = new(GlobalScope.Statement, variables);
+        BoundStatement statement = GetStatement();
+        Evaluator evaluator = new(statement, variables);
         object? result = evaluator.Evaluate();
 
         return new EvaluationResult([], result);
@@ -54,6 +56,13 @@ public sealed class Compilation
 
     public void EmitTree(TextWriter writer)
     {
-        GlobalScope.Statement.WriteTo(writer);
+        BoundStatement statement = GetStatement();
+        statement.WriteTo(writer);
+    }
+
+    private BoundStatement GetStatement()
+    {
+        BoundStatement statement = GlobalScope.Statement;
+        return Lowerer.Lower(statement);
     }
 }
