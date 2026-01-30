@@ -49,6 +49,8 @@ internal sealed class BoundBinaryOperator
         new(SyntaxKind.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, typeof(int)),
         new(SyntaxKind.PipeToken, BoundBinaryOperatorKind.BitwiseOr, typeof(int)),
         new(SyntaxKind.CaretToken, BoundBinaryOperatorKind.BitwiseExclusiveOr, typeof(int)),
+        new(SyntaxKind.LessLessToken, BoundBinaryOperatorKind.LeftShift, typeof(int)),
+        new(SyntaxKind.GreaterGreaterToken, BoundBinaryOperatorKind.RightShift, typeof(int)),
 
         new(SyntaxKind.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, typeof(bool)),
         new(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),

@@ -162,6 +162,8 @@ internal sealed class Evaluator
             BoundBinaryOperatorKind.BitwiseOr => EvaluateBitwiseOr(leftValue, rightValue),
             BoundBinaryOperatorKind.LogicalOr => (bool) leftValue! || (bool) rightValue!,
             BoundBinaryOperatorKind.BitwiseExclusiveOr => EvaluateBitwiseExclusiveOr(leftValue, rightValue),
+            BoundBinaryOperatorKind.LeftShift => (int?) leftValue << (int?) rightValue,
+            BoundBinaryOperatorKind.RightShift => (int?) leftValue >> (int?) rightValue,
             BoundBinaryOperatorKind.Equals => Equals(leftValue, rightValue),
             BoundBinaryOperatorKind.NotEquals => !Equals(leftValue, rightValue),
             BoundBinaryOperatorKind.LessThan => (int?) leftValue < (int?) rightValue,

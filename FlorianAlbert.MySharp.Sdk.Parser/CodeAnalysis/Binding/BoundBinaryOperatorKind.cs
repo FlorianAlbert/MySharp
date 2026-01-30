@@ -12,6 +12,8 @@ internal enum BoundBinaryOperatorKind
     BitwiseAnd,
     BitwiseOr,
     BitwiseExclusiveOr,
+    LeftShift,
+    RightShift,
     Equals,
     NotEquals,
     LessThan,

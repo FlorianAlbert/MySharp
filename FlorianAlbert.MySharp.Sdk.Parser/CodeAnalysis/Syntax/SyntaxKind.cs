@@ -16,6 +16,8 @@ public enum SyntaxKind
     AmpersandToken,
     PipeToken,
     BangToken,
+    LessLessToken,
+    GreaterGreaterToken,
     AmpersandAmpersandToken,
     PipePipeToken,
     CaretToken,

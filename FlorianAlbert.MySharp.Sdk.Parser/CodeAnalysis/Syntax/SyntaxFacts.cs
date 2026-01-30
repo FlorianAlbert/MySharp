@@ -4,11 +4,13 @@ public static class SyntaxFacts
 {
     public static int GetBinaryOperatorPrecedence(this SyntaxKind kind) => kind switch
     {
-        SyntaxKind.StarToken => 6,
-        SyntaxKind.SlashToken => 6,
-        SyntaxKind.PercentToken => 6,
-        SyntaxKind.PlusToken => 5,
-        SyntaxKind.MinusToken => 5,
+        SyntaxKind.StarToken => 7,
+        SyntaxKind.SlashToken => 7,
+        SyntaxKind.PercentToken => 7,
+        SyntaxKind.PlusToken => 6,
+        SyntaxKind.MinusToken => 6,
+        SyntaxKind.LessLessToken => 5,
+        SyntaxKind.GreaterGreaterToken => 5,
         SyntaxKind.EqualsEqualsToken => 4,
         SyntaxKind.BangEqualsToken => 4,
         SyntaxKind.LessToken => 4,
@@ -36,10 +38,10 @@ public static class SyntaxFacts
 
     public static int GetUnaryOperatorPrecedence(this SyntaxKind kind) => kind switch
     {
-        SyntaxKind.PlusToken => 7,
-        SyntaxKind.MinusToken => 7,
-        SyntaxKind.BangToken => 7,
-        SyntaxKind.TildeToken => 7,
+        SyntaxKind.PlusToken => 8,
+        SyntaxKind.MinusToken => 8,
+        SyntaxKind.BangToken => 8,
+        SyntaxKind.TildeToken => 8,
         _ => 0
     };
 
@@ -82,6 +84,8 @@ public static class SyntaxFacts
         SyntaxKind.TildeToken => "~",
         SyntaxKind.AmpersandToken => "&",
         SyntaxKind.PipeToken => "|",
+        SyntaxKind.LessLessToken => "<<",
+        SyntaxKind.GreaterGreaterToken => ">>",
         SyntaxKind.EqualsEqualsToken => "==",
         SyntaxKind.BangEqualsToken => "!=",
         SyntaxKind.LessToken => "<",

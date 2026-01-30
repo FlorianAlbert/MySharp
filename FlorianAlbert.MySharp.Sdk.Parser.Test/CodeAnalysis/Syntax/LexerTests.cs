@@ -31,7 +31,7 @@ public class LexerTests
 
     [Theory]
     [MemberData(nameof(GetTokenPairs))]
-    public void Lexer_LexesTokenPairs_ReturnsCorrectSyntaxTokens(SyntaxKind firstTokenKind, string firstTokenText, 
+    public void Lexer_LexesTokenPairs_ReturnsCorrectSyntaxTokens(SyntaxKind firstTokenKind, string firstTokenText,
                                                                  SyntaxKind secondTokenKind, string secondTokenText)
     {
         string text = firstTokenText + secondTokenText;
@@ -48,8 +48,8 @@ public class LexerTests
 
     [Theory]
     [MemberData(nameof(GetTokenPairsWithSeparator))]
-    public void Lexer_LexesTokenPairsWithSeparator_ReturnsCorrectSyntaxTokens(SyntaxKind firstTokenKind, string firstTokenText, 
-                                                                              SyntaxKind separatorKind, string separatorText, 
+    public void Lexer_LexesTokenPairsWithSeparator_ReturnsCorrectSyntaxTokens(SyntaxKind firstTokenKind, string firstTokenText,
+                                                                              SyntaxKind separatorKind, string separatorText,
                                                                               SyntaxKind secondTokenKind, string secondTokenText)
     {
         string text = firstTokenText + separatorText + secondTokenText;
@@ -224,14 +224,28 @@ public class LexerTests
 
         // "<" & "=" => "<="
         // "<" & "==" => "<=="
-        if (first is SyntaxKind.LessToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
+        // "<" & "<" => "<<"
+        // "<" & "<<" => "<<<"
+        // "<" & "<=" => "<<="
+        if (first is SyntaxKind.LessToken && second is SyntaxKind.EqualsToken 
+                                             or SyntaxKind.EqualsEqualsToken
+                                             or SyntaxKind.LessToken
+                                             or SyntaxKind.LessLessToken
+                                             or SyntaxKind.LessOrEqualsToken)
         {
             return true;
         }
 
         // ">" & "=" => ">="
         // ">" & "==" => ">=="
-        if (first is SyntaxKind.GreaterToken && second is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
+        // ">" & ">" => ">>"
+        // ">" & ">>" => ">>>"
+        // ">" & ">=" => ">>="
+        if (first is SyntaxKind.GreaterToken && second is SyntaxKind.EqualsToken
+                                                or SyntaxKind.EqualsEqualsToken
+                                                or SyntaxKind.GreaterToken
+                                                or SyntaxKind.GreaterGreaterToken
+                                                or SyntaxKind.GreaterOrEqualsToken)
         {
             return true;
         }
