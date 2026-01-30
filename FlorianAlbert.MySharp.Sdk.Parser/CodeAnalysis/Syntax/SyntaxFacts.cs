@@ -60,6 +60,8 @@ public static class SyntaxFacts
         "if" => SyntaxKind.IfKeyword,
         "else" => SyntaxKind.ElseKeyword,
         "while" => SyntaxKind.WhileKeyword,
+        "for" => SyntaxKind.ForKeyword,
+        "to" => SyntaxKind.ToKeyword,
         _ => SyntaxKind.IdentifierToken
     };
 
@@ -92,6 +94,8 @@ public static class SyntaxFacts
         SyntaxKind.IfKeyword => "if",
         SyntaxKind.ElseKeyword => "else",
         SyntaxKind.WhileKeyword => "while",
+        SyntaxKind.ForKeyword => "for",
+        SyntaxKind.ToKeyword => "to",
         SyntaxKind.SemicolonToken => ";",
         _ => null
     };

@@ -86,6 +86,7 @@ internal sealed class Parser
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclarationStatement(),
             SyntaxKind.IfKeyword => ParseIfStatement(),
             SyntaxKind.WhileKeyword => ParseWhileStatement(),
+            SyntaxKind.ForKeyword => ParseForStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -167,6 +168,32 @@ internal sealed class Parser
             whileKeyword,
             openParenthesesToken,
             conditionExpression,
+            closeParenthesesToken,
+            bodyStatement);
+    }
+
+    private ForStatementSyntax ParseForStatement()
+    {
+        SyntaxToken forKeyword = MatchToken(SyntaxKind.ForKeyword);
+        SyntaxToken openParenthesesToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+        SyntaxToken letKeyword = MatchToken(SyntaxKind.LetKeyword);
+        SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
+        ExpressionSyntax lowerBoundExpression = ParseExpression();
+        SyntaxToken toKeyword = MatchToken(SyntaxKind.ToKeyword);
+        ExpressionSyntax upperBoundExpression = ParseExpression();
+        SyntaxToken closeParenthesesToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+        StatementSyntax bodyStatement = ParseStatement();
+
+        return new ForStatementSyntax(
+            forKeyword,
+            openParenthesesToken,
+            letKeyword,
+            identifierToken,
+            equalsToken,
+            lowerBoundExpression,
+            toKeyword,
+            upperBoundExpression,
             closeParenthesesToken,
             bodyStatement);
     }

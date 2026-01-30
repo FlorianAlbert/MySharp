@@ -38,17 +38,20 @@ public enum SyntaxKind
     IfKeyword,
     ElseKeyword,
     WhileKeyword,
+    ForKeyword,
+    ToKeyword,
 
     // Nodes
     CompilationUnit,
     ElseClause,
 
     // Statements
-    ExpressionStatement,
     BlockStatement,
     VariableDeclarationStatement,
     IfStatement,
     WhileStatement,
+    ForStatement,
+    ExpressionStatement,
 
     // Expressions
     LiteralExpression,

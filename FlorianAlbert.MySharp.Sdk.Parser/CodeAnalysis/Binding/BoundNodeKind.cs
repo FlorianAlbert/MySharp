@@ -3,11 +3,12 @@
 internal enum BoundNodeKind
 {
     // Statements
-    ExpressionStatement,
     BlockStatement,
     VariableDeclarationStatement,
     IfStatement,
     WhileStatement,
+    ForStatement,
+    ExpressionStatement,
 
     // Expressions
     UnaryExpression,

@@ -64,6 +64,7 @@ public class EvaluatorTests
     [InlineData("{ var a = 0; if (a == 0) a = 10; else a = -4; }", 10)]
     [InlineData("{ var a = 0; if (a == 5) a = 10; else a = -4; }", -4)]
     [InlineData("{ var i = 0; var result = 0; while (i < 5) { result = result + i; i = i + 1; } result; }", 10)]
+    [InlineData("{ var result = 0; for (let i = 1 to 11) { result = result + i; } result; }", 55)]
     public void Evaluator_EvaluatesExpression_Correctly(string expression, object expectedResult)
     {
         AssertValue(expression, expectedResult);

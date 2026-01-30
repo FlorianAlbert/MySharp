@@ -55,6 +55,7 @@ internal sealed class Binder
             SyntaxKind.VariableDeclarationStatement => BindVariableDeclarationStatement((VariableDeclarationStatementSyntax) statementSyntax),
             SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax) statementSyntax),
             SyntaxKind.WhileStatement => BindWhileStatement((WhileStatementSyntax) statementSyntax),
+            SyntaxKind.ForStatement => BindForStatement((ForStatementSyntax) statementSyntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
@@ -112,6 +113,24 @@ internal sealed class Binder
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.BodyStatement);
 
         return new BoundWhileStatement(boundConditionExpression, boundBodyStatement);
+    }
+
+    private BoundForStatement BindForStatement(ForStatementSyntax statementSyntax)
+    {
+        BoundExpression boundLowerBoundExpression = BindExpression(statementSyntax.LowerBoundExpression, typeof(int));
+        BoundExpression boundUpperBoundExpression = BindExpression(statementSyntax.UpperBoundExpression, typeof(int));
+
+        _scope = new(_scope);
+
+        string iteratorName = statementSyntax.IdentifierToken.Text;
+        VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, typeof(int));
+        _scope.TryDeclare(variableSymbol);
+
+        BoundStatement boundBodyStatement = BindStatement(statementSyntax.Body);
+
+        _scope = _scope.Parent!;
+
+        return new BoundForStatement(variableSymbol, boundLowerBoundExpression, boundUpperBoundExpression, boundBodyStatement);
     }
 
     private BoundExpressionStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
