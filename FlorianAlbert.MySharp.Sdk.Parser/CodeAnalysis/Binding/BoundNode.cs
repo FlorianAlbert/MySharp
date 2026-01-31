@@ -85,7 +85,7 @@ internal abstract class BoundNode
     {
         bool isConsole = textWriter == Console.Out;
         bool isFirstProperty = true;
-        foreach (var (name, value) in node.GetProperties())
+        foreach ((string name, object? value) in node.GetProperties())
         {
             if (isFirstProperty)
             {
