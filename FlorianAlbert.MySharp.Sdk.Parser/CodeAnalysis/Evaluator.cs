@@ -4,12 +4,15 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
 internal sealed class Evaluator
 {
-    private readonly BoundStatement _root;
+    private readonly BoundBlockStatement _root;
     private readonly Dictionary<VariableSymbol, object?> _variables;
+    readonly Dictionary<LabelSymbol, int> _indexedLabels = [];
+
+    private int _currentStatementIndex = 0;
 
     private object? _lastValue;
 
-    public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object?> variables)
+    public Evaluator(BoundBlockStatement root, Dictionary<VariableSymbol, object?> variables)
     {
         _root = root;
         _variables = variables;
@@ -17,7 +20,22 @@ internal sealed class Evaluator
 
     public object? Evaluate()
     {
-        EvaluateStatement(_root);
+        // We need to index labels first, to be able to jump
+        // to labels that are declared after a goto statement.
+        for (int statementIndex = 0; statementIndex < _root.Statements.Length; statementIndex++)
+        {
+            if (_root.Statements[statementIndex] is BoundLabelStatement labelStatement)
+            {
+                _indexedLabels[labelStatement.LabelSymbol] = statementIndex + 1;
+            }
+        }
+
+        while (_currentStatementIndex < _root.Statements.Length)
+        {
+            BoundStatement statement = _root.Statements[_currentStatementIndex];
+            EvaluateStatement(statement);
+        }
+
         return _lastValue;
     }
 
@@ -25,17 +43,17 @@ internal sealed class Evaluator
     {
         switch (statement.Kind)
         {
-            case BoundNodeKind.BlockStatement:
-                EvaluateBlockStatement((BoundBlockStatement) statement);
-                break;
             case BoundNodeKind.VariableDeclarationStatement:
                 EvaluateVariableDeclarationStatement((BoundVariableDeclarationStatement) statement);
                 break;
-            case BoundNodeKind.IfStatement:
-                EvaluateIfStatement((BoundIfStatement) statement);
+            case BoundNodeKind.LabelStatement:
+                EvaluateLabelStatement();
                 break;
-            case BoundNodeKind.WhileStatement:
-                EvaluateWhileStatement((BoundWhileStatement) statement);
+            case BoundNodeKind.GotoStatement:
+                EvaluateGotoStatement((BoundGotoStatement) statement);
+                break;
+            case BoundNodeKind.ConditionalGotoStatement:
+                EvaluateConditionalGotoStatement((BoundConditionalGotoStatement) statement);
                 break;
             case BoundNodeKind.ExpressionStatement:
                 EvaluateExpressionStatement((BoundExpressionStatement) statement);
@@ -45,45 +63,44 @@ internal sealed class Evaluator
         }
     }
 
-    private void EvaluateBlockStatement(BoundBlockStatement blockStatement)
-    {
-        foreach (BoundStatement s in blockStatement.Statements)
-        {
-            EvaluateStatement(s);
-        }
-    }
-
     private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement variableDeclarationStatement)
     {
         object? value = EvaluateExpression(variableDeclarationStatement.ValueExpression);
         _variables[variableDeclarationStatement.Variable] = value;
         _lastValue = value;
+
+        _currentStatementIndex++;
     }
 
-    private void EvaluateIfStatement(BoundIfStatement statement)
+    private void EvaluateLabelStatement()
+    {
+        // Labels are already indexed before, so we can just skip them here.
+        _currentStatementIndex++;
+    }
+
+    private void EvaluateGotoStatement(BoundGotoStatement statement)
+    {
+        _currentStatementIndex = _indexedLabels[statement.LabelSymbol];
+    }
+
+    private void EvaluateConditionalGotoStatement(BoundConditionalGotoStatement statement)
     {
         bool conditionValue = (bool) EvaluateExpression(statement.Condition)!;
-        if (conditionValue)
+        if (conditionValue != statement.JumpIfFalse)
         {
-            EvaluateStatement(statement.ThenStatement);
+            _currentStatementIndex = _indexedLabels[statement.LabelSymbol];
         }
-        else if (statement.ElseStatement is not null)
+        else
         {
-            EvaluateStatement(statement.ElseStatement);
-        }
-    }
-
-    private void EvaluateWhileStatement(BoundWhileStatement statement)
-    {
-        while ((bool) EvaluateExpression(statement.Condition)!)
-        {
-            EvaluateStatement(statement.Body);
+            _currentStatementIndex++;
         }
     }
 
     private void EvaluateExpressionStatement(BoundExpressionStatement expressionStatement)
     {
         _lastValue = EvaluateExpression(expressionStatement.Expression);
+
+        _currentStatementIndex++;
     }
 
     private object? EvaluateExpression(BoundExpression expression)

@@ -64,23 +64,19 @@ internal abstract class BoundTreeRewriter
 
     public virtual BoundStatement RewriteStatement(BoundStatement statement)
     {
-        switch (statement.Kind)
+        return statement.Kind switch
         {
-            case BoundNodeKind.BlockStatement:
-                return RewriteBlockStatement((BoundBlockStatement) statement);
-            case BoundNodeKind.VariableDeclarationStatement:
-                return RewriteVariableDeclarationStatement((BoundVariableDeclarationStatement) statement);
-            case BoundNodeKind.IfStatement:
-                return RewriteIfStatement((BoundIfStatement) statement);
-            case BoundNodeKind.WhileStatement:
-                return RewriteWhileStatement((BoundWhileStatement) statement);
-            case BoundNodeKind.ForStatement:
-                return RewriteForStatement((BoundForStatement) statement);
-            case BoundNodeKind.ExpressionStatement:
-                return RewriteExpressionStatement((BoundExpressionStatement) statement);
-            default:
-                throw new InvalidOperationException($"Unexpected statement kind: {statement.Kind}");
-        }
+            BoundNodeKind.BlockStatement => RewriteBlockStatement((BoundBlockStatement) statement),
+            BoundNodeKind.VariableDeclarationStatement => RewriteVariableDeclarationStatement((BoundVariableDeclarationStatement) statement),
+            BoundNodeKind.IfStatement => RewriteIfStatement((BoundIfStatement) statement),
+            BoundNodeKind.WhileStatement => RewriteWhileStatement((BoundWhileStatement) statement),
+            BoundNodeKind.ForStatement => RewriteForStatement((BoundForStatement) statement),
+            BoundNodeKind.LabelStatement => RewriteLabelStatement((BoundLabelStatement) statement),
+            BoundNodeKind.GotoStatement => RewriteGotoStatement((BoundGotoStatement) statement),
+            BoundNodeKind.ConditionalGotoStatement => RewriteConditionalGotoStatement((BoundConditionalGotoStatement) statement),
+            BoundNodeKind.ExpressionStatement => RewriteExpressionStatement((BoundExpressionStatement) statement),
+            _ => throw new InvalidOperationException($"Unexpected statement kind: {statement.Kind}"),
+        };
     }
 
     protected virtual BoundBlockStatement RewriteBlockStatement(BoundBlockStatement blockStatement)
@@ -124,7 +120,7 @@ internal abstract class BoundTreeRewriter
         return new BoundVariableDeclarationStatement(variableDeclarationStatement.Variable, rewrittenValueExpression);
     }
 
-    protected virtual BoundIfStatement RewriteIfStatement(BoundIfStatement ifStatement)
+    protected virtual BoundStatement RewriteIfStatement(BoundIfStatement ifStatement)
     {
         BoundExpression rewrittenCondition = RewriteExpression(ifStatement.Condition);
         BoundStatement rewrittenThenStatement = RewriteStatement(ifStatement.ThenStatement);
@@ -140,7 +136,7 @@ internal abstract class BoundTreeRewriter
         return new BoundIfStatement(rewrittenCondition, rewrittenThenStatement, rewrittenElseStatement);
     }
 
-    protected virtual BoundWhileStatement RewriteWhileStatement(BoundWhileStatement whileStatement)
+    protected virtual BoundStatement RewriteWhileStatement(BoundWhileStatement whileStatement)
     {
         BoundExpression rewrittenCondition = RewriteExpression(whileStatement.Condition);
         BoundStatement rewrittenBody = RewriteStatement(whileStatement.Body);
@@ -168,6 +164,27 @@ internal abstract class BoundTreeRewriter
         }
 
         return new BoundForStatement(forStatement.IteratorSymbol, rewrittenLowerBound, rewrittenUpperBound, rewrittenBody);
+    }
+
+    protected virtual BoundLabelStatement RewriteLabelStatement(BoundLabelStatement labelStatement)
+    {
+        return labelStatement;
+    }
+
+    protected virtual BoundGotoStatement RewriteGotoStatement(BoundGotoStatement gotoStatement)
+    {
+        return gotoStatement;
+    }
+
+    protected virtual BoundConditionalGotoStatement RewriteConditionalGotoStatement(BoundConditionalGotoStatement conditionalGotoStatement)
+    {
+        BoundExpression rewrittenCondition = RewriteExpression(conditionalGotoStatement.Condition);
+        if (rewrittenCondition == conditionalGotoStatement.Condition)
+        {
+            return conditionalGotoStatement;
+        }
+
+        return new BoundConditionalGotoStatement(conditionalGotoStatement.LabelSymbol, rewrittenCondition, conditionalGotoStatement.JumpIfFalse);
     }
 
     protected virtual BoundExpressionStatement RewriteExpressionStatement(BoundExpressionStatement expressionStatement)

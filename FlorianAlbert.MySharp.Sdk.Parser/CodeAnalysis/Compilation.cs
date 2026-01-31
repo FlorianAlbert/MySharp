@@ -47,8 +47,8 @@ public sealed class Compilation
             return new EvaluationResult([.. diagnostics], null);
         }
 
-        BoundStatement statement = GetStatement();
-        Evaluator evaluator = new(statement, variables);
+        BoundBlockStatement blockStatement = GetStatement();
+        Evaluator evaluator = new(blockStatement, variables);
         object? result = evaluator.Evaluate();
 
         return new EvaluationResult([], result);
@@ -56,11 +56,11 @@ public sealed class Compilation
 
     public void EmitTree(TextWriter writer)
     {
-        BoundStatement statement = GetStatement();
-        statement.WriteTo(writer);
+        BoundBlockStatement blockStatement = GetStatement();
+        blockStatement.WriteTo(writer);
     }
 
-    private BoundStatement GetStatement()
+    private BoundBlockStatement GetStatement()
     {
         BoundStatement statement = GlobalScope.Statement;
         return Lowerer.Lower(statement);
