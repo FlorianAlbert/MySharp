@@ -69,7 +69,6 @@ while (true)
     Compilation compilation = previousCompilation is null? 
         new(syntaxTree) : 
         previousCompilation.ContinueWith(syntaxTree);
-    EvaluationResult result = compilation.Evaluate(variables);
 
     if (showParseTree)
     {
@@ -84,6 +83,8 @@ while (true)
         Console.WriteLine("Bound tree:");
         compilation.EmitTree(Console.Out);
     }
+
+    EvaluationResult result = compilation.Evaluate(variables);
 
     if (result.Diagnostics.Length > 0)
     {
