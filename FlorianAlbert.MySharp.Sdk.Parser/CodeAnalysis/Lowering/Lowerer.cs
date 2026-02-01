@@ -6,10 +6,16 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Lowering;
 
 internal sealed class Lowerer : BoundTreeRewriter
 {
+    private int _variableCounter = 0;
     private int _labelCounter = 0;
 
     private Lowerer()
     {
+    }
+
+    private VariableSymbol GenerateVariableSymbol(bool isReadonly, Type type)
+    {
+        return new VariableSymbol($"<Variable{_variableCounter++}>", isReadonly, type);
     }
 
     private LabelSymbol GenerateLabelSymbol()
@@ -123,10 +129,17 @@ internal sealed class Lowerer : BoundTreeRewriter
             forStatement.IteratorSymbol,
             forStatement.LowerBound);
 
+        VariableSymbol upperBoundSymbol = GenerateVariableSymbol(isReadonly: true, typeof(int));
+
+        BoundVariableDeclarationStatement upperBoundVariableDeclarationStatement =
+            new(upperBoundSymbol, forStatement.UpperBound);
+
+        BoundVariableExpression upperBoundExpression = new(upperBoundSymbol);
+
         BoundBinaryExpression conditionExpression = new(
             new BoundVariableExpression(forStatement.IteratorSymbol),
             BoundBinaryOperator.Bind(SyntaxKind.LessToken, typeof(int), typeof(int))!,
-            forStatement.UpperBound);
+            upperBoundExpression);
 
         BoundExpressionStatement incrementStatement = new(
             new BoundAssignmentExpression(
@@ -140,7 +153,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
         BoundWhileStatement whileStatement = new(conditionExpression, whileBlockStatement);
 
-        BoundBlockStatement result = new([variableDeclarationStatement, whileStatement]);
+        BoundBlockStatement result = new([variableDeclarationStatement, upperBoundVariableDeclarationStatement, whileStatement]);
 
         return RewriteStatement(result);
     }
