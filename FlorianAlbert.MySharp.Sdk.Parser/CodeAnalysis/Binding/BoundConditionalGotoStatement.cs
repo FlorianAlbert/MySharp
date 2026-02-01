@@ -3,11 +3,11 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundConditionalGotoStatement : BoundStatement
 {
-    public BoundConditionalGotoStatement(LabelSymbol labelSymbol, BoundExpression condition, bool jumpIfFalse = false)
+    public BoundConditionalGotoStatement(LabelSymbol labelSymbol, BoundExpression condition, bool jumpIf = true)
     {
         LabelSymbol = labelSymbol;
         Condition = condition;
-        JumpIfFalse = jumpIfFalse;
+        JumpIf = jumpIf;
     }
 
     public override BoundNodeKind Kind => BoundNodeKind.ConditionalGotoStatement;
@@ -16,7 +16,7 @@ internal sealed class BoundConditionalGotoStatement : BoundStatement
 
     public BoundExpression Condition { get; }
 
-    public bool JumpIfFalse { get; }
+    public bool JumpIf { get; }
 
     public override IEnumerable<BoundNode> GetChildren()
     {
@@ -26,6 +26,6 @@ internal sealed class BoundConditionalGotoStatement : BoundStatement
     public override IEnumerable<(string name, object? value)> GetProperties()
     {
         yield return (nameof(LabelSymbol), LabelSymbol);
-        yield return (nameof(JumpIfFalse), JumpIfFalse);
+        yield return (nameof(JumpIf), JumpIf);
     }
 }

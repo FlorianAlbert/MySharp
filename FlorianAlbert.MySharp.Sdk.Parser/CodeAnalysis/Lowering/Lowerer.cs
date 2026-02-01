@@ -67,7 +67,7 @@ internal sealed class Lowerer : BoundTreeRewriter
             BoundConditionalGotoStatement falseGotoStatement = new(
                 endLabel,
                 ifStatement.Condition,
-                jumpIfFalse: true);
+                jumpIf: false);
 
             result = new([falseGotoStatement, ifStatement.ThenStatement, endLabelStatement]);
         }
@@ -80,7 +80,7 @@ internal sealed class Lowerer : BoundTreeRewriter
             BoundConditionalGotoStatement elseGotoStatement = new(
                 elseLabel,
                 ifStatement.Condition,
-                jumpIfFalse: true);
+                jumpIf: false);
 
             BoundGotoStatement gotoEndStatement = new(endLabel);
 
@@ -108,7 +108,7 @@ internal sealed class Lowerer : BoundTreeRewriter
         BoundConditionalGotoStatement falseGotoStatement = new(
             endLabel,
             whileStatement.Condition,
-            jumpIfFalse: true);
+            jumpIf: false);
 
         BoundGotoStatement gotoBeginStatement = new(beginLabel);
 

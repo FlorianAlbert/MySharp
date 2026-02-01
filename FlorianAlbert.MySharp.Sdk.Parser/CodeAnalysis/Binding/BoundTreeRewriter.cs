@@ -184,7 +184,7 @@ internal abstract class BoundTreeRewriter
             return conditionalGotoStatement;
         }
 
-        return new BoundConditionalGotoStatement(conditionalGotoStatement.LabelSymbol, rewrittenCondition, conditionalGotoStatement.JumpIfFalse);
+        return new BoundConditionalGotoStatement(conditionalGotoStatement.LabelSymbol, rewrittenCondition, conditionalGotoStatement.JumpIf);
     }
 
     protected virtual BoundExpressionStatement RewriteExpressionStatement(BoundExpressionStatement expressionStatement)

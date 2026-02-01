@@ -86,7 +86,7 @@ internal sealed class Evaluator
     private void EvaluateConditionalGotoStatement(BoundConditionalGotoStatement statement)
     {
         bool conditionValue = (bool) EvaluateExpression(statement.Condition)!;
-        if (conditionValue != statement.JumpIfFalse)
+        if (conditionValue == statement.JumpIf)
         {
             _currentStatementIndex = _indexedLabels[statement.LabelSymbol];
         }
