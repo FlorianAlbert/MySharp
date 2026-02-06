@@ -287,12 +287,12 @@ internal sealed class Lexer
             _position++;
         }
 
-        int length = _position - _start;
-        string tokenText = _text.ToString(_start, length);
+        TextSpan span = TextSpan.FromBounds(_start, _position);
+        string tokenText = _text.ToString(span);
 
         if (!int.TryParse(tokenText, out int value))
         {
-            Diagnostics.ReportInvalidNumber(new TextSpan(_start, length), tokenText, typeof(int));
+            Diagnostics.ReportInvalidNumber(span, tokenText, typeof(int));
         }
 
         _value = value;
