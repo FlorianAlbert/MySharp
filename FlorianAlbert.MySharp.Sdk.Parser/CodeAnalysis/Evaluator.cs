@@ -8,7 +8,7 @@ internal sealed class Evaluator
     private readonly Dictionary<VariableSymbol, object?> _variables;
     readonly Dictionary<LabelSymbol, int> _indexedLabels = [];
 
-    private int _currentStatementIndex = 0;
+    private int _currentStatementIndex;
 
     private object? _lastValue;
 

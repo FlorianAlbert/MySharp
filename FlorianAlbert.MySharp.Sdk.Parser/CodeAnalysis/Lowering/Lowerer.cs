@@ -6,8 +6,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Lowering;
 
 internal sealed class Lowerer : BoundTreeRewriter
 {
-    private int _variableCounter = 0;
-    private int _labelCounter = 0;
+    private int _variableCounter;
+    private int _labelCounter;
 
     private Lowerer()
     {

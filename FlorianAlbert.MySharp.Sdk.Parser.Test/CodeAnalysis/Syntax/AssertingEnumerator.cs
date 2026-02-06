@@ -2,7 +2,7 @@
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Test.CodeAnalysis.Syntax;
 
-internal class AssertingEnumerator : IDisposable
+internal sealed class AssertingEnumerator : IDisposable
 {
     private readonly IEnumerator<SyntaxNode> _enumerator;
     private bool _hasErrors;

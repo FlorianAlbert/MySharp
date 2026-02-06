@@ -8,8 +8,8 @@ namespace FlorianAlbert.MySharp.Interpreter;
 internal sealed class MySharpRepl : Repl
 {
     private Compilation? _previousCompilation;
-    private bool _showSyntaxTree = false;
-    private bool _showBoundTree = false;
+    private bool _showSyntaxTree;
+    private bool _showBoundTree;
     private readonly Dictionary<VariableSymbol, object?> _variables = [];
 
     public MySharpRepl() : base(new MySharpLineRenderer())

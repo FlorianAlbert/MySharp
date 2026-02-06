@@ -8,7 +8,7 @@ public class LexerTests
     [Fact]
     public void Lexer_Tests_AllTokenKinds()
     {
-        SyntaxKind[] tokenKinds = [.. Enum.GetValues<SyntaxKind>().Where(k => k.ToString().EndsWith("Token") || k.ToString().EndsWith("Keyword"))];
+        SyntaxKind[] tokenKinds = [.. Enum.GetValues<SyntaxKind>().Where(k => k.ToString().EndsWith("Token", StringComparison.OrdinalIgnoreCase) || k.ToString().EndsWith("Keyword", StringComparison.OrdinalIgnoreCase))];
         IEnumerable<SyntaxKind> testedTokenKinds = GetAllTokens().GetTuples().Select(t => t.Item1).Distinct();
 
         HashSet<SyntaxKind> missingTokenKinds = [.. tokenKinds.Except(testedTokenKinds)];
@@ -155,8 +155,8 @@ public class LexerTests
 
     private static bool RequiresSeparator(SyntaxKind first, SyntaxKind second)
     {
-        bool firstIsKeyword = first.ToString().EndsWith("Keyword");
-        bool secondIsKeyword = second.ToString().EndsWith("Keyword");
+        bool firstIsKeyword = first.ToString().EndsWith("Keyword", StringComparison.OrdinalIgnoreCase);
+        bool secondIsKeyword = second.ToString().EndsWith("Keyword", StringComparison.OrdinalIgnoreCase);
 
         // "x" & "y" => "xy"
         if (first is SyntaxKind.IdentifierToken && second is SyntaxKind.IdentifierToken)

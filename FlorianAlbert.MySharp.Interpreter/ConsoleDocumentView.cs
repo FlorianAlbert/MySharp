@@ -16,7 +16,7 @@ internal sealed class ConsoleDocumentView
 
     private readonly ConsoleRenderer _renderer;
     private readonly List<string> _lines = [string.Empty];
-    private int _currentHistoryIndex = 0;
+    private int _currentHistoryIndex;
 
     public ConsoleDocumentView(Func<string, bool> submissionChecker, 
         ConsoleKey forceLineEnterKey, 
@@ -55,9 +55,9 @@ internal sealed class ConsoleDocumentView
         }
     }
 
-    public int CurrentLineIndex { get; private set; } = 0;
+    public int CurrentLineIndex { get; private set; }
 
-    public int CurrentCharIndex { get; private set; } = 0;
+    public int CurrentCharIndex { get; private set; }
 
     // Key Handling
 
