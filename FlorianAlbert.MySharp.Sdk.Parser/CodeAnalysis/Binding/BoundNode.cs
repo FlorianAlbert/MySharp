@@ -1,4 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
@@ -15,7 +15,7 @@ internal abstract class BoundNode
         PrettyPrint(textWriter, this);
     }
 
-    private static void PrettyPrint(TextWriter textWriter, BoundNode node, string indent = "", bool isLast = true)
+    private static void PrettyPrint(TextWriter textWriter, BoundNode node, string indent = GlobalStringConstants.ConstEmpty, bool isLast = true)
     {
         bool isConsole = textWriter == Console.Out;
 

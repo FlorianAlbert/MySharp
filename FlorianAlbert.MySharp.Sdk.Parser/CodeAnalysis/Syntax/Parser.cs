@@ -2,6 +2,7 @@
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
@@ -66,7 +67,7 @@ internal sealed class Parser
         }
 
         _diagnosticBag.ReportUnexpectedToken(token.Span, token.Kind, kind);
-        return new SyntaxToken(kind, token.Span.Start, string.Empty, null);
+        return new SyntaxToken(kind, token.Span.Start, GlobalStringConstants.ConstEmpty, null);
     }
 
     public CompilationUnitSyntax ParseCompilationUnit()

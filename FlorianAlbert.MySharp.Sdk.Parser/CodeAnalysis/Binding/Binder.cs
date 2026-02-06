@@ -2,6 +2,7 @@
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
+using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
@@ -202,7 +203,7 @@ internal sealed class Binder
     {
         string name = expressionSyntax.IdentifierToken.Text;
 
-        if (name is "")
+        if (name is GlobalStringConstants.ConstEmpty)
         {
             // The token got inserted by the parser due to an error.
             return new BoundLiteralExpression(0);
