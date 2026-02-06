@@ -1,72 +1,55 @@
-﻿using System.Collections.ObjectModel;
-using System.Text;
+﻿using FlorianAlbert.MySharp.Interpreter.LineRendering;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
 internal abstract class Repl
 {
+    protected const char _metaCommandPrefix = '/';
+    private const string _exitString = "";
+
+    private readonly List<string> _history = [];
+    private readonly LineRenderer? _lineRenderer;
+
+    protected Repl(LineRenderer? lineRenderer = null)
+    {
+        _lineRenderer = lineRenderer;
+    }
+
     public void Run()
     {
         while (true)
         {
-            string? submission = GetSubmission();
+            string submission = GetSubmission();
 
-            if (submission is null)
+            if (submission is _exitString)
             {
-                break;
+                return;
             }
 
             EvaluateSubmission(submission);
+
+            _history.Add(submission);
         }
     }
 
-    private string? GetSubmission()
+    private string GetSubmission()
     {
-        StringBuilder textBuilder = new();
-        while (true)
+        ConsoleDocumentView documentView = new(IsCompleteSubmission, ConsoleKey.Enter, ConsoleModifiers.Control, [.. _history], _lineRenderer);
+        while (!documentView.IsDone)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            if (textBuilder.Length == 0)
-            {
-                Console.Write("\u00BB ");
-            }
-            else
-            {
-                Console.Write("\u00B7 ");
-            }
-            Console.ResetColor();
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-            string? input = Console.ReadLine();
-
-            if (textBuilder.Length == 0)
-            {
-                if (string.IsNullOrWhiteSpace(input))
-                {
-                    return null;
-                }
-                
-                if (input.StartsWith('#'))
-                {
-                    EvaluateMetaCommand(input);
-                    continue;
-                }
-            }
-
-            textBuilder.AppendLine(input);
-            string currentText = textBuilder.ToString();
-
-            if (!IsCompleteSubmission(currentText) && !string.IsNullOrWhiteSpace(input))
-            {
-                continue;
-            }
-
-            return currentText;
+            documentView.HandleKeyPress(keyInfo);
         }
+
+        Console.WriteLine();
+
+        return documentView.Text;
     }
 
     protected virtual void EvaluateMetaCommand(string input)
     {
-        if (input.Equals("#cls", StringComparison.OrdinalIgnoreCase))
+        if (input.Equals($"{_metaCommandPrefix}cls", StringComparison.OrdinalIgnoreCase))
         {
             Console.Clear();
         }
@@ -78,7 +61,37 @@ internal abstract class Repl
         }
     }
 
-    protected abstract bool IsCompleteSubmission(string text);
+    protected virtual bool IsCompleteSubmission(string text)
+    {
+        if (text.StartsWith(_metaCommandPrefix))
+        {
+            return true;
+        }
 
-    protected abstract void EvaluateSubmission(string currentText);
+        if (text is _exitString)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Evaluates the given submission. Returns true if the submission was evaluated, otherwise false.
+    /// If overridden, the overriding method should call base.EvaluateSubmission to ensure meta-commands are handled.
+    /// Only if submission is not already handled by the base implementation, the overriding method should
+    /// evaluate the submission and return true if it was evaluated.
+    /// </summary>
+    /// <param name="text">The text to evaluate.</param>
+    /// <returns>Boolean value indicating whether the submission was evaluated.</returns>
+    protected virtual bool EvaluateSubmission(string text)
+    {
+        if (text.StartsWith(_metaCommandPrefix))
+        {
+            EvaluateMetaCommand(text);
+            return true;
+        }
+
+        return false;
+    }
 }

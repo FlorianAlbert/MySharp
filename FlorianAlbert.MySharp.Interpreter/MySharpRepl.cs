@@ -1,4 +1,5 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+﻿using FlorianAlbert.MySharp.Interpreter.LineRendering;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
@@ -11,19 +12,23 @@ internal sealed class MySharpRepl : Repl
     private bool _showBoundTree = false;
     private readonly Dictionary<VariableSymbol, object?> _variables = [];
 
+    public MySharpRepl() : base(new MySharpLineRenderer())
+    {
+    }
+
     protected override void EvaluateMetaCommand(string input)
     {
-        if (input.Equals("#showSyntaxTree", StringComparison.OrdinalIgnoreCase) || input.Equals("#sst", StringComparison.OrdinalIgnoreCase))
+        if (input.Equals($"{_metaCommandPrefix}showSyntaxTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sst", StringComparison.OrdinalIgnoreCase))
         {
             _showSyntaxTree = !_showSyntaxTree;
             Console.WriteLine(_showSyntaxTree ? "Showing syntax tree" : "Not showing syntax tree");
         }
-        else if (input.Equals("#showBoundTree", StringComparison.OrdinalIgnoreCase) || input.Equals("#sbt", StringComparison.OrdinalIgnoreCase))
+        else if (input.Equals($"{_metaCommandPrefix}showBoundTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sbt", StringComparison.OrdinalIgnoreCase))
         {
             _showBoundTree = !_showBoundTree;
             Console.WriteLine(_showBoundTree ? "Showing bound tree" : "Not showing bound tree");
         }
-        else if (input.Equals("#reset", StringComparison.OrdinalIgnoreCase))
+        else if (input.Equals($"{_metaCommandPrefix}reset", StringComparison.OrdinalIgnoreCase))
         {
             _previousCompilation = null;
             _variables.Clear();
@@ -37,9 +42,9 @@ internal sealed class MySharpRepl : Repl
 
     protected override bool IsCompleteSubmission(string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (base.IsCompleteSubmission(text))
         {
-            return false;
+            return true;
         }
 
         SyntaxTree syntaxTree = SyntaxTree.Parse(text);
@@ -47,9 +52,19 @@ internal sealed class MySharpRepl : Repl
         return !syntaxTree.Diagnostics.Any();
     }
 
-    protected override void EvaluateSubmission(string currentText)
+    /// <summary>
+    /// Evaluates the given submission. Returns true if the submission was evaluated, otherwise false.
+    /// </summary>
+    /// <param name="text">The text to evaluate.</param>
+    /// <returns>Boolean value indicating whether the submission was evaluated.</returns>
+    protected override bool EvaluateSubmission(string text)
     {
-        var syntaxTree = SyntaxTree.Parse(currentText);
+        if (base.EvaluateSubmission(text))
+        {
+            return true;
+        }
+
+        var syntaxTree = SyntaxTree.Parse(text);
 
         Compilation compilation = _previousCompilation is null ?
             new(syntaxTree) :
@@ -111,5 +126,7 @@ internal sealed class MySharpRepl : Repl
 
             _previousCompilation = compilation;
         }
+
+        return true;
     }
 }
