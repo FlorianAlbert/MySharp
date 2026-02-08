@@ -47,6 +47,12 @@ internal sealed class MySharpRepl : Repl
             return true;
         }
 
+        bool lastTwoLinesAreEmpty = text.Split(Environment.NewLine).Reverse().Take(2).All(string.IsNullOrWhiteSpace);
+        if (lastTwoLinesAreEmpty)
+        {
+            return true;
+        }
+
         SyntaxTree syntaxTree = SyntaxTree.Parse(text);
 
         return !syntaxTree.Diagnostics.Any();
