@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;

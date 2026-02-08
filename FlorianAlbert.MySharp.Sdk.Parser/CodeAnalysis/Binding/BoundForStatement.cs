@@ -1,4 +1,6 @@
 ﻿
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundForStatement : BoundStatement

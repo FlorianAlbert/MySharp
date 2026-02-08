@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
