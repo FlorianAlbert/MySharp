@@ -2,7 +2,7 @@
 
 internal sealed class BoundConditionalGotoStatement : BoundStatement
 {
-    public BoundConditionalGotoStatement(LabelSymbol labelSymbol, BoundExpression condition, bool jumpIf = true)
+    public BoundConditionalGotoStatement(BoundLabel labelSymbol, BoundExpression condition, bool jumpIf = true)
     {
         LabelSymbol = labelSymbol;
         Condition = condition;
@@ -11,7 +11,7 @@ internal sealed class BoundConditionalGotoStatement : BoundStatement
 
     public override BoundNodeKind Kind => BoundNodeKind.ConditionalGotoStatement;
 
-    public LabelSymbol LabelSymbol { get; }
+    public BoundLabel LabelSymbol { get; }
 
     public BoundExpression Condition { get; }
 

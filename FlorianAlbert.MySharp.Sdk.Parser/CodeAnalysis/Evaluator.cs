@@ -6,7 +6,7 @@ internal sealed class Evaluator
 {
     private readonly BoundBlockStatement _root;
     private readonly Dictionary<VariableSymbol, object?> _variables;
-    readonly Dictionary<LabelSymbol, int> _indexedLabels = [];
+    readonly Dictionary<BoundLabel, int> _indexedLabels = [];
 
     private int _currentStatementIndex;
 

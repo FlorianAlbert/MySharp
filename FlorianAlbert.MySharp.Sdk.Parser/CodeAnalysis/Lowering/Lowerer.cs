@@ -18,9 +18,9 @@ internal sealed class Lowerer : BoundTreeRewriter
         return new VariableSymbol($"<Variable{_variableCounter++}>", isReadonly, type);
     }
 
-    private LabelSymbol GenerateLabelSymbol()
+    private BoundLabel GenerateLabelSymbol()
     {
-        return new LabelSymbol($"<Label{_labelCounter++}>");
+        return new BoundLabel($"<Label{_labelCounter++}>");
     }
 
     private static BoundBlockStatement Flatten(BoundStatement statement)
@@ -58,7 +58,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
     protected override BoundStatement RewriteIfStatement(BoundIfStatement ifStatement)
     {
-        LabelSymbol endLabel = GenerateLabelSymbol();
+        BoundLabel endLabel = GenerateLabelSymbol();
         BoundLabelStatement endLabelStatement = new(endLabel);
 
         BoundBlockStatement result;
@@ -74,7 +74,7 @@ internal sealed class Lowerer : BoundTreeRewriter
         else
         {
 
-            LabelSymbol elseLabel = GenerateLabelSymbol();
+            BoundLabel elseLabel = GenerateLabelSymbol();
             BoundLabelStatement elseLabelStatement = new(elseLabel);
 
             BoundConditionalGotoStatement elseGotoStatement = new(
@@ -99,10 +99,10 @@ internal sealed class Lowerer : BoundTreeRewriter
 
     protected override BoundStatement RewriteWhileStatement(BoundWhileStatement whileStatement)
     {
-        LabelSymbol beginLabel = GenerateLabelSymbol();
+        BoundLabel beginLabel = GenerateLabelSymbol();
         BoundLabelStatement beginLabelStatement = new(beginLabel);
 
-        LabelSymbol endLabel = GenerateLabelSymbol();
+        BoundLabel endLabel = GenerateLabelSymbol();
         BoundLabelStatement endLabelStatement = new(endLabel);
 
         BoundConditionalGotoStatement falseGotoStatement = new(

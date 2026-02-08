@@ -2,14 +2,14 @@
 
 internal sealed class BoundGotoStatement : BoundStatement
 {
-    public BoundGotoStatement(LabelSymbol labelSymbol)
+    public BoundGotoStatement(BoundLabel labelSymbol)
     {
         LabelSymbol = labelSymbol;
     }
 
     public override BoundNodeKind Kind => BoundNodeKind.GotoStatement;
 
-    public LabelSymbol LabelSymbol { get; }
+    public BoundLabel LabelSymbol { get; }
 
     public override IEnumerable<BoundNode> GetChildren()
     {
