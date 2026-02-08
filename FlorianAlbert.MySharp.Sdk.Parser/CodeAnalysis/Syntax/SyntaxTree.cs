@@ -56,7 +56,6 @@ public sealed class SyntaxTree
     {
         static IEnumerable<SyntaxToken> LexTokens(Lexer lexer)
     {
-        var lexer = new Lexer(text);
         while (true)
         {
             SyntaxToken token = lexer.Lex();
