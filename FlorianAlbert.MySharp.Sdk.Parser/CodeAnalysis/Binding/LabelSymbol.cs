@@ -1,4 +1,4 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class LabelSymbol
 {

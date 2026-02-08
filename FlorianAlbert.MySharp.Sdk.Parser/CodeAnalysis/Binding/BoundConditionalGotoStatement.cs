@@ -1,5 +1,4 @@
-﻿
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundConditionalGotoStatement : BoundStatement
 {
