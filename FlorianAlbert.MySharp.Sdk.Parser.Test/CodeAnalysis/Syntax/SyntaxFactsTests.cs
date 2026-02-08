@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Test.CodeAnalysis.Syntax;
 
@@ -15,7 +16,7 @@ public class SyntaxFactsTests
             return;
         }
 
-        IEnumerable<SyntaxToken> tokens = SyntaxTree.ParseTokens(text);
+        ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(text);
 
         SyntaxToken token = Assert.Single(tokens);
 

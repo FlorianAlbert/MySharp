@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Interpreter.LineRendering;
 
@@ -6,7 +7,7 @@ internal class MySharpLineRenderer : LineRenderer
 {
     public override void RenderLine(string line)
     {
-        IEnumerable<SyntaxToken> tokens = SyntaxTree.ParseTokens(line);
+        ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(line);
         foreach (SyntaxToken token in tokens)
         {
             bool isKeyword = token.Kind.ToString().EndsWith("Keyword", StringComparison.Ordinal);

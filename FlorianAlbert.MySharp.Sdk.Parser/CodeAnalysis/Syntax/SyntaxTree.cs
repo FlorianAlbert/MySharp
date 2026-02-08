@@ -33,14 +33,28 @@ public sealed class SyntaxTree
         return new SyntaxTree(text);
     }
 
-    public static IEnumerable<SyntaxToken> ParseTokens(string text)
+    public static ImmutableArray<SyntaxToken> ParseTokens(string text)
     {
         SourceText sourceText = SourceText.From(text);
 
         return ParseTokens(sourceText);
     }
 
-    public static IEnumerable<SyntaxToken> ParseTokens(SourceText text)
+    public static ImmutableArray<SyntaxToken> ParseTokens(string text, out ImmutableArray<Diagnostic> diagnostics)
+    {
+        SourceText sourceText = SourceText.From(text);
+
+        return ParseTokens(sourceText, out diagnostics);
+    }
+
+    public static ImmutableArray<SyntaxToken> ParseTokens(SourceText text)
+    {
+        return ParseTokens(text, out _);
+    }
+
+    public static ImmutableArray<SyntaxToken> ParseTokens(SourceText text, out ImmutableArray<Diagnostic> diagnostics)
+    {
+        static IEnumerable<SyntaxToken> LexTokens(Lexer lexer)
     {
         var lexer = new Lexer(text);
         while (true)
@@ -52,7 +66,14 @@ public sealed class SyntaxTree
             }
 
             yield return token;
-
+            }
         }
+
+        Lexer lexer = new(text);
+        ImmutableArray<SyntaxToken> tokens = [.. LexTokens(lexer)];
+
+        diagnostics = [.. lexer.Diagnostics];
+
+        return tokens;
     }
 }

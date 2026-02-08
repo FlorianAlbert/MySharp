@@ -1,5 +1,6 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.Test;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Test.CodeAnalysis.Syntax;
 
@@ -22,7 +23,7 @@ public class LexerTests
     [MemberData(nameof(GetAllTokens))]
     public void Lexer_LexesTokens_ReturnsCorrectSyntaxToken(SyntaxKind tokenKind, string tokenText)
     {
-        IEnumerable<SyntaxToken> tokens = SyntaxTree.ParseTokens(tokenText);
+        ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(tokenText);
 
         SyntaxToken token = Assert.Single(tokens);
         Assert.Equal(tokenKind, token.Kind);
@@ -35,7 +36,7 @@ public class LexerTests
                                                                  SyntaxKind secondTokenKind, string secondTokenText)
     {
         string text = firstTokenText + secondTokenText;
-        SyntaxToken[] tokens = [.. SyntaxTree.ParseTokens(text)];
+        ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(text);
 
         Assert.Equal(2, tokens.Length);
 
@@ -53,7 +54,7 @@ public class LexerTests
                                                                               SyntaxKind secondTokenKind, string secondTokenText)
     {
         string text = firstTokenText + separatorText + secondTokenText;
-        SyntaxToken[] tokens = [.. SyntaxTree.ParseTokens(text)];
+        ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(text);
 
         Assert.Equal(3, tokens.Length);
 
