@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+using System.Text;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
@@ -21,6 +22,8 @@ internal sealed class Lexer
     public DiagnosticBag Diagnostics { get; }
 
     private char _Current => Peek(0);
+
+    private char _Lookahead => Peek(1);
 
     private char Peek(int offset)
     {
@@ -169,6 +172,9 @@ internal sealed class Lexer
                 _kind = SyntaxKind.SemicolonToken;
                 _position++;
                 break;
+            case '"':
+                ReadStringToken();
+                break;
             case '0':
             case '1':
             case '2':
@@ -297,6 +303,62 @@ internal sealed class Lexer
 
         _value = value;
         _kind = SyntaxKind.NumberToken;
+    }
+
+    private void ReadStringToken()
+    {
+        _position++;
+        StringBuilder stringTokenBuilder = new();
+        bool isDone = false;
+        while (!isDone)
+        {
+            switch (_Current)
+            {
+                case '\0' or '\n' or '\r':
+                    Diagnostics.ReportUnterminatedString(TextSpan.FromBounds(_start, _position));
+                    isDone = true;
+                    break;
+                case '\\':
+                    TryReadEscapeSequence(stringTokenBuilder);
+                    _position++;
+                    break;
+                case '"':
+                    isDone = true;
+                    _position++;
+                    break;
+                default:
+                    stringTokenBuilder.Append(_Current);
+                    _position++;
+                    break;
+            }
+        }
+
+        _value = stringTokenBuilder.ToString();
+        _kind = SyntaxKind.StringToken;
+    }
+
+    /// <summary>
+    /// Tries to read an escape sequence and appends the corresponding character to the provided StringBuilder.
+    /// If the string is unterminated, reports a diagnostic and returns true to indicate termination.
+    /// </summary>
+    /// <param name="stringTokenBuilder">The StringBuilder to append the character to.</param>
+    /// <returns>True if the string is unterminated and reading of the string should stop, false otherwise.</returns>
+    private void TryReadEscapeSequence(StringBuilder stringTokenBuilder)
+    {
+        switch (_Lookahead)
+        {
+            case '"':
+                stringTokenBuilder.Append('"');
+                _position++;
+                break;
+            case '\\':
+                stringTokenBuilder.Append('\\');
+                _position++;
+                break;
+            default:
+                Diagnostics.ReportInvalidEscapeSequence(new(_position, 1));
+                break;
+        }
     }
 
     private void ReadIdentifierOrKeyword()

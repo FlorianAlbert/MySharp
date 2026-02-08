@@ -55,16 +55,16 @@ public sealed class SyntaxTree
     public static ImmutableArray<SyntaxToken> ParseTokens(SourceText text, out ImmutableArray<Diagnostic> diagnostics)
     {
         static IEnumerable<SyntaxToken> LexTokens(Lexer lexer)
-    {
-        while (true)
         {
-            SyntaxToken token = lexer.Lex();
-            if (token.Kind == SyntaxKind.EndOfFileToken)
+            while (true)
             {
-                break;
-            }
+                SyntaxToken token = lexer.Lex();
+                if (token.Kind == SyntaxKind.EndOfFileToken)
+                {
+                    break;
+                }
 
-            yield return token;
+                yield return token;
             }
         }
 

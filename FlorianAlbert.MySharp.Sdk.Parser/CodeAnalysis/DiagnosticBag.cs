@@ -84,4 +84,16 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Cannot assign to read-only variable '{name}'.";
         Report(span, message);
     }
+
+    internal void ReportUnterminatedString(TextSpan span)
+    {
+        string message = "Unterminated string literal.";
+        Report(span, message);
+    }
+
+    internal void ReportInvalidEscapeSequence(TextSpan textSpan)
+    {
+        string message = $"Invalid escape sequence.";
+        Report(textSpan, message);
+    }
 }

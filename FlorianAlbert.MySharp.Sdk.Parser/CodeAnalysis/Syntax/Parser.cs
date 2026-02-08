@@ -264,6 +264,7 @@ internal sealed class Parser
             SyntaxKind.OpenParenthesisToken => ParseParenthesizedExpression(),
             SyntaxKind.FalseKeyword or SyntaxKind.TrueKeyword => ParseBooleanLiteral(),
             SyntaxKind.NumberToken => ParseNumberLiteral(),
+            SyntaxKind.StringToken => ParseStringLiteral(),
             _ => ParseNameExpression(),
         };
     }
@@ -273,6 +274,13 @@ internal sealed class Parser
         SyntaxToken nextNumberToken = MatchToken(SyntaxKind.NumberToken);
 
         return new LiteralExpressionSyntax(nextNumberToken);
+    }
+
+    private LiteralExpressionSyntax ParseStringLiteral()
+    {
+        SyntaxToken nextStringToken = MatchToken(SyntaxKind.StringToken);
+
+        return new LiteralExpressionSyntax(nextStringToken);
     }
 
     private ParenthesizedExpressionSyntax ParseParenthesizedExpression()

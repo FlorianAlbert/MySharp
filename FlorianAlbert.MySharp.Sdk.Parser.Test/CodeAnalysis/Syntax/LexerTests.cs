@@ -1,4 +1,6 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using FlorianAlbert.MySharp.Sdk.Parser.Test;
 using System.Collections.Immutable;
 
@@ -68,6 +70,21 @@ public class LexerTests
         Assert.Equal(secondTokenText, tokens[2].Text);
     }
 
+    [Fact]
+    public void Lexer_LexesUnterminatedString_WithDiagnostic()
+    {
+        string text = $"\"abc";
+        ImmutableArray<SyntaxToken> tokens = SyntaxTree.ParseTokens(text, out ImmutableArray<Diagnostic> diagnostics);
+
+        SyntaxToken token = Assert.Single(tokens);
+        Assert.Equal(SyntaxKind.StringToken, token.Kind);
+        Assert.Equal(text, token.Text);
+
+        Diagnostic diagnostic = Assert.Single(diagnostics);
+        Assert.Equal(new TextSpan(0, text.Length), diagnostic.Span);
+        Assert.Equal("Unterminated string literal.", diagnostic.Message);
+    }
+
     public static TheoryData<SyntaxKind, string> GetTokens()
     {
 
@@ -77,6 +94,11 @@ public class LexerTests
             { SyntaxKind.NumberToken, "123" },
             { SyntaxKind.IdentifierToken, "a" },
             { SyntaxKind.IdentifierToken, "abc" },
+            { SyntaxKind.StringToken, "\"\""  },
+            { SyntaxKind.StringToken, "\"a\""  },
+            { SyntaxKind.StringToken, "\"abc\""  },
+            { SyntaxKind.StringToken, "\"\\\"\""  },
+            { SyntaxKind.StringToken, "\"\\\\\""  },
         };
 
         IEnumerable<(SyntaxKind, string)> fixedTokens = Enum.GetValues<SyntaxKind>()
