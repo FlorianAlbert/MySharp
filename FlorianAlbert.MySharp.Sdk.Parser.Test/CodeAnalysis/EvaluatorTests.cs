@@ -292,6 +292,21 @@ public class EvaluatorTests
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
+    [Theory]
+    [InlineData("![!]5;", @"
+        Unary operator '!' is not defined for type 'int32'.
+    ")]
+    [InlineData("(10 [*] false) || true;", @"
+        Binary operator '*' is not defined for types 'int32' and 'bool'.
+    ")]
+    [InlineData("if ((42 [*] \"\") || true) { }", @"
+        Binary operator '*' is not defined for types 'int32' and 'string'.
+    ")]
+    public void Evaluator_CascadingErrors_Reports_OnlyRootCause(string text, string expectedDiagnosticTexts)
+    {
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
     private static void AssertValue(string expression, object expectedResult)
     {
         var syntaxTree = SyntaxTree.Parse(expression);

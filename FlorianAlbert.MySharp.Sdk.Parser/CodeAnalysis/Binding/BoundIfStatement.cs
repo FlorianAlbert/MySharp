@@ -31,6 +31,6 @@ internal sealed class BoundIfStatement : BoundStatement
 
     public override IEnumerable<(string name, object? value)> GetProperties()
     {
-        return [];
+        yield break;
     }
 }

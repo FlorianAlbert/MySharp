@@ -13,7 +13,7 @@ internal sealed class BoundGotoStatement : BoundStatement
 
     public override IEnumerable<BoundNode> GetChildren()
     {
-        return [];
+        yield break;
     }
 
     public override IEnumerable<(string name, object? value)> GetProperties()

@@ -86,10 +86,7 @@ internal sealed class Binder
 
         BoundExpression boundValueExpression = BindExpression(statementSyntax.ValueExpression);
 
-        TypeSymbol type = boundValueExpression.Type;
-        ArgumentNullException.ThrowIfNull(type);
-
-        VariableSymbol variableSymbol = new(name, isReadOnly, type);
+        VariableSymbol variableSymbol = new(name, isReadOnly, boundValueExpression.Type);
         if (!_scope.TryDeclare(variableSymbol))
         {
             Diagnostics.ReportVariableAlreadyDeclared(statementSyntax.IdentifierToken.Span, name);
@@ -145,12 +142,14 @@ internal sealed class Binder
     {
         BoundExpression boundExpression = BindExpression(expression);
 
-        TypeSymbol type = boundExpression.Type;
-        ArgumentNullException.ThrowIfNull(type);
-
-        if (type != expectedType)
+        if (boundExpression.Type == TypeSymbol.Error)
         {
-            Diagnostics.ReportCannotConvert(expression.Span, type, expectedType);
+            return boundExpression;
+        }
+
+        if (boundExpression.Type != expectedType)
+        {
+            Diagnostics.ReportCannotConvert(expression.Span, boundExpression.Type, expectedType);
         }
 
         return boundExpression;
@@ -176,9 +175,6 @@ internal sealed class Binder
 
         string name = expressionSyntax.IdentifierToken.Text;
 
-        TypeSymbol type = boundExpression.Type;
-        ArgumentNullException.ThrowIfNull(type);
-
         if (!_scope.TryLookup(name, out VariableSymbol? existingVariableSymbol))
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
@@ -191,9 +187,9 @@ internal sealed class Binder
             return boundExpression;
         }
 
-        if (existingVariableSymbol.Type != type)
+        if (existingVariableSymbol.Type != boundExpression.Type)
         {
-            Diagnostics.ReportCannotConvert(expressionSyntax.EqualsToken.Span, type, existingVariableSymbol.Type);
+            Diagnostics.ReportCannotConvert(expressionSyntax.EqualsToken.Span, boundExpression.Type, existingVariableSymbol.Type);
             return boundExpression;
         }
 
@@ -207,13 +203,13 @@ internal sealed class Binder
         if (name is GlobalStringConstants.ConstEmpty)
         {
             // The token got inserted by the parser due to an error.
-            return new BoundLiteralExpression(0);
+            return BoundErrorExpression.Instance;
         }
 
         if (!_scope.TryLookup(name, out VariableSymbol? variableSymbol))
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
-            return new BoundLiteralExpression(0);
+            return BoundErrorExpression.Instance;
         }
 
         return new BoundVariableExpression(variableSymbol);
@@ -225,12 +221,18 @@ internal sealed class Binder
     {
         BoundExpression boundLeftExpression = BindExpression(expressionSyntax.LeftExpression);
         BoundExpression boundRightExpression = BindExpression(expressionSyntax.RightExpression);
+
+        if (boundLeftExpression.Type == TypeSymbol.Error || boundRightExpression.Type == TypeSymbol.Error)
+        {
+            return BoundErrorExpression.Instance;
+        }
+
         BoundBinaryOperator? boundBinaryOperator = BoundBinaryOperator.Bind(expressionSyntax.OperatorToken.Kind, boundLeftExpression.Type, boundRightExpression.Type);
 
         if (boundBinaryOperator is null)
         {
             Diagnostics.ReportUndefindedBinaryOperator(expressionSyntax.OperatorToken.Span, expressionSyntax.OperatorToken.Text, boundLeftExpression.Type, boundRightExpression.Type);
-            return boundLeftExpression;
+            return BoundErrorExpression.Instance;
         }
 
         return new BoundBinaryExpression(boundLeftExpression, boundBinaryOperator, boundRightExpression);
@@ -239,12 +241,18 @@ internal sealed class Binder
     private BoundExpression BindUnaryExpression(UnaryExpressionSyntax expressionSyntax)
     {
         BoundExpression boundOperandExpression = BindExpression(expressionSyntax.Operand);
+
+        if (boundOperandExpression.Type == TypeSymbol.Error)
+        {
+            return boundOperandExpression;
+        }
+
         BoundUnaryOperator? boundUnaryOperator = BoundUnaryOperator.Bind(expressionSyntax.OperatorToken.Kind, boundOperandExpression.Type);
 
         if (boundUnaryOperator is null)
         {
             Diagnostics.ReportUndefindedUnaryOperator(expressionSyntax.OperatorToken.Span, expressionSyntax.OperatorToken.Text, boundOperandExpression.Type);
-            return boundOperandExpression;
+            return BoundErrorExpression.Instance;
         }
 
         return new BoundUnaryExpression(boundUnaryOperator, boundOperandExpression);

@@ -26,7 +26,7 @@ internal sealed class BoundLiteralExpression : BoundExpression
 
     public override IEnumerable<BoundNode> GetChildren()
     {
-        return [];
+        yield break;
     }
 
     public override IEnumerable<(string name, object? value)> GetProperties()
