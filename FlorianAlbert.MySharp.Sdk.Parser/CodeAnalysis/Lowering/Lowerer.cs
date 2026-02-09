@@ -14,7 +14,7 @@ internal sealed class Lowerer : BoundTreeRewriter
     {
     }
 
-    private VariableSymbol GenerateVariableSymbol(bool isReadonly, Type type)
+    private VariableSymbol GenerateVariableSymbol(bool isReadonly, TypeSymbol type)
     {
         return new VariableSymbol($"<Variable{_variableCounter++}>", isReadonly, type);
     }
@@ -130,7 +130,7 @@ internal sealed class Lowerer : BoundTreeRewriter
             forStatement.IteratorSymbol,
             forStatement.LowerBound);
 
-        VariableSymbol upperBoundSymbol = GenerateVariableSymbol(isReadonly: true, typeof(int));
+        VariableSymbol upperBoundSymbol = GenerateVariableSymbol(isReadonly: true, TypeSymbol.Int32);
 
         BoundVariableDeclarationStatement upperBoundVariableDeclarationStatement =
             new(upperBoundSymbol, forStatement.UpperBound);
@@ -139,7 +139,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
         BoundBinaryExpression conditionExpression = new(
             new BoundVariableExpression(forStatement.IteratorSymbol),
-            BoundBinaryOperator.Bind(SyntaxKind.LessToken, typeof(int), typeof(int))!,
+            BoundBinaryOperator.Bind(SyntaxKind.LessToken, TypeSymbol.Int32, TypeSymbol.Int32)!,
             upperBoundExpression);
 
         BoundExpressionStatement incrementStatement = new(
@@ -147,7 +147,7 @@ internal sealed class Lowerer : BoundTreeRewriter
                 forStatement.IteratorSymbol,
                 new BoundBinaryExpression(
                     new BoundVariableExpression(forStatement.IteratorSymbol),
-                    BoundBinaryOperator.Bind(SyntaxKind.PlusToken, forStatement.IteratorSymbol.Type, typeof(int))!,
+                    BoundBinaryOperator.Bind(SyntaxKind.PlusToken, forStatement.IteratorSymbol.Type, TypeSymbol.Int32)!,
                     new BoundLiteralExpression(1))));
 
         BoundBlockStatement whileBlockStatement = new([forStatement.Body, incrementStatement]);

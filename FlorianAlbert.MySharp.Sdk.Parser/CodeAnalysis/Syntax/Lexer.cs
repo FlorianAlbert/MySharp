@@ -1,4 +1,5 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Text;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
@@ -298,7 +299,7 @@ internal sealed class Lexer
 
         if (!int.TryParse(tokenText, out int value))
         {
-            Diagnostics.ReportInvalidNumber(span, tokenText, typeof(int));
+            Diagnostics.ReportInvalidNumber(span, tokenText, TypeSymbol.Int32);
         }
 
         _value = value;

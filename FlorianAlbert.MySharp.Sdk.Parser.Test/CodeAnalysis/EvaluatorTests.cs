@@ -170,7 +170,7 @@ public class EvaluatorTests
         ";
 
         string expectedDiagnosticTexts = @"
-            Cannot convert type 'System.Boolean' to 'System.Int32'.
+            Cannot convert type 'bool' to 'int32'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -182,7 +182,7 @@ public class EvaluatorTests
         string text = @"[+]true;";
 
         string expectedDiagnosticTexts = @"
-            Unary operator '+' is not defined for type 'System.Boolean'.
+            Unary operator '+' is not defined for type 'bool'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -194,7 +194,7 @@ public class EvaluatorTests
         string text = @"10 [+] true;";
 
         string expectedDiagnosticTexts = @"
-            Binary operator '+' is not defined for types 'System.Int32' and 'System.Boolean'.
+            Binary operator '+' is not defined for types 'int32' and 'bool'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -211,7 +211,7 @@ public class EvaluatorTests
         ";
 
         string expectedDiagnosticTexts = @"
-            Cannot convert type 'System.Int32' to 'System.Boolean'.
+            Cannot convert type 'int32' to 'bool'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -233,7 +233,7 @@ public class EvaluatorTests
         ";
 
         string expectedDiagnosticTexts = @"
-            Cannot convert type 'System.Int32' to 'System.Boolean'.
+            Cannot convert type 'int32' to 'bool'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -253,7 +253,7 @@ public class EvaluatorTests
         ";
 
         string expectedDiagnosticTexts = @"
-            Cannot convert type 'System.Boolean' to 'System.Int32'.
+            Cannot convert type 'bool' to 'int32'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -273,7 +273,7 @@ public class EvaluatorTests
         ";
 
         string expectedDiagnosticTexts = @"
-            Cannot convert type 'System.Boolean' to 'System.Int32'.
+            Cannot convert type 'bool' to 'int32'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);

@@ -117,7 +117,7 @@ internal sealed class Evaluator
         };
     }
 
-    private static object? EvaluateLiteralExpression(BoundLiteralExpression boundLiteralExpression)
+    private static object EvaluateLiteralExpression(BoundLiteralExpression boundLiteralExpression)
     {
         return boundLiteralExpression.Value;
     }

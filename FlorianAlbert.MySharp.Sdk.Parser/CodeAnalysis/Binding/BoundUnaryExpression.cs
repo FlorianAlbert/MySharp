@@ -1,4 +1,5 @@
-﻿
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundUnaryExpression : BoundExpression
@@ -9,7 +10,7 @@ internal sealed class BoundUnaryExpression : BoundExpression
         Operand = operand;
     }
 
-    public override Type Type => Operator.ResultType;
+    public override TypeSymbol Type => Operator.ResultType;
 
     public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
 

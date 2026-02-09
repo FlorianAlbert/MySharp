@@ -1,4 +1,5 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;

@@ -1,4 +1,5 @@
-﻿
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundBinaryExpression : BoundExpression
@@ -10,7 +11,7 @@ internal sealed class BoundBinaryExpression : BoundExpression
         Right = right;
     }
 
-    public override Type Type => Operator.ResultType;
+    public override TypeSymbol Type => Operator.ResultType;
     public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
 
     public BoundExpression Left { get; }

@@ -1,4 +1,5 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Collections;
 
@@ -30,7 +31,7 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         _diagnostics.AddRange(diagnosticBag);
     }
 
-    internal void ReportInvalidNumber(TextSpan textSpan, string tokenText, Type type)
+    internal void ReportInvalidNumber(TextSpan textSpan, string tokenText, TypeSymbol type)
     {
         string message = $"The number '{tokenText}' is not a valid {type}.";
         Report(textSpan, message);
@@ -49,13 +50,13 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         Report(span, message);
     }
 
-    internal void ReportUndefindedBinaryOperator(TextSpan span, string? text, Type? leftType, Type? rightType)
+    internal void ReportUndefindedBinaryOperator(TextSpan span, string text, TypeSymbol leftType, TypeSymbol rightType)
     {
         string message = $"Binary operator '{text}' is not defined for types '{leftType}' and '{rightType}'.";
         Report(span, message);
     }
 
-    internal void ReportUndefindedUnaryOperator(TextSpan span, string? text, Type? type)
+    internal void ReportUndefindedUnaryOperator(TextSpan span, string text, TypeSymbol type)
     {
         string message = $"Unary operator '{text}' is not defined for type '{type}'.";
         Report(span, message);
@@ -73,7 +74,7 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         Report(span, message);
     }
 
-    internal void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
+    internal void ReportCannotConvert(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
     {
         string message = $"Cannot convert type '{fromType}' to '{toType}'.";
         Report(span, message);

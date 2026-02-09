@@ -1,15 +1,16 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundUnaryOperator
 {
-    private BoundUnaryOperator(SyntaxKind syntaxKind, BoundUnaryOperatorKind kind, Type operandType) 
+    private BoundUnaryOperator(SyntaxKind syntaxKind, BoundUnaryOperatorKind kind, TypeSymbol operandType) 
         : this(syntaxKind, kind, operandType, operandType)
     {
     }
 
-    private BoundUnaryOperator(SyntaxKind syntaxKind, BoundUnaryOperatorKind kind, Type operandType, Type resultType)
+    private BoundUnaryOperator(SyntaxKind syntaxKind, BoundUnaryOperatorKind kind, TypeSymbol operandType, TypeSymbol resultType)
     {
         SyntaxKind = syntaxKind;
         Kind = kind;
@@ -21,19 +22,19 @@ internal sealed class BoundUnaryOperator
 
     public BoundUnaryOperatorKind Kind { get; }
 
-    public Type OperandType { get; }
+    public TypeSymbol OperandType { get; }
 
-    public Type ResultType { get; }
+    public TypeSymbol ResultType { get; }
 
     private static readonly BoundUnaryOperator[] _operators =
     [
-        new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int)),
-        new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, typeof(int)),
-        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool)),
-        new(SyntaxKind.TildeToken, BoundUnaryOperatorKind.BitwiseNegation, typeof(int))
+        new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, TypeSymbol.Int32),
+        new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, TypeSymbol.Int32),
+        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
+        new(SyntaxKind.TildeToken, BoundUnaryOperatorKind.BitwiseNegation, TypeSymbol.Int32)
     ];
 
-    public static BoundUnaryOperator? Bind(SyntaxKind syntaxKind, Type? operandType)
+    public static BoundUnaryOperator? Bind(SyntaxKind syntaxKind, TypeSymbol operandType)
     {
         foreach (BoundUnaryOperator @operator in _operators)
         {

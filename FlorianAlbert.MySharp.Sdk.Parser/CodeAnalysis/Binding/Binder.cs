@@ -86,7 +86,7 @@ internal sealed class Binder
 
         BoundExpression boundValueExpression = BindExpression(statementSyntax.ValueExpression);
 
-        Type? type = boundValueExpression.Type;
+        TypeSymbol type = boundValueExpression.Type;
         ArgumentNullException.ThrowIfNull(type);
 
         VariableSymbol variableSymbol = new(name, isReadOnly, type);
@@ -100,7 +100,7 @@ internal sealed class Binder
 
     private BoundIfStatement BindIfStatement(IfStatementSyntax statementSyntax)
     {
-        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, typeof(bool));
+        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.Bool);
 
         BoundStatement boundThenStatement = BindStatement(statementSyntax.ThenStatement);
 
@@ -111,7 +111,7 @@ internal sealed class Binder
 
     private BoundWhileStatement BindWhileStatement(WhileStatementSyntax statementSyntax)
     {
-        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, typeof(bool));
+        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.Bool);
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.BodyStatement);
 
         return new BoundWhileStatement(boundConditionExpression, boundBodyStatement);
@@ -119,13 +119,13 @@ internal sealed class Binder
 
     private BoundForStatement BindForStatement(ForStatementSyntax statementSyntax)
     {
-        BoundExpression boundLowerBoundExpression = BindExpression(statementSyntax.LowerBoundExpression, typeof(int));
-        BoundExpression boundUpperBoundExpression = BindExpression(statementSyntax.UpperBoundExpression, typeof(int));
+        BoundExpression boundLowerBoundExpression = BindExpression(statementSyntax.LowerBoundExpression, TypeSymbol.Int32);
+        BoundExpression boundUpperBoundExpression = BindExpression(statementSyntax.UpperBoundExpression, TypeSymbol.Int32);
 
         _scope = new(_scope);
 
         string iteratorName = statementSyntax.IdentifierToken.Text;
-        VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, typeof(int));
+        VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, TypeSymbol.Int32);
         _scope.TryDeclare(variableSymbol);
 
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.Body);
@@ -141,11 +141,11 @@ internal sealed class Binder
         return new BoundExpressionStatement(boundExpression);
     }
 
-    private BoundExpression BindExpression(ExpressionSyntax expression, Type expectedType)
+    private BoundExpression BindExpression(ExpressionSyntax expression, TypeSymbol expectedType)
     {
         BoundExpression boundExpression = BindExpression(expression);
 
-        Type? type = boundExpression.Type;
+        TypeSymbol type = boundExpression.Type;
         ArgumentNullException.ThrowIfNull(type);
 
         if (type != expectedType)
@@ -176,7 +176,7 @@ internal sealed class Binder
 
         string name = expressionSyntax.IdentifierToken.Text;
 
-        Type? type = boundExpression.Type;
+        TypeSymbol type = boundExpression.Type;
         ArgumentNullException.ThrowIfNull(type);
 
         if (!_scope.TryLookup(name, out VariableSymbol? existingVariableSymbol))
