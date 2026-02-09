@@ -142,9 +142,9 @@ internal sealed class Binder
     {
         BoundExpression boundExpression = BindExpression(expression);
 
-        if (boundExpression.Type == TypeSymbol.Error)
+        if (boundExpression.Type == TypeSymbol.Error || expectedType == TypeSymbol.Error)
         {
-            return boundExpression;
+            return BoundErrorExpression.Instance;
         }
 
         if (boundExpression.Type != expectedType)
