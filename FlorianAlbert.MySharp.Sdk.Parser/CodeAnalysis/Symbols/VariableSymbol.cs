@@ -13,6 +13,4 @@ public sealed class VariableSymbol : Symbol
     public bool IsReadOnly { get; }
 
     public TypeSymbol Type { get; }
-
-    public override string ToString() => $"{{{Type} {Name} {(IsReadOnly ? "immutable" : "mutable")}}}";
 }
