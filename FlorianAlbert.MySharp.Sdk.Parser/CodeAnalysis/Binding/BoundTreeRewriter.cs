@@ -8,6 +8,7 @@ internal abstract class BoundTreeRewriter
     {
         return expression.Kind switch
         {
+            BoundNodeKind.ErrorExpression => RewriteErrorExpression((BoundErrorExpression) expression),
             BoundNodeKind.UnaryExpression => RewriteUnaryExpression((BoundUnaryExpression) expression),
             BoundNodeKind.LiteralExpression => RewriteLiteralExpression((BoundLiteralExpression) expression),
             BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression) expression),
@@ -15,6 +16,11 @@ internal abstract class BoundTreeRewriter
             BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression) expression),
             _ => throw new InvalidOperationException($"Unexpected expression kind: {expression.Kind}"),
         };
+    }
+
+    protected virtual BoundErrorExpression RewriteErrorExpression(BoundErrorExpression errorExpression)
+    {
+        return errorExpression;
     }
 
     protected virtual BoundUnaryExpression RewriteUnaryExpression(BoundUnaryExpression unaryExpression)
