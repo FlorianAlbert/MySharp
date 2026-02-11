@@ -174,6 +174,7 @@ internal sealed class Evaluator
             BoundBinaryOperatorKind.LessThanOrEquals => (int?) leftValue <= (int?) rightValue,
             BoundBinaryOperatorKind.GreaterThan => (int?) leftValue > (int?) rightValue,
             BoundBinaryOperatorKind.GreaterThanOrEquals => (int?) leftValue >= (int?) rightValue,
+            BoundBinaryOperatorKind.Concatenation => (string?) leftValue + (string?) rightValue,
             _ => throw new Exception($"Unexpected binary operator {boundBinaryExpression.Operator.Kind}"),
         };
     }

@@ -85,6 +85,7 @@ public class EvaluatorTests
     [InlineData("10 >= 5;", true)]
     [InlineData("10 >= 10;", true)]
     [InlineData("\"Test\";", "Test")]
+    [InlineData("\"Hello \" + \"World\";", "Hello World")]
     [InlineData("{ var a = 10; (a = 4) * a / 2; }", 8)]
     [InlineData("{ var a = 0; if (a == 0) a = 10; }", 10)]
     [InlineData("{ var a = 0; if (a == 5) a = 10; }", 0)]
