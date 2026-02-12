@@ -1,5 +1,6 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
@@ -176,6 +177,9 @@ internal sealed class Lexer
             case '"':
                 ReadStringToken();
                 break;
+            case '\'':
+                ReadCharacterToken();
+                break;
             case '0':
             case '1':
             case '2':
@@ -320,7 +324,7 @@ internal sealed class Lexer
                     isDone = true;
                     break;
                 case '\\':
-                    TryReadEscapeSequence(stringTokenBuilder);
+                    TryReadStringEscapeSequence(stringTokenBuilder);
                     _position++;
                     break;
                 case '"':
@@ -339,21 +343,82 @@ internal sealed class Lexer
     }
 
     /// <summary>
-    /// Tries to read an escape sequence and appends the corresponding character to the provided StringBuilder.
-    /// If the string is unterminated, reports a diagnostic and returns true to indicate termination.
+    /// Tries to read a string escape sequence and appends the corresponding character to the provided StringBuilder.
+    /// Otherwise a diagnostic is set.
     /// </summary>
     /// <param name="stringTokenBuilder">The StringBuilder to append the character to.</param>
-    /// <returns>True if the string is unterminated and reading of the string should stop, false otherwise.</returns>
-    private void TryReadEscapeSequence(StringBuilder stringTokenBuilder)
+    private void TryReadStringEscapeSequence(StringBuilder stringTokenBuilder)
     {
         switch (_Lookahead)
         {
             case '"':
-                stringTokenBuilder.Append('"');
+            case '\\':
+                stringTokenBuilder.Append(_Lookahead);
                 _position++;
                 break;
+            default:
+                Diagnostics.ReportInvalidEscapeSequence(new(_position, 1));
+                break;
+        }
+    }
+
+    private void ReadCharacterToken()
+    {
+        _position++;
+        StringBuilder stringTokenBuilder = new();
+        bool isDone = false;
+        while (!isDone)
+        {
+            switch (_Current)
+            {
+                case '\0' or '\n' or '\r':
+                    Diagnostics.ReportUnterminatedCharacter(TextSpan.FromBounds(_start, _position));
+                    isDone = true;
+                    break;
+                case '\\':
+                    TryReadCharacterEscapeSequence(stringTokenBuilder);
+                    _position++;
+                    break;
+                case '\'':
+                    isDone = true;
+                    _position++;
+                    break;
+                default:
+                    stringTokenBuilder.Append(_Current);
+                    _position++;
+                    break;
+            }
+        }
+
+        if (stringTokenBuilder.Length > 1)
+        {
+            Diagnostics.ReportTooManyCharactersInCharacterLiteral(TextSpan.FromBounds(_start, _position));
+        }
+
+        if (_Current == '\'')
+        {
+            _value = stringTokenBuilder.ToString()[0];
+        }
+        else
+        {
+            _value = '\0';
+        }
+        _kind = SyntaxKind.CharacterToken;
+    }
+
+    /// <summary>
+    /// Tries to read a character escape sequence.
+    /// If an invalid escape sequence is found, a diagnostic gets set.
+    /// </summary>
+    /// <param name="value">The out parameter the value gets written to, if successful.</param>
+    /// <returns>If the escape sequence got read successfully.</returns>
+    private void TryReadCharacterEscapeSequence(StringBuilder stringTokenBuilder)
+    {
+        switch (_Lookahead)
+        {
+            case '\'':
             case '\\':
-                stringTokenBuilder.Append('\\');
+                stringTokenBuilder.Append(_Lookahead);
                 _position++;
                 break;
             default:

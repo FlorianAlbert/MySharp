@@ -84,6 +84,8 @@ public class EvaluatorTests
     [InlineData("5 >= 10;", false)]
     [InlineData("10 >= 5;", true)]
     [InlineData("10 >= 10;", true)]
+    [InlineData("'x';", 'x')]
+    [InlineData("'a';", 'a')]
     [InlineData("\"Test\";", "Test")]
     [InlineData("\"Hello \" + \"World\";", "Hello World")]
     [InlineData("\"Hello\" == \"Hello\";", true)]
@@ -309,6 +311,29 @@ public class EvaluatorTests
         Binary operator '*' is not defined for types 'int32' and 'string'.
     ")]
     public void Evaluator_CascadingErrors_Reports_OnlyRootCause(string text, string expectedDiagnosticTexts)
+    {
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Theory]
+    [InlineData("['x][]", @"
+        Unterminated character literal.
+        Unexpected token <EndOfFileToken>, expected <SemicolonToken>.
+    ")]
+    [InlineData("['[\\]][]", @"
+        Invalid escape sequence.
+        Unterminated character literal.
+        Unexpected token <EndOfFileToken>, expected <SemicolonToken>.
+    ")]
+    [InlineData("['\\\\][]", @"
+        Unterminated character literal.
+        Unexpected token <EndOfFileToken>, expected <SemicolonToken>.
+    ")]
+    [InlineData("['\\'][]", @"
+        Unterminated character literal.
+        Unexpected token <EndOfFileToken>, expected <SemicolonToken>.
+    ")]
+    public void Evaluator_CharacterLiteral_Reports_Unterminated(string text, string expectedDiagnosticTexts)
     {
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }

@@ -92,6 +92,18 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         Report(span, message);
     }
 
+    internal void ReportUnterminatedCharacter(TextSpan span)
+    {
+        string message = "Unterminated character literal.";
+        Report(span, message);
+    }
+
+    internal void ReportTooManyCharactersInCharacterLiteral(TextSpan span)
+    {
+        string message = "Too many characters in character literal.";
+        Report(span, message);
+    }
+
     internal void ReportInvalidEscapeSequence(TextSpan textSpan)
     {
         string message = $"Invalid escape sequence.";

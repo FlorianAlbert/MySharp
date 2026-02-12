@@ -14,6 +14,7 @@ internal sealed class BoundLiteralExpression : BoundExpression
             bool => TypeSymbol.Bool,
             int => TypeSymbol.Int32,
             string => TypeSymbol.String,
+            char => TypeSymbol.Character,
             _ => throw new InvalidOperationException($"Unexpected literal type: {value.GetType()}")
         };
     }

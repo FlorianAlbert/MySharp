@@ -15,4 +15,6 @@ public sealed class TypeSymbol : Symbol
     public static readonly TypeSymbol Int32 = new("int32");
 
     public static readonly TypeSymbol String = new("string");
+
+    public static readonly TypeSymbol Character = new("char");
 }

@@ -99,6 +99,11 @@ public class LexerTests
             { SyntaxKind.StringToken, "\"abc\""  },
             { SyntaxKind.StringToken, "\"\\\"\""  },
             { SyntaxKind.StringToken, "\"\\\\\""  },
+            { SyntaxKind.CharacterToken, "'a'" },
+            { SyntaxKind.CharacterToken, "'x'" },
+            { SyntaxKind.CharacterToken, "'\\\''" },
+            { SyntaxKind.CharacterToken, "'\\\\'" },
+            { SyntaxKind.CharacterToken, "'\"'" }
         };
 
         IEnumerable<(SyntaxKind, string)> fixedTokens = Enum.GetValues<SyntaxKind>()

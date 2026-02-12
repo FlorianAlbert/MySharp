@@ -7,6 +7,7 @@ public enum SyntaxKind
     EndOfFileToken,
     WhitespaceToken,
     NumberToken,
+    CharacterToken,
     StringToken,
     PlusToken,
     MinusToken,
