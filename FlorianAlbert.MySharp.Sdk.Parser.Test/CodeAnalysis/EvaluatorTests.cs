@@ -86,6 +86,11 @@ public class EvaluatorTests
     [InlineData("10 >= 10;", true)]
     [InlineData("'x';", 'x')]
     [InlineData("'a';", 'a')]
+    [InlineData("'\\'';", '\'')]
+    [InlineData("'\\\\';", '\\')]
+    [InlineData("'a' + 'b';", "ab")]
+    [InlineData("\"Hallo\" + '!';", "Hallo!")]
+    [InlineData("'-' + \"512\";", "-512")]
     [InlineData("\"Test\";", "Test")]
     [InlineData("\"Hello \" + \"World\";", "Hello World")]
     [InlineData("\"Hello\" == \"Hello\";", true)]
@@ -334,6 +339,27 @@ public class EvaluatorTests
         Unexpected token <EndOfFileToken>, expected <SemicolonToken>.
     ")]
     public void Evaluator_CharacterLiteral_Reports_Unterminated(string text, string expectedDiagnosticTexts)
+    {
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Theory]
+    [InlineData("['abc'];", @"
+        Too many characters in character literal.
+    ")]
+    [InlineData("['\\\\x'];", @"
+        Too many characters in character literal.
+    ")]
+    [InlineData("['x\\\\'];", @"
+        Too many characters in character literal.
+    ")]
+    [InlineData("['\\'x'];", @"
+        Too many characters in character literal.
+    ")]
+    [InlineData("['x\\''];", @"
+        Too many characters in character literal.
+    ")]
+    public void Evaluator_CharacterLiteral_Reports_TooManyCharacters(string text, string expectedDiagnosticTexts)
     {
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }

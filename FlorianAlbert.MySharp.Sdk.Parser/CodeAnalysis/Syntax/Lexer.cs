@@ -381,7 +381,6 @@ internal sealed class Lexer
                     break;
                 case '\'':
                     isDone = true;
-                    _position++;
                     break;
                 default:
                     stringTokenBuilder.Append(_Current);
@@ -392,12 +391,14 @@ internal sealed class Lexer
 
         if (stringTokenBuilder.Length > 1)
         {
-            Diagnostics.ReportTooManyCharactersInCharacterLiteral(TextSpan.FromBounds(_start, _position));
+            int endPosition = _Current == '\'' ? _position + 1 : _position;
+            Diagnostics.ReportTooManyCharactersInCharacterLiteral(TextSpan.FromBounds(_start, endPosition));
         }
 
         if (_Current == '\'')
         {
             _value = stringTokenBuilder.ToString()[0];
+            _position++;
         }
         else
         {
