@@ -127,7 +127,7 @@ internal sealed class MySharpRepl : Repl
         }
         else
         {
-            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(result.Value);
             Console.ResetColor();
 
