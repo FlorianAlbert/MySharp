@@ -215,7 +215,7 @@ internal sealed class Evaluator
         return $"{leftValue}{rightValue}";
     }
 
-    private string? EvaluateCallExpression(BoundCallExpression expression)
+    private object? EvaluateCallExpression(BoundCallExpression expression)
     {
         if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Print)
         {
@@ -226,6 +226,12 @@ internal sealed class Evaluator
         else if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Input)
         {
             return Console.ReadLine();
+        }
+        else if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Random)
+        {
+            int minValue = (int) EvaluateExpression(expression.Arguments[0])!;
+            int maxValue = (int) EvaluateExpression(expression.Arguments[1])!;
+            return Random.Shared.Next(minValue, maxValue);
         }
         else
         {

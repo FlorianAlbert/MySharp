@@ -23,6 +23,8 @@ public sealed class FunctionSymbol : Symbol
 
         public static readonly FunctionSymbol Input = new("input", [], TypeSymbol.String);
 
-        public static ImmutableArray<FunctionSymbol> GetAll() => [Print, Input];
+        public static readonly FunctionSymbol Random = new("random", [new("min", TypeSymbol.Int32), new("max", TypeSymbol.Int32)], TypeSymbol.Int32);
+
+        public static ImmutableArray<FunctionSymbol> GetAll() => [Print, Input, Random];
     }
 }
