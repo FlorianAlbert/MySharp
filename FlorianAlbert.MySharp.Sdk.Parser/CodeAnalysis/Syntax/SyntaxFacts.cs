@@ -107,6 +107,7 @@ public static class SyntaxFacts
         SyntaxKind.ForKeyword => "for",
         SyntaxKind.ToKeyword => "to",
         SyntaxKind.SemicolonToken => ";",
+        SyntaxKind.CommaToken => ",",
         _ => null
     };
 }

@@ -36,6 +36,7 @@ public enum SyntaxKind
     IdentifierToken,
     EqualsToken,
     SemicolonToken,
+    CommaToken,
 
     // Keywords
     FalseKeyword,
@@ -66,5 +67,6 @@ public enum SyntaxKind
     AssignmentExpression,
     UnaryExpression,
     BinaryExpression,
-    ParenthesizedExpression
+    ParenthesizedExpression,
+    CallExpression
 }

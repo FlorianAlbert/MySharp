@@ -127,9 +127,12 @@ internal sealed class MySharpRepl : Repl
         }
         else
         {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(result.Value);
-            Console.ResetColor();
+            if (result.Value is not null)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(result.Value);
+                Console.ResetColor();
+            }
 
             _previousCompilation = compilation;
         }

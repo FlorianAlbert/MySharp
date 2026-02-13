@@ -14,6 +14,7 @@ internal abstract class BoundTreeRewriter
             BoundNodeKind.BinaryExpression => RewriteBinaryExpression((BoundBinaryExpression) expression),
             BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression) expression),
             BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression) expression),
+            BoundNodeKind.CallExpression => RewriteCallExpression((BoundCallExpression) expression),
             _ => throw new InvalidOperationException($"Unexpected expression kind: {expression.Kind}"),
         };
     }
@@ -66,6 +67,35 @@ internal abstract class BoundTreeRewriter
         }
 
         return new BoundAssignmentExpression(assignmentExpression.VariableSymbol, rewrittenExpression);
+    }
+
+    protected virtual BoundExpression RewriteCallExpression(BoundCallExpression expression)
+    {
+        ImmutableArray<BoundExpression>.Builder? rewrittenArgumentsBuilder = null;
+        for (int argumentIndex = 0; argumentIndex < expression.Arguments.Length; argumentIndex++)
+        {
+            BoundExpression argument = expression.Arguments[argumentIndex];
+            BoundExpression rewrittenArgument = RewriteExpression(argument);
+            if (rewrittenArgument != argument)
+            {
+                if (rewrittenArgumentsBuilder is null)
+                {
+                    rewrittenArgumentsBuilder = ImmutableArray.CreateBuilder<BoundExpression>(expression.Arguments.Length);
+                    for (int previousArgumentIndex = 0; previousArgumentIndex < argumentIndex; previousArgumentIndex++)
+                    {
+                        rewrittenArgumentsBuilder.Add(expression.Arguments[previousArgumentIndex]);
+                    }
+                }
+            }
+            rewrittenArgumentsBuilder?.Add(rewrittenArgument);
+        }
+
+        if (rewrittenArgumentsBuilder is null)
+        {
+            return expression;
+        }
+
+        return new BoundCallExpression(expression.FunctionSymbol, rewrittenArgumentsBuilder.ToImmutable());
     }
 
     public virtual BoundStatement RewriteStatement(BoundStatement statement)

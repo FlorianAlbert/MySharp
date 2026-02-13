@@ -10,6 +10,8 @@ public sealed class TypeSymbol : Symbol
 
     public static readonly TypeSymbol Error = new("<error>");
 
+    public static readonly TypeSymbol Void = new("<void>");
+
     public static readonly TypeSymbol Bool = new("bool");
 
     public static readonly TypeSymbol Int32 = new("int32");

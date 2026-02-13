@@ -46,6 +46,8 @@ internal sealed class Parser
 
     private SyntaxToken _Current => Peek(0);
 
+    private SyntaxToken _Lookahead => Peek(1);
+
     private SyntaxToken Peek(int offset)
     {
         int index = _position + offset;
@@ -267,7 +269,7 @@ internal sealed class Parser
             SyntaxKind.NumberToken => ParseNumberLiteral(),
             SyntaxKind.CharacterToken => ParseCharacterLiteral(),
             SyntaxKind.StringToken => ParseStringLiteral(),
-            _ => ParseNameExpression(),
+            _ => ParseNameOrCallExpression(),
         };
     }
 
@@ -308,6 +310,49 @@ internal sealed class Parser
         SyntaxToken keywordToken = MatchToken(isTrue ? SyntaxKind.TrueKeyword : SyntaxKind.FalseKeyword);
 
         return new LiteralExpressionSyntax(keywordToken, isTrue);
+    }
+
+    private ExpressionSyntax ParseNameOrCallExpression()
+    {
+        if (_Lookahead.Kind == SyntaxKind.OpenParenthesisToken)
+        {
+            return ParseCallExpression();
+        }
+        else
+        {
+            return ParseNameExpression();
+        }
+    }
+
+    private CallExpressionSyntax ParseCallExpression()
+    {
+        SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        SyntaxToken openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+
+        SeparatedSyntaxList<ExpressionSyntax> arguments = ParseArgumentList();
+
+        SyntaxToken closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+
+        return new CallExpressionSyntax(identifierToken, openParenthesisToken, arguments, closeParenthesisToken);
+    }
+
+    private SeparatedSyntaxList<ExpressionSyntax> ParseArgumentList()
+    {
+        ImmutableArray<SyntaxNode>.Builder argumentsAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
+;
+        while (_Current.Kind is not SyntaxKind.CloseParenthesisToken and not SyntaxKind.EndOfFileToken)
+        {
+            ExpressionSyntax expression = ParseExpression();
+            argumentsAndSeparators.Add(expression);
+
+            if (_Current.Kind is not SyntaxKind.CloseParenthesisToken)
+            {
+                SyntaxToken commaToken = MatchToken(SyntaxKind.CommaToken);
+                argumentsAndSeparators.Add(commaToken);
+            }
+        }
+
+        return new SeparatedSyntaxList<ExpressionSyntax>(argumentsAndSeparators.ToImmutable());
     }
 
     private NameExpressionSyntax ParseNameExpression()

@@ -165,8 +165,57 @@ internal sealed class Binder
             SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax) expressionSyntax),
             SyntaxKind.NameExpression => BindNameExpression((NameExpressionSyntax) expressionSyntax),
             SyntaxKind.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionSyntax) expressionSyntax),
+            SyntaxKind.CallExpression => BindCallExpression((CallExpressionSyntax) expressionSyntax),
             _ => throw new Exception($"Unexpected syntax {expressionSyntax.Kind}"),
         };
+    }
+
+    private BoundExpression BindCallExpression(CallExpressionSyntax expressionSyntax)
+    {
+        FunctionSymbol? function = FunctionSymbol.BuiltIns.GetAll().SingleOrDefault(f => f.Name == expressionSyntax.IdentifierToken.Text);
+        if (function is null)
+        {
+            Diagnostics.ReportUndefinedFunction(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text);
+            return BoundErrorExpression.Instance;
+        }
+
+        if (expressionSyntax.Parameters.Count != function.Parameters.Length)
+        {
+            Diagnostics.ReportWrongNumberOfArguments(expressionSyntax.Span, function.Name, function.Parameters.Length, expressionSyntax.Parameters.Count);
+            return BoundErrorExpression.Instance;
+        }
+
+        bool hasError = false;
+        ImmutableArray<BoundExpression>.Builder boundArgumentExpressions = ImmutableArray.CreateBuilder<BoundExpression>();
+        for (int i = 0; i < expressionSyntax.Parameters.Count; i++)
+        {
+            BoundExpression boundArgumentExpression = BindExpression(expressionSyntax.Parameters[i]);
+            TypeSymbol parameterType = function.Parameters[i].Type;
+
+            if (boundArgumentExpression.Type == TypeSymbol.Error)
+            {
+                boundArgumentExpressions.Add(BoundErrorExpression.Instance);
+                hasError = true;
+                continue;
+            }
+
+            if (boundArgumentExpression.Type != parameterType)
+            {
+                Diagnostics.ReportCannotConvert(expressionSyntax.Parameters[i].Span, boundArgumentExpression.Type, parameterType);
+                boundArgumentExpressions.Add(BoundErrorExpression.Instance);
+                hasError = true;
+                continue;
+            }
+
+            boundArgumentExpressions.Add(boundArgumentExpression);
+        }
+
+        if (hasError)
+        {
+            return BoundErrorExpression.Instance;
+        }
+
+        return new BoundCallExpression(function, boundArgumentExpressions.ToImmutable());
     }
 
     private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax expressionSyntax)

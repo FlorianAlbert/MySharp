@@ -109,4 +109,16 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Invalid escape sequence.";
         Report(textSpan, message);
     }
+
+    internal void ReportUndefinedFunction(TextSpan span, string text)
+    {
+        string message = $"Undefined function '{text}'.";
+        Report(span, message);
+    }
+
+    internal void ReportWrongNumberOfArguments(TextSpan span, string name, int length, int count)
+    {
+        string message = $"Function '{name}' expects {length} arguments but was given {count}.";
+        Report(span, message);
+    }
 }

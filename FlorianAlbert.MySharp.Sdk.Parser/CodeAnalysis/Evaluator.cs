@@ -113,6 +113,7 @@ internal sealed class Evaluator
             BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression) expression),
             BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression) expression),
             BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression) expression),
+            BoundNodeKind.CallExpression => EvaluateCallExpression((BoundCallExpression) expression),
             _ => throw new Exception($"Unexpected node {expression.Kind}")
         };
     }
@@ -212,5 +213,23 @@ internal sealed class Evaluator
     private static string EvaluateConcatenation(object? leftValue, object? rightValue)
     {
         return $"{leftValue}{rightValue}";
+    }
+
+    private string? EvaluateCallExpression(BoundCallExpression expression)
+    {
+        if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Print)
+        {
+            object? argument = EvaluateExpression(expression.Arguments[0]);
+            Console.WriteLine(argument);
+            return null;
+        }
+        else if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Input)
+        {
+            return Console.ReadLine();
+        }
+        else
+        {
+            throw new Exception($"Unexpected function {expression.FunctionSymbol.Name}");
+        }
     }
 }
