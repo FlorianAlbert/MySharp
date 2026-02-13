@@ -12,16 +12,16 @@ internal sealed class Binder
 {
     private BoundScope _scope;
 
-    public Binder(BoundScope? parent)
+    public Binder(BoundScope parent)
     {
-        _scope = new BoundScope(parent);
+        _scope = new(parent);
     }
 
     public DiagnosticBag Diagnostics { get; } = [];
 
     public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax compilationUnitSyntax)
     {
-        BoundScope? parentScope = CreateParentScope(previous);
+        BoundScope parentScope = CreateParentScope(previous);
         Binder binder = new(parentScope);
         BoundStatement boundStatement = binder.BindStatement(compilationUnitSyntax.Statement);
 
@@ -31,22 +31,34 @@ internal sealed class Binder
         return new BoundGlobalScope(previous, diagnostics, variables, boundStatement);
     }
 
-    private static BoundScope? CreateParentScope(BoundGlobalScope? previousGlobalScope)
+    private static BoundScope CreateParentScope(BoundGlobalScope? previousGlobalScope)
     {
         if (previousGlobalScope is null)
         {
-            return null;
+            return CreateRootScope();
         }
 
-        BoundScope? parent = CreateParentScope(previousGlobalScope.Previous);
+        BoundScope parent = CreateParentScope(previousGlobalScope.Previous);
 
         BoundScope scope = new(parent);
         foreach (VariableSymbol variable in previousGlobalScope.Variables)
         {
-            scope.TryDeclare(variable);
+            scope.TryDeclareVariable(variable);
         }
 
         return scope;
+    }
+
+    private static BoundScope CreateRootScope()
+    {
+        BoundScope rootScope = new(null);
+
+        foreach (FunctionSymbol function in FunctionSymbol.BuiltIns.GetAll())
+        {
+            rootScope.TryDeclareFunction(function);
+        }
+
+        return rootScope;
     }
 
     private BoundStatement BindStatement(StatementSyntax statementSyntax)
@@ -87,7 +99,7 @@ internal sealed class Binder
         BoundExpression boundValueExpression = BindExpression(statementSyntax.ValueExpression);
 
         VariableSymbol variableSymbol = new(name, isReadOnly, boundValueExpression.Type);
-        if (!_scope.TryDeclare(variableSymbol))
+        if (!_scope.TryDeclareVariable(variableSymbol))
         {
             Diagnostics.ReportVariableAlreadyDeclared(statementSyntax.IdentifierToken.Span, name);
         }
@@ -123,7 +135,7 @@ internal sealed class Binder
 
         string iteratorName = statementSyntax.IdentifierToken.Text;
         VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, TypeSymbol.Int32);
-        _scope.TryDeclare(variableSymbol);
+        _scope.TryDeclareVariable(variableSymbol);
 
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.Body);
 
@@ -180,8 +192,14 @@ internal sealed class Binder
 
     private BoundExpression BindCallExpression(CallExpressionSyntax expressionSyntax)
     {
-        FunctionSymbol? function = FunctionSymbol.BuiltIns.GetAll().SingleOrDefault(f => f.Name == expressionSyntax.IdentifierToken.Text);
-        if (function is null)
+        ImmutableArray<BoundExpression>.Builder boundArgumentExpressions = ImmutableArray.CreateBuilder<BoundExpression>();
+        foreach (ExpressionSyntax parameterSyntax in expressionSyntax.Parameters)
+        {
+            BoundExpression boundParameterExpression = BindExpression(parameterSyntax);
+            boundArgumentExpressions.Add(boundParameterExpression);
+        }
+
+        if (!_scope.TryLookupFunction(expressionSyntax.IdentifierToken.Text, out FunctionSymbol? function))
         {
             Diagnostics.ReportUndefinedFunction(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text);
             return BoundErrorExpression.Instance;
@@ -194,10 +212,9 @@ internal sealed class Binder
         }
 
         bool hasError = false;
-        ImmutableArray<BoundExpression>.Builder boundArgumentExpressions = ImmutableArray.CreateBuilder<BoundExpression>();
         for (int i = 0; i < expressionSyntax.Parameters.Count; i++)
         {
-            BoundExpression boundArgumentExpression = BindExpression(expressionSyntax.Parameters[i]);
+            BoundExpression boundArgumentExpression = boundArgumentExpressions[i];
             TypeSymbol parameterType = function.Parameters[i].Type;
 
             if (boundArgumentExpression.Type == TypeSymbol.Error)
@@ -232,7 +249,7 @@ internal sealed class Binder
 
         string name = expressionSyntax.IdentifierToken.Text;
 
-        if (!_scope.TryLookup(name, out VariableSymbol? existingVariableSymbol))
+        if (!_scope.TryLookupVariable(name, out VariableSymbol? existingVariableSymbol))
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
             return boundExpression;
@@ -263,7 +280,7 @@ internal sealed class Binder
             return BoundErrorExpression.Instance;
         }
 
-        if (!_scope.TryLookup(name, out VariableSymbol? variableSymbol))
+        if (!_scope.TryLookupVariable(name, out VariableSymbol? variableSymbol))
         {
             Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
             return BoundErrorExpression.Instance;

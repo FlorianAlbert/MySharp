@@ -6,7 +6,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundScope
 {
-    private readonly Dictionary<string, VariableSymbol> _variables = [];
+    private Dictionary<string, VariableSymbol>? _variables;
+    private Dictionary<string, FunctionSymbol>? _functions;
 
     public BoundScope? Parent { get; }
 
@@ -15,23 +16,26 @@ internal sealed class BoundScope
         Parent = parent;
     }
 
-    public bool TryLookup(string name, [NotNullWhen(true)] out VariableSymbol? variable)
+    public bool TryLookupVariable(string name, [NotNullWhen(true)] out VariableSymbol? variable)
     {
-        if (_variables.TryGetValue(name, out variable))
+        variable = null;
+        if (_variables?.TryGetValue(name, out variable) ?? false)
         {
             return true;
         }
 
         if (Parent is not null)
         {
-            return Parent.TryLookup(name, out variable);
+            return Parent.TryLookupVariable(name, out variable);
         }
 
         return false;
     }
 
-    public bool TryDeclare(VariableSymbol variable)
+    public bool TryDeclareVariable(VariableSymbol variable)
     {
+        _variables ??= new();
+
         if (_variables.ContainsKey(variable.Name))
         {
             return false;
@@ -43,6 +47,50 @@ internal sealed class BoundScope
 
     public ImmutableArray<VariableSymbol> GetDeclaredVariables()
     {
+        if (_variables is null)
+        {
+            return [];
+        }
+
         return [.. _variables.Values];
+    }
+
+    public bool TryLookupFunction(string name, [NotNullWhen(true)] out FunctionSymbol? function)
+    {
+        function = null;
+        if (_functions?.TryGetValue(name, out function) ?? false)
+        {
+            return true;
+        }
+
+        if (Parent is not null)
+        {
+            return Parent.TryLookupFunction(name, out function);
+        }
+
+        return false;
+    }
+
+    public bool TryDeclareFunction(FunctionSymbol function)
+    {
+        _functions ??= [];
+
+        if (_functions.ContainsKey(function.Name))
+        {
+            return false;
+        }
+
+        _functions[function.Name] = function;
+        return true;
+    }
+
+    public ImmutableArray<FunctionSymbol> GetDeclaredFunctions()
+    {
+        if (_functions is null)
+        {
+            return [];
+        }
+
+        return [.. _functions.Values];
     }
 }
