@@ -118,7 +118,13 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
 
     internal void ReportWrongNumberOfArguments(TextSpan span, string name, int length, int count)
     {
-        string message = $"Function '{name}' expects {length} arguments but was given {count}.";
+        string message = $"Function '{name}' expects {length} argument(s) but was called with {count}.";
+        Report(span, message);
+    }
+
+    internal void ReportExpressionMustHaveValue(TextSpan span)
+    {
+        string message = "Expression must have a value.";
         Report(span, message);
     }
 }

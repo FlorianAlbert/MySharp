@@ -134,7 +134,7 @@ internal sealed class Binder
 
     private BoundExpressionStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)
     {
-        BoundExpression boundExpression = BindExpression(statementSyntax.Expression);
+        BoundExpression boundExpression = BindExpression(statementSyntax.Expression, canBeVoid: true);
         return new BoundExpressionStatement(boundExpression);
     }
 
@@ -155,9 +155,9 @@ internal sealed class Binder
         return boundExpression;
     }
 
-    private BoundExpression BindExpression(ExpressionSyntax expressionSyntax)
+    private BoundExpression BindExpression(ExpressionSyntax expressionSyntax, bool canBeVoid = false)
     {
-        return expressionSyntax.Kind switch
+        BoundExpression boundExpression = expressionSyntax.Kind switch
         {
             SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax) expressionSyntax),
             SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax) expressionSyntax),
@@ -168,6 +168,14 @@ internal sealed class Binder
             SyntaxKind.CallExpression => BindCallExpression((CallExpressionSyntax) expressionSyntax),
             _ => throw new Exception($"Unexpected syntax {expressionSyntax.Kind}"),
         };
+
+        if (!canBeVoid && boundExpression.Type == TypeSymbol.Void)
+        {
+            Diagnostics.ReportExpressionMustHaveValue(expressionSyntax.Span);
+            return BoundErrorExpression.Instance;
+        }
+
+        return boundExpression;
     }
 
     private BoundExpression BindCallExpression(CallExpressionSyntax expressionSyntax)

@@ -111,7 +111,7 @@ public class EvaluatorTests
     }
 
     [Fact]
-    public void Evaluator_VariableDeclaration_Reports_Redaclaration()
+    public void Evaluator_VariableDeclaration_Reports_Redeclaration()
     {
         string text = @"
             {
@@ -361,6 +361,46 @@ public class EvaluatorTests
     ")]
     public void Evaluator_CharacterLiteral_Reports_TooManyCharacters(string text, string expectedDiagnosticTexts)
     {
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_CallExpression_Reports_UndefinedName()
+    {
+        string text = "[f]();";
+        string expectedDiagnosticTexts = @"
+            Undefined function 'f'.
+        ";
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_CallExpression_Reports_WrongArgumentsCount()
+    {
+        string text = "[print(\"Hello \", \"World\")];";
+        string expectedDiagnosticTexts = @"
+            Function 'print' expects 1 argument(s) but was called with 2.
+        ";
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_CallExpression_Reports_WrongArgumentType()
+    {
+        string text = "print([42]);";
+        string expectedDiagnosticTexts = @"
+            Cannot convert type 'int32' to 'string'.
+        ";
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_VoidExpression_Reports_MustHaveValue()
+    {
+        string text = "let x = [print(\"Hello\")];";
+        string expectedDiagnosticTexts = @"
+            Expression must have a value.
+        ";
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }
 
