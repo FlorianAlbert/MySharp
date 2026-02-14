@@ -114,6 +114,7 @@ internal sealed class Evaluator
             BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression) expression),
             BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression) expression),
             BoundNodeKind.CallExpression => EvaluateCallExpression((BoundCallExpression) expression),
+            BoundNodeKind.ConversionExpression => EvaluateConversionExpression((BoundConversionExpression) expression),
             _ => throw new Exception($"Unexpected node {expression.Kind}")
         };
     }
@@ -215,27 +216,49 @@ internal sealed class Evaluator
         return $"{leftValue}{rightValue}";
     }
 
-    private object? EvaluateCallExpression(BoundCallExpression expression)
+    private object? EvaluateCallExpression(BoundCallExpression boundCallExpression)
     {
-        if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Print)
+        if (boundCallExpression.FunctionSymbol == FunctionSymbol.BuiltIns.Print)
         {
-            object? argument = EvaluateExpression(expression.Arguments[0]);
+            object? argument = EvaluateExpression(boundCallExpression.Arguments[0]);
             Console.WriteLine(argument);
             return null;
         }
-        else if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Input)
+        else if (boundCallExpression.FunctionSymbol == FunctionSymbol.BuiltIns.Input)
         {
             return Console.ReadLine();
         }
-        else if (expression.FunctionSymbol == FunctionSymbol.BuiltIns.Random)
+        else if (boundCallExpression.FunctionSymbol == FunctionSymbol.BuiltIns.Random)
         {
-            int minValue = (int) EvaluateExpression(expression.Arguments[0])!;
-            int maxValue = (int) EvaluateExpression(expression.Arguments[1])!;
+            int minValue = (int) EvaluateExpression(boundCallExpression.Arguments[0])!;
+            int maxValue = (int) EvaluateExpression(boundCallExpression.Arguments[1])!;
             return Random.Shared.Next(minValue, maxValue);
         }
         else
         {
-            throw new Exception($"Unexpected function {expression.FunctionSymbol.Name}");
+            throw new Exception($"Unexpected function {boundCallExpression.FunctionSymbol.Name}");
+        }
+    }
+
+    private object? EvaluateConversionExpression(BoundConversionExpression boundConversionExpression)
+    {
+        object? value = EvaluateExpression(boundConversionExpression.Expression);
+
+        if (boundConversionExpression.Type == TypeSymbol.Bool)
+        {
+            return Convert.ToBoolean(value);
+        }
+        else if (boundConversionExpression.Type == TypeSymbol.Int32)
+        {
+            return Convert.ToInt32(value);
+        }
+        else if (boundConversionExpression.Type == TypeSymbol.String)
+        {
+            return Convert.ToString(value);
+        }
+        else
+        {
+            throw new Exception($"Unexpected type {boundConversionExpression.Type}");
         }
     }
 }

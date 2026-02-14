@@ -29,6 +29,7 @@ internal sealed class BoundCallExpression : BoundExpression
 
     public override IEnumerable<(string name, object? value)> GetProperties()
     {
+        yield return (nameof(Type), Type);
         yield return (nameof(FunctionSymbol), FunctionSymbol);
     }
 }

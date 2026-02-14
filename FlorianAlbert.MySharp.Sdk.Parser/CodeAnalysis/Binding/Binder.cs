@@ -211,36 +211,40 @@ internal sealed class Binder
             return BoundErrorExpression.Instance;
         }
 
-        bool hasError = false;
         for (int i = 0; i < expressionSyntax.Parameters.Count; i++)
         {
             BoundExpression boundArgumentExpression = boundArgumentExpressions[i];
             TypeSymbol parameterType = function.Parameters[i].Type;
 
-            if (boundArgumentExpression.Type == TypeSymbol.Error)
-            {
-                boundArgumentExpressions.Add(BoundErrorExpression.Instance);
-                hasError = true;
-                continue;
-            }
-
-            if (boundArgumentExpression.Type != parameterType)
-            {
-                Diagnostics.ReportCannotConvert(expressionSyntax.Parameters[i].Span, boundArgumentExpression.Type, parameterType);
-                boundArgumentExpressions.Add(BoundErrorExpression.Instance);
-                hasError = true;
-                continue;
-            }
-
-            boundArgumentExpressions.Add(boundArgumentExpression);
+            boundArgumentExpressions[i] = BindImplicitConversion(expressionSyntax.Parameters[i], boundArgumentExpression, parameterType);
         }
 
-        if (hasError)
+        return new BoundCallExpression(function, boundArgumentExpressions.ToImmutable());
+    }
+
+    private BoundExpression BindImplicitConversion(ExpressionSyntax expressionSyntax, BoundExpression boundArgumentExpression, TypeSymbol targetType)
+    {
+        if (boundArgumentExpression.Type == TypeSymbol.Error)
         {
             return BoundErrorExpression.Instance;
         }
 
-        return new BoundCallExpression(function, boundArgumentExpressions.ToImmutable());
+        Conversion conversion = Conversion.Classify(boundArgumentExpression.Type, targetType);
+        switch (conversion)
+        {
+            case Conversion.None:
+                Diagnostics.ReportCannotConvert(expressionSyntax.Span, boundArgumentExpression.Type, targetType);
+                return boundArgumentExpression;
+            case Conversion.Identity:
+                return boundArgumentExpression;
+            case Conversion.Implicit:
+                return new BoundConversionExpression(boundArgumentExpression, targetType);
+            case Conversion.Explicit:
+                Diagnostics.ReportExplicitConversionNeeded(expressionSyntax.Span, boundArgumentExpression.Type, targetType);
+                return boundArgumentExpression;
+            default:
+                throw new Exception($"Unexpected conversion type: { conversion }");
+        }
     }
 
     private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax expressionSyntax)

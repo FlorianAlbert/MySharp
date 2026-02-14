@@ -387,9 +387,9 @@ public class EvaluatorTests
     [Fact]
     public void Evaluator_CallExpression_Reports_WrongArgumentType()
     {
-        string text = "print([42]);";
+        string text = "random(0, [\"test\"]);";
         string expectedDiagnosticTexts = @"
-            Cannot convert type 'int32' to 'string'.
+            Cannot convert type 'string' to 'int32'.
         ";
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }

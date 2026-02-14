@@ -127,4 +127,10 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = "Expression must have a value.";
         Report(span, message);
     }
+
+    internal void ReportExplicitConversionNeeded(TextSpan span, TypeSymbol fromType, TypeSymbol targetType)
+    {
+        string message = $"Cannot implicitly convert from {fromType} to {targetType}. An explicit cast is needed.";
+        Report(span, message);
+    }
 }

@@ -15,6 +15,7 @@ internal abstract class BoundTreeRewriter
             BoundNodeKind.VariableExpression => RewriteVariableExpression((BoundVariableExpression) expression),
             BoundNodeKind.AssignmentExpression => RewriteAssignmentExpression((BoundAssignmentExpression) expression),
             BoundNodeKind.CallExpression => RewriteCallExpression((BoundCallExpression) expression),
+            BoundNodeKind.ConversionExpression => RewriteConversionExpression((BoundConversionExpression) expression),
             _ => throw new InvalidOperationException($"Unexpected expression kind: {expression.Kind}"),
         };
     }
@@ -69,21 +70,21 @@ internal abstract class BoundTreeRewriter
         return new BoundAssignmentExpression(assignmentExpression.VariableSymbol, rewrittenExpression);
     }
 
-    protected virtual BoundExpression RewriteCallExpression(BoundCallExpression expression)
+    protected virtual BoundExpression RewriteCallExpression(BoundCallExpression callExpression)
     {
         ImmutableArray<BoundExpression>.Builder? rewrittenArgumentsBuilder = null;
-        for (int argumentIndex = 0; argumentIndex < expression.Arguments.Length; argumentIndex++)
+        for (int argumentIndex = 0; argumentIndex < callExpression.Arguments.Length; argumentIndex++)
         {
-            BoundExpression argument = expression.Arguments[argumentIndex];
+            BoundExpression argument = callExpression.Arguments[argumentIndex];
             BoundExpression rewrittenArgument = RewriteExpression(argument);
             if (rewrittenArgument != argument)
             {
                 if (rewrittenArgumentsBuilder is null)
                 {
-                    rewrittenArgumentsBuilder = ImmutableArray.CreateBuilder<BoundExpression>(expression.Arguments.Length);
+                    rewrittenArgumentsBuilder = ImmutableArray.CreateBuilder<BoundExpression>(callExpression.Arguments.Length);
                     for (int previousArgumentIndex = 0; previousArgumentIndex < argumentIndex; previousArgumentIndex++)
                     {
-                        rewrittenArgumentsBuilder.Add(expression.Arguments[previousArgumentIndex]);
+                        rewrittenArgumentsBuilder.Add(callExpression.Arguments[previousArgumentIndex]);
                     }
                 }
             }
@@ -92,10 +93,21 @@ internal abstract class BoundTreeRewriter
 
         if (rewrittenArgumentsBuilder is null)
         {
-            return expression;
+            return callExpression;
         }
 
-        return new BoundCallExpression(expression.FunctionSymbol, rewrittenArgumentsBuilder.ToImmutable());
+        return new BoundCallExpression(callExpression.FunctionSymbol, rewrittenArgumentsBuilder.ToImmutable());
+    }
+
+    protected virtual BoundExpression RewriteConversionExpression(BoundConversionExpression conversionExpression)
+    {
+        BoundExpression rewrittenExpression = RewriteExpression(conversionExpression.Expression);
+        if (rewrittenExpression == conversionExpression.Expression)
+        {
+            return conversionExpression;
+        }
+
+        return new BoundConversionExpression(rewrittenExpression, conversionExpression.Type);
     }
 
     public virtual BoundStatement RewriteStatement(BoundStatement statement)
