@@ -1,4 +1,6 @@
-﻿namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+﻿using System.Collections.Immutable;
+
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 
 public sealed class TypeSymbol : Symbol
 {
@@ -12,11 +14,16 @@ public sealed class TypeSymbol : Symbol
 
     public static readonly TypeSymbol Void = new("<void>");
 
-    public static readonly TypeSymbol Bool = new("bool");
+    public static class BuiltIns
+    {
+        public static readonly TypeSymbol Bool = new("bool");
 
-    public static readonly TypeSymbol Int32 = new("int32");
+        public static readonly TypeSymbol Int32 = new("int32");
 
-    public static readonly TypeSymbol String = new("string");
+        public static readonly TypeSymbol String = new("string");
 
-    public static readonly TypeSymbol Character = new("char");
+        public static readonly TypeSymbol Character = new("char");
+
+        public static ImmutableArray<TypeSymbol> GetAll() => [Bool, Int32, String, Character];
+    }
 }

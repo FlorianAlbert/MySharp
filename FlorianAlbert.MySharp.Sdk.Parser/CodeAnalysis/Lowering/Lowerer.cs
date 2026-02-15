@@ -130,7 +130,7 @@ internal sealed class Lowerer : BoundTreeRewriter
             forStatement.IteratorSymbol,
             forStatement.LowerBound);
 
-        VariableSymbol upperBoundSymbol = GenerateVariableSymbol(isReadonly: true, TypeSymbol.Int32);
+        VariableSymbol upperBoundSymbol = GenerateVariableSymbol(isReadonly: true, TypeSymbol.BuiltIns.Int32);
 
         BoundVariableDeclarationStatement upperBoundVariableDeclarationStatement =
             new(upperBoundSymbol, forStatement.UpperBound);
@@ -139,7 +139,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
         BoundBinaryExpression conditionExpression = new(
             new BoundVariableExpression(forStatement.IteratorSymbol),
-            BoundBinaryOperator.Bind(SyntaxKind.LessToken, TypeSymbol.Int32, TypeSymbol.Int32)!,
+            BoundBinaryOperator.Bind(SyntaxKind.LessToken, TypeSymbol.BuiltIns.Int32, TypeSymbol.BuiltIns.Int32)!,
             upperBoundExpression);
 
         BoundExpressionStatement incrementStatement = new(
@@ -147,7 +147,7 @@ internal sealed class Lowerer : BoundTreeRewriter
                 forStatement.IteratorSymbol,
                 new BoundBinaryExpression(
                     new BoundVariableExpression(forStatement.IteratorSymbol),
-                    BoundBinaryOperator.Bind(SyntaxKind.PlusToken, forStatement.IteratorSymbol.Type, TypeSymbol.Int32)!,
+                    BoundBinaryOperator.Bind(SyntaxKind.PlusToken, forStatement.IteratorSymbol.Type, TypeSymbol.BuiltIns.Int32)!,
                     new BoundLiteralExpression(1))));
 
         BoundBlockStatement whileBlockStatement = new([forStatement.Body, incrementStatement]);

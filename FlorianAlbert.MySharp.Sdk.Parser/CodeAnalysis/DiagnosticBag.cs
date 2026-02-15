@@ -31,9 +31,9 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         _diagnostics.AddRange(diagnosticBag);
     }
 
-    internal void ReportInvalidNumber(TextSpan textSpan, string tokenText, TypeSymbol type)
+    internal void ReportInvalidNumber(TextSpan textSpan, string tokenText)
     {
-        string message = $"The number '{tokenText}' is not a valid {type}.";
+        string message = $"The number '{tokenText}' is not a valid number.";
         Report(textSpan, message);
     }
 
@@ -137,6 +137,12 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
     internal void ReportUnexpectedSymbolKind(TextSpan span, string symbolName, SymbolKind expectedSymbolKind, SymbolKind actualSymbolKind)
     {
         string message = $"The symbol '{symbolName}' is not of type '{expectedSymbolKind}' but of type '{actualSymbolKind}'.";
+        Report(span, message);
+    }
+
+    internal void ReportUndefinedType(TextSpan span, string typeName)
+    {
+        string message = $"Undefined type '{typeName}'.";
         Report(span, message);
     }
 }

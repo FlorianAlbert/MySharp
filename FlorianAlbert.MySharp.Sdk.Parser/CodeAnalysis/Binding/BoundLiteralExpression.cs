@@ -11,10 +11,10 @@ internal sealed class BoundLiteralExpression : BoundExpression
 
         Type = value switch
         {
-            bool => TypeSymbol.Bool,
-            int => TypeSymbol.Int32,
-            string => TypeSymbol.String,
-            char => TypeSymbol.Character,
+            bool => TypeSymbol.BuiltIns.Bool,
+            int => TypeSymbol.BuiltIns.Int32,
+            string => TypeSymbol.BuiltIns.String,
+            char => TypeSymbol.BuiltIns.Character,
             _ => throw new InvalidOperationException($"Unexpected literal type: {value.GetType()}")
         };
     }

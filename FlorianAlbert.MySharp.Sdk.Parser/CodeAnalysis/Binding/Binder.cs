@@ -59,6 +59,11 @@ internal sealed class Binder
             rootScope.TryDeclareFunction(function);
         }
 
+        foreach (TypeSymbol type in TypeSymbol.BuiltIns.GetAll())
+        {
+            rootScope.TryDeclareType(type);
+        }
+
         return rootScope;
     }
 
@@ -98,8 +103,16 @@ internal sealed class Binder
         bool isReadOnly = statementSyntax.KeywordToken.Kind == SyntaxKind.LetKeyword;
 
         BoundExpression boundValueExpression = BindExpression(statementSyntax.ValueExpression);
+        TypeSymbol variableType = boundValueExpression.Type;
 
-        VariableSymbol variableSymbol = new(name, isReadOnly, boundValueExpression.Type);
+        if (statementSyntax.TypeClause is TypeClauseSyntax typeClause)
+        {
+            variableType = BindTypeClause(typeClause) ?? variableType;
+        }
+
+        boundValueExpression = BindImplicitConversion(boundValueExpression, variableType, statementSyntax.ValueExpression.Span);
+
+        VariableSymbol variableSymbol = new(name, isReadOnly, variableType);
         if (!_scope.TryDeclareVariable(variableSymbol))
         {
             Diagnostics.ReportVariableAlreadyDeclared(statementSyntax.IdentifierToken.Span, name);
@@ -108,9 +121,28 @@ internal sealed class Binder
         return new BoundVariableDeclarationStatement(variableSymbol, boundValueExpression);
     }
 
+    private TypeSymbol? BindTypeClause(TypeClauseSyntax typeClause)
+    {
+        if (!_scope.TryLookupType(typeClause.IdentifierToken.Text, out TypeSymbol? clauseType, out bool symbolExists))
+        {
+            if (symbolExists)
+            {
+                Diagnostics.ReportUnexpectedSymbolKind(typeClause.IdentifierToken.Span, typeClause.IdentifierToken.Text, SymbolKind.Type, _scope.GetSymbolKind(typeClause.IdentifierToken.Text));
+            }
+            else
+            {
+                Diagnostics.ReportUndefinedType(typeClause.IdentifierToken.Span, typeClause.IdentifierToken.Text);
+            }
+
+            return null;
+        }
+
+        return clauseType;
+    }
+
     private BoundIfStatement BindIfStatement(IfStatementSyntax statementSyntax)
     {
-        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.Bool);
+        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.BuiltIns.Bool);
 
         BoundStatement boundThenStatement = BindStatement(statementSyntax.ThenStatement);
 
@@ -121,7 +153,7 @@ internal sealed class Binder
 
     private BoundWhileStatement BindWhileStatement(WhileStatementSyntax statementSyntax)
     {
-        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.Bool);
+        BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.BuiltIns.Bool);
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.BodyStatement);
 
         return new BoundWhileStatement(boundConditionExpression, boundBodyStatement);
@@ -129,13 +161,13 @@ internal sealed class Binder
 
     private BoundForStatement BindForStatement(ForStatementSyntax statementSyntax)
     {
-        BoundExpression boundLowerBoundExpression = BindExpression(statementSyntax.LowerBoundExpression, TypeSymbol.Int32);
-        BoundExpression boundUpperBoundExpression = BindExpression(statementSyntax.UpperBoundExpression, TypeSymbol.Int32);
+        BoundExpression boundLowerBoundExpression = BindExpression(statementSyntax.LowerBoundExpression, TypeSymbol.BuiltIns.Int32);
+        BoundExpression boundUpperBoundExpression = BindExpression(statementSyntax.UpperBoundExpression, TypeSymbol.BuiltIns.Int32);
 
         _scope = new(_scope);
 
         string iteratorName = statementSyntax.IdentifierToken.Text;
-        VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, TypeSymbol.Int32);
+        VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, TypeSymbol.BuiltIns.Int32);
         _scope.TryDeclareVariable(variableSymbol);
 
         BoundStatement boundBodyStatement = BindStatement(statementSyntax.Body);

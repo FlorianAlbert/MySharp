@@ -244,17 +244,21 @@ internal sealed class Evaluator
     {
         object? value = EvaluateExpression(boundConversionExpression.Expression);
 
-        if (boundConversionExpression.Type == TypeSymbol.Bool)
+        if (boundConversionExpression.Type == TypeSymbol.BuiltIns.Bool)
         {
             return Convert.ToBoolean(value);
         }
-        else if (boundConversionExpression.Type == TypeSymbol.Int32)
+        else if (boundConversionExpression.Type == TypeSymbol.BuiltIns.Int32)
         {
             return Convert.ToInt32(value);
         }
-        else if (boundConversionExpression.Type == TypeSymbol.String)
+        else if (boundConversionExpression.Type == TypeSymbol.BuiltIns.String)
         {
             return Convert.ToString(value);
+        }
+        else if (boundConversionExpression.Type == TypeSymbol.BuiltIns.Character)
+        {
+            return Convert.ToChar(value);
         }
         else
         {

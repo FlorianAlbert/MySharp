@@ -106,6 +106,7 @@ public static class SyntaxFacts
         SyntaxKind.WhileKeyword => "while",
         SyntaxKind.ForKeyword => "for",
         SyntaxKind.ToKeyword => "to",
+        SyntaxKind.ColonToken => ":",
         SyntaxKind.SemicolonToken => ";",
         SyntaxKind.CommaToken => ",",
         _ => null

@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
@@ -6,13 +7,15 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 public sealed class VariableDeclarationStatementSyntax : StatementSyntax
 {
     public VariableDeclarationStatementSyntax(SyntaxToken keywordToken, 
-        SyntaxToken identifierToken, 
+        SyntaxToken identifierToken,
+        TypeClauseSyntax? typeClause, 
         SyntaxToken equalsToken, 
         ExpressionSyntax valueExpression, 
         SyntaxToken semicolonToken)
     {
         KeywordToken = keywordToken;
         IdentifierToken = identifierToken;
+        TypeClause = typeClause;
         EqualsToken = equalsToken;
         ValueExpression = valueExpression;
         SemicolonToken = semicolonToken;
@@ -26,6 +29,8 @@ public sealed class VariableDeclarationStatementSyntax : StatementSyntax
 
     public SyntaxToken IdentifierToken { get; }
 
+    public TypeClauseSyntax? TypeClause { get; }
+
     public SyntaxToken EqualsToken { get; }
 
     public ExpressionSyntax ValueExpression { get; }
@@ -36,6 +41,12 @@ public sealed class VariableDeclarationStatementSyntax : StatementSyntax
     {
         yield return KeywordToken;
         yield return IdentifierToken;
+
+        if (TypeClause is not null)
+        {
+            yield return TypeClause;
+        }
+
         yield return EqualsToken;
         yield return ValueExpression;
         yield return SemicolonToken;

@@ -35,6 +35,7 @@ public enum SyntaxKind
     CloseBraceToken,
     IdentifierToken,
     EqualsToken,
+    ColonToken,
     SemicolonToken,
     CommaToken,
 
@@ -52,6 +53,7 @@ public enum SyntaxKind
     // Nodes
     CompilationUnit,
     ElseClause,
+    TypeClause,
 
     // Statements
     BlockStatement,

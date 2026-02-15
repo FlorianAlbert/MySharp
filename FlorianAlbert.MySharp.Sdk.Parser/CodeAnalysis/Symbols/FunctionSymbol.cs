@@ -19,11 +19,11 @@ public sealed class FunctionSymbol : Symbol
 
     public static class BuiltIns
     {
-        public static readonly FunctionSymbol Print = new("print", [new("value", TypeSymbol.String)], TypeSymbol.Void);
+        public static readonly FunctionSymbol Print = new("print", [new("value", TypeSymbol.BuiltIns.String)], TypeSymbol.Void);
 
-        public static readonly FunctionSymbol Input = new("input", [], TypeSymbol.String);
+        public static readonly FunctionSymbol Input = new("input", [], TypeSymbol.BuiltIns.String);
 
-        public static readonly FunctionSymbol Random = new("random", [new("min", TypeSymbol.Int32), new("max", TypeSymbol.Int32)], TypeSymbol.Int32);
+        public static readonly FunctionSymbol Random = new("random", [new("min", TypeSymbol.BuiltIns.Int32), new("max", TypeSymbol.BuiltIns.Int32)], TypeSymbol.BuiltIns.Int32);
 
         public static ImmutableArray<FunctionSymbol> GetAll() => [Print, Input, Random];
     }

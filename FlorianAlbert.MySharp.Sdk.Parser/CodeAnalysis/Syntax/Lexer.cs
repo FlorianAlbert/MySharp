@@ -170,6 +170,10 @@ internal sealed class Lexer
                     _kind = SyntaxKind.GreaterToken;
                 }
                 break;
+            case ':':
+                _kind = SyntaxKind.ColonToken;
+                _position++;
+                break;
             case ';':
                 _kind = SyntaxKind.SemicolonToken;
                 _position++;
@@ -307,7 +311,7 @@ internal sealed class Lexer
 
         if (!int.TryParse(tokenText, out int value))
         {
-            Diagnostics.ReportInvalidNumber(span, tokenText, TypeSymbol.Int32);
+            Diagnostics.ReportInvalidNumber(span, tokenText);
         }
 
         _value = value;
@@ -434,7 +438,7 @@ internal sealed class Lexer
 
     private void ReadIdentifierOrKeyword()
     {
-        while (char.IsLetter(_Current))
+        while (char.IsLetterOrDigit(_Current))
         {
             _position++;
         }

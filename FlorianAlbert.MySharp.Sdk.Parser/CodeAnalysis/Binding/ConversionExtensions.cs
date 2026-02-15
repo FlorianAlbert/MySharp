@@ -13,7 +13,7 @@ internal static class ConversionExtensions
                 return Conversion.Identity;
             }
 
-            if (to == TypeSymbol.String)
+            if (to == TypeSymbol.BuiltIns.String)
             {
                 return Conversion.Implicit;
             }

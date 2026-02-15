@@ -116,6 +116,7 @@ internal sealed class Parser
 
         SyntaxToken keywordToken = MatchToken(expectedKeywordKind);
         SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        TypeClauseSyntax? typeClause = ParseOptionalTypeClause();
         SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
         ExpressionSyntax valueExpression = ParseExpression();
         SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
@@ -123,9 +124,29 @@ internal sealed class Parser
         return new VariableDeclarationStatementSyntax(
             keywordToken,
             identifierToken,
+            typeClause,
             equalsToken,
             valueExpression,
             semicolonToken);
+    }
+
+    private TypeClauseSyntax? ParseOptionalTypeClause()
+    {
+        if (_Current.Kind != SyntaxKind.ColonToken)
+        {
+            return null;
+        }
+
+        return ParseTypeClause();
+    }
+
+    private TypeClauseSyntax ParseTypeClause()
+    {
+        SyntaxToken colonToken = MatchToken(SyntaxKind.ColonToken);
+        SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        TypeClauseSyntax typeClause = new(colonToken, identifierToken);
+
+        return typeClause;
     }
 
     private IfStatementSyntax ParseIfStatement()

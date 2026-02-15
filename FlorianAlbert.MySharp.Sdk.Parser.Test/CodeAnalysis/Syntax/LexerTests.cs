@@ -192,6 +192,12 @@ public class LexerTests
             return true;
         }
 
+        // "x" & "123" => "x123"
+        if (first is SyntaxKind.IdentifierToken && second is SyntaxKind.NumberToken)
+        {
+            return true;
+        }
+
         // "true" & "false" => "truefalse"
         if (firstIsKeyword && secondIsKeyword)
         {
@@ -200,6 +206,12 @@ public class LexerTests
 
         // "let" & "x" => "letx"
         if (firstIsKeyword && second is SyntaxKind.IdentifierToken)
+        {
+            return true;
+        }
+
+        // "let" & "123" => "let123"
+        if (firstIsKeyword && second is SyntaxKind.NumberToken)
         {
             return true;
         }

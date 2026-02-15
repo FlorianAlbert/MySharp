@@ -103,4 +103,19 @@ internal sealed class BoundScope
     {
         return GetDeclaredSymbols<FunctionSymbol>();
     }
+
+    public bool TryLookupType(string name, [NotNullWhen(true)] out TypeSymbol? type, out bool symbolExists)
+    {
+        return TryLookupSymbol(name, out type, out symbolExists);
+    }
+
+    public bool TryDeclareType(TypeSymbol type)
+    {
+        return TryDeclareSymbol(type);
+    }
+
+    public ImmutableArray<TypeSymbol> GetDeclaredTypes()
+    {
+        return GetDeclaredSymbols<TypeSymbol>();
+    }
 }

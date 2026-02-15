@@ -28,10 +28,10 @@ internal sealed class BoundUnaryOperator
 
     private static readonly BoundUnaryOperator[] _operators =
     [
-        new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, TypeSymbol.Int32),
-        new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, TypeSymbol.Int32),
-        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.Bool),
-        new(SyntaxKind.TildeToken, BoundUnaryOperatorKind.BitwiseNegation, TypeSymbol.Int32)
+        new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, TypeSymbol.BuiltIns.Int32),
+        new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, TypeSymbol.BuiltIns.Int32),
+        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeSymbol.BuiltIns.Bool),
+        new(SyntaxKind.TildeToken, BoundUnaryOperatorKind.BitwiseNegation, TypeSymbol.BuiltIns.Int32)
     ];
 
     public static BoundUnaryOperator? Bind(SyntaxKind syntaxKind, TypeSymbol operandType)
