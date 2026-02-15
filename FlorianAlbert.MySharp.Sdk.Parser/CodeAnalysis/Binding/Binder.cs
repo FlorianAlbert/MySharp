@@ -199,9 +199,17 @@ internal sealed class Binder
             boundArgumentExpressions.Add(boundParameterExpression);
         }
 
-        if (!_scope.TryLookupFunction(expressionSyntax.IdentifierToken.Text, out FunctionSymbol? function))
+        if (!_scope.TryLookupFunction(expressionSyntax.IdentifierToken.Text, out FunctionSymbol? function, out bool symbolExists))
         {
-            Diagnostics.ReportUndefinedFunction(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text);
+            if (symbolExists)
+            {
+                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text, SymbolKind.Function, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
+            }
+            else
+            {
+                Diagnostics.ReportUndefinedFunction(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text);
+            }
+
             return BoundErrorExpression.Instance;
         }
 
@@ -253,9 +261,17 @@ internal sealed class Binder
 
         string name = expressionSyntax.IdentifierToken.Text;
 
-        if (!_scope.TryLookupVariable(name, out VariableSymbol? existingVariableSymbol))
+        if (!_scope.TryLookupVariable(name, out VariableSymbol? existingVariableSymbol, out bool symbolExists))
         {
-            Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
+            if (symbolExists)
+            {
+                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text, SymbolKind.Variable, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
+            }
+            else
+            {
+                Diagnostics.ReportUndefinedVariable(expressionSyntax.IdentifierToken.Span, name);
+            }
+
             return boundExpression;
         }
 
@@ -284,9 +300,17 @@ internal sealed class Binder
             return BoundErrorExpression.Instance;
         }
 
-        if (!_scope.TryLookupVariable(name, out VariableSymbol? variableSymbol))
+        if (!_scope.TryLookupVariable(name, out VariableSymbol? variableSymbol, out bool symbolExists))
         {
-            Diagnostics.ReportUndefinedName(expressionSyntax.IdentifierToken.Span, name);
+            if (symbolExists)
+            {
+                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text, SymbolKind.Variable, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
+            }
+            else
+            {
+                Diagnostics.ReportUndefinedVariable(expressionSyntax.IdentifierToken.Span, name);
+            }
+
             return BoundErrorExpression.Instance;
         }
 

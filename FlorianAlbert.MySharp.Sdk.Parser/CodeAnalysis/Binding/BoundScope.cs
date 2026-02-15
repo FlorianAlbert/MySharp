@@ -6,8 +6,7 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundScope
 {
-    private Dictionary<string, VariableSymbol>? _variables;
-    private Dictionary<string, FunctionSymbol>? _functions;
+    private Dictionary<string, Symbol>? _symbols;
 
     public BoundScope? Parent { get; }
 
@@ -16,81 +15,92 @@ internal sealed class BoundScope
         Parent = parent;
     }
 
-    public bool TryLookupVariable(string name, [NotNullWhen(true)] out VariableSymbol? variable)
+    private bool TryLookupSymbol<TSymbol>(string name, [NotNullWhen(true)] out TSymbol? symbol, out bool symbolExists)
+        where TSymbol : Symbol
     {
-        variable = null;
-        if (_variables?.TryGetValue(name, out variable) ?? false)
+        symbol = null;
+        symbolExists = false;
+        if (_symbols?.TryGetValue(name, out Symbol? foundSymbol) ?? false)
         {
-            return true;
+            symbolExists = true;
+
+            if (foundSymbol is TSymbol typeMatchingSymbol)
+            {
+                symbol = typeMatchingSymbol;
+                return true;
+            }
+
+            return false;
         }
 
         if (Parent is not null)
         {
-            return Parent.TryLookupVariable(name, out variable);
+            return Parent.TryLookupSymbol(name, out symbol, out symbolExists);
         }
 
         return false;
+    }
+
+    private bool TryDeclareSymbol(Symbol symbol)
+    {
+        _symbols ??= [];
+
+        if (_symbols.ContainsKey(symbol.Name))
+        {
+            return false;
+        }
+
+        _symbols[symbol.Name] = symbol;
+        return true;
+    }
+
+    public ImmutableArray<TSymbol> GetDeclaredSymbols<TSymbol>()
+    {
+        if (_symbols is null)
+        {
+            return [];
+        }
+
+        return [.. _symbols.Values.OfType<TSymbol>()];
+    }
+
+    public SymbolKind GetSymbolKind(string symbolName)
+    {
+        if (!TryLookupSymbol(symbolName, out Symbol? symbol, out _))
+        {
+            throw new Exception($"No symbol with name '{symbolName}' exists.");
+        }
+
+        return symbol.Kind;
+    }
+
+    public bool TryLookupVariable(string name, [NotNullWhen(true)] out VariableSymbol? variable, out bool symbolExists)
+    {
+        return TryLookupSymbol(name, out variable, out symbolExists);
     }
 
     public bool TryDeclareVariable(VariableSymbol variable)
     {
-        _variables ??= new();
-
-        if (_variables.ContainsKey(variable.Name))
-        {
-            return false;
-        }
-
-        _variables[variable.Name] = variable;
-        return true;
+        return TryDeclareSymbol(variable);
     }
 
     public ImmutableArray<VariableSymbol> GetDeclaredVariables()
     {
-        if (_variables is null)
-        {
-            return [];
-        }
-
-        return [.. _variables.Values];
+        return GetDeclaredSymbols<VariableSymbol>();
     }
 
-    public bool TryLookupFunction(string name, [NotNullWhen(true)] out FunctionSymbol? function)
+    public bool TryLookupFunction(string name, [NotNullWhen(true)] out FunctionSymbol? function, out bool symbolExists)
     {
-        function = null;
-        if (_functions?.TryGetValue(name, out function) ?? false)
-        {
-            return true;
-        }
-
-        if (Parent is not null)
-        {
-            return Parent.TryLookupFunction(name, out function);
-        }
-
-        return false;
+        return TryLookupSymbol(name, out function, out symbolExists);
     }
 
     public bool TryDeclareFunction(FunctionSymbol function)
     {
-        _functions ??= [];
-
-        if (_functions.ContainsKey(function.Name))
-        {
-            return false;
-        }
-
-        _functions[function.Name] = function;
-        return true;
+        return TryDeclareSymbol(function);
     }
 
     public ImmutableArray<FunctionSymbol> GetDeclaredFunctions()
     {
-        if (_functions is null)
-        {
-            return [];
-        }
-
-        return [.. _functions.Values];
+        return GetDeclaredSymbols<FunctionSymbol>();
     }
 }

@@ -137,7 +137,7 @@ public class EvaluatorTests
         string text = @"[x] * 10;";
 
         string expectedDiagnosticTexts = @"
-            Undefined name 'x'.
+            Undefined variable 'x'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -149,7 +149,7 @@ public class EvaluatorTests
         string text = @"[x] = 10;";
 
         string expectedDiagnosticTexts = @"
-            Undefined name 'x'.
+            Undefined variable 'x'.
         ";
 
         AssertDiagnostics(text, expectedDiagnosticTexts);
@@ -400,6 +400,21 @@ public class EvaluatorTests
         string text = "let x = [print(\"Hello\")];";
         string expectedDiagnosticTexts = @"
             Expression must have a value.
+        ";
+        AssertDiagnostics(text, expectedDiagnosticTexts);
+    }
+
+    [Fact]
+    public void Evaluator_Shadowing_Reports_UnexpectedSymbolType()
+    {
+        string text = @"
+            {
+                let print = 5;
+                [print](print);
+            }
+        ";
+        string expectedDiagnosticTexts = @"
+            The symbol 'print' is not of type 'Function' but of type 'Variable'.
         ";
         AssertDiagnostics(text, expectedDiagnosticTexts);
     }

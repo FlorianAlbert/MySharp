@@ -68,9 +68,9 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         Report(span, message);
     }
 
-    internal void ReportUndefinedName(TextSpan span, string name)
+    internal void ReportUndefinedVariable(TextSpan span, string name)
     {
-        string message = $"Undefined name '{name}'.";
+        string message = $"Undefined variable '{name}'.";
         Report(span, message);
     }
 
@@ -131,6 +131,12 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
     internal void ReportExplicitConversionNeeded(TextSpan span, TypeSymbol fromType, TypeSymbol targetType)
     {
         string message = $"Cannot implicitly convert from {fromType} to {targetType}. An explicit cast is needed.";
+        Report(span, message);
+    }
+
+    internal void ReportUnexpectedSymbolKind(TextSpan span, string symbolName, SymbolKind expectedSymbolKind, SymbolKind actualSymbolKind)
+    {
+        string message = $"The symbol '{symbolName}' is not of type '{expectedSymbolKind}' but of type '{actualSymbolKind}'.";
         Report(span, message);
     }
 }
