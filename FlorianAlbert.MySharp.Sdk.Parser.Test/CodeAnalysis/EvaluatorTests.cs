@@ -178,7 +178,7 @@ public class EvaluatorTests
         string text = @"
             {
                 var y = 100;
-                y [=] true;
+                y = [true];
             }
         ";
 

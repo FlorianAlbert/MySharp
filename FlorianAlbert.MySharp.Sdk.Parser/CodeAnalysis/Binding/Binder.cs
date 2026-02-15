@@ -3,6 +3,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 using System.Collections.Immutable;
 
@@ -154,17 +155,7 @@ internal sealed class Binder
     {
         BoundExpression boundExpression = BindExpression(expression);
 
-        if (boundExpression.Type == TypeSymbol.Error || expectedType == TypeSymbol.Error)
-        {
-            return BoundErrorExpression.Instance;
-        }
-
-        if (boundExpression.Type != expectedType)
-        {
-            Diagnostics.ReportCannotConvert(expression.Span, boundExpression.Type, expectedType);
-        }
-
-        return boundExpression;
+        return BindImplicitConversion(boundExpression, expectedType, expression.Span);
     }
 
     private BoundExpression BindExpression(ExpressionSyntax expressionSyntax, bool canBeVoid = false)
@@ -224,32 +215,32 @@ internal sealed class Binder
             BoundExpression boundArgumentExpression = boundArgumentExpressions[i];
             TypeSymbol parameterType = function.Parameters[i].Type;
 
-            boundArgumentExpressions[i] = BindImplicitConversion(expressionSyntax.Parameters[i], boundArgumentExpression, parameterType);
+            boundArgumentExpressions[i] = BindImplicitConversion(boundArgumentExpression, parameterType, expressionSyntax.Parameters[i].Span);
         }
 
         return new BoundCallExpression(function, boundArgumentExpressions.ToImmutable());
     }
 
-    private BoundExpression BindImplicitConversion(ExpressionSyntax expressionSyntax, BoundExpression boundArgumentExpression, TypeSymbol targetType)
+    private BoundExpression BindImplicitConversion(BoundExpression boundExpression, TypeSymbol targetType, TextSpan diagnosticSpan)
     {
-        if (boundArgumentExpression.Type == TypeSymbol.Error)
+        if (boundExpression.Type == TypeSymbol.Error || targetType == TypeSymbol.Error)
         {
             return BoundErrorExpression.Instance;
         }
 
-        Conversion conversion = Conversion.Classify(boundArgumentExpression.Type, targetType);
+        Conversion conversion = Conversion.Classify(boundExpression.Type, targetType);
         switch (conversion)
         {
             case Conversion.None:
-                Diagnostics.ReportCannotConvert(expressionSyntax.Span, boundArgumentExpression.Type, targetType);
-                return boundArgumentExpression;
+                Diagnostics.ReportCannotConvert(diagnosticSpan, boundExpression.Type, targetType);
+                return boundExpression;
             case Conversion.Identity:
-                return boundArgumentExpression;
+                return boundExpression;
             case Conversion.Implicit:
-                return new BoundConversionExpression(boundArgumentExpression, targetType);
+                return new BoundConversionExpression(boundExpression, targetType);
             case Conversion.Explicit:
-                Diagnostics.ReportExplicitConversionNeeded(expressionSyntax.Span, boundArgumentExpression.Type, targetType);
-                return boundArgumentExpression;
+                Diagnostics.ReportExplicitConversionNeeded(diagnosticSpan, boundExpression.Type, targetType);
+                return boundExpression;
             default:
                 throw new Exception($"Unexpected conversion type: { conversion }");
         }
@@ -281,11 +272,7 @@ internal sealed class Binder
             return boundExpression;
         }
 
-        if (existingVariableSymbol.Type != boundExpression.Type)
-        {
-            Diagnostics.ReportCannotConvert(expressionSyntax.EqualsToken.Span, boundExpression.Type, existingVariableSymbol.Type);
-            return boundExpression;
-        }
+        boundExpression = BindImplicitConversion(boundExpression, existingVariableSymbol.Type, expressionSyntax.Expression.Span);
 
         return new BoundAssignmentExpression(existingVariableSymbol, boundExpression);
     }
