@@ -97,6 +97,9 @@ public static class SyntaxFacts
         SyntaxKind.OpenBraceToken => "{",
         SyntaxKind.CloseBraceToken => "}",
         SyntaxKind.EqualsToken => "=",
+        SyntaxKind.ColonToken => ":",
+        SyntaxKind.SemicolonToken => ";",
+        SyntaxKind.CommaToken => ",",
         SyntaxKind.TrueKeyword => "true",
         SyntaxKind.FalseKeyword => "false",
         SyntaxKind.LetKeyword => "let",
@@ -106,9 +109,6 @@ public static class SyntaxFacts
         SyntaxKind.WhileKeyword => "while",
         SyntaxKind.ForKeyword => "for",
         SyntaxKind.ToKeyword => "to",
-        SyntaxKind.ColonToken => ":",
-        SyntaxKind.SemicolonToken => ";",
-        SyntaxKind.CommaToken => ",",
         _ => null
     };
 }
