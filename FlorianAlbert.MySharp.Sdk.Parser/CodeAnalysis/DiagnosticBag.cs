@@ -145,4 +145,16 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Undefined type '{typeName}'.";
         Report(span, message);
     }
+
+    internal void ReportDuplicateParameterName(TextSpan span, string parameterName)
+    {
+        string message = $"The parameter name '{parameterName}' is a duplicate.";
+        Report(span, message);
+    }
+
+    internal void ReportFunctionAlreadyDeclared(TextSpan span, string name)
+    {
+        string message = $"Function '{name}' is already declared.";
+        Report(span, message);
+    }
 }

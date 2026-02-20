@@ -75,11 +75,59 @@ internal sealed class Parser
 
     public CompilationUnitSyntax ParseCompilationUnit()
     {
-        StatementSyntax statement = ParseStatement();
+        ImmutableArray<CompilationUnitSyntaxMember>.Builder compilationUnitMembers = ImmutableArray.CreateBuilder<CompilationUnitSyntaxMember>();
+        do
+        {
+            CompilationUnitSyntaxMember compilationUnitMember = ParseCompilationUnitMember();
+            compilationUnitMembers.Add(compilationUnitMember);
+        } while (_Current.Kind is not SyntaxKind.EndOfFileToken);
 
         SyntaxToken endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
 
-        return new CompilationUnitSyntax(statement, endOfFileToken);
+        return new CompilationUnitSyntax(compilationUnitMembers.ToImmutable(), endOfFileToken);
+    }
+
+    private CompilationUnitSyntaxMember ParseCompilationUnitMember()
+    {
+        if (_Current.Kind is SyntaxKind.FunctionKeyword)
+        {
+            return ParseFunctionDefinition();
+        }
+
+        return ParseGlobalStatement();
+    }
+
+    private FunctionDefinitionSyntax ParseFunctionDefinition()
+    {
+        SyntaxToken functionKeyword = MatchToken(SyntaxKind.FunctionKeyword);
+        SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        SyntaxToken openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+        SeparatedSyntaxList<ParameterSyntax> parameters = ParseSeparatedSyntaxList(ParseParameter);
+        SyntaxToken closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+        TypeClauseSyntax? typeClause = ParseOptionalTypeClause();
+        BlockStatementSyntax bodyStatement = ParseBlockStatement();
+
+        return new FunctionDefinitionSyntax(functionKeyword,
+            identifierToken,
+            openParenthesisToken,
+            parameters,
+            closeParenthesisToken,
+            typeClause,
+            bodyStatement);
+    }
+
+    private ParameterSyntax ParseParameter()
+    {
+        SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        TypeClauseSyntax typeClause = ParseTypeClause();
+
+        return new ParameterSyntax(identifierToken, typeClause);
+    }
+
+    private GlobalStatementSyntax ParseGlobalStatement()
+    {
+        StatementSyntax statement = ParseStatement();
+        return new GlobalStatementSyntax(statement);
     }
 
     private StatementSyntax ParseStatement()
@@ -235,7 +283,7 @@ internal sealed class Parser
 
     private ExpressionSyntax ParseAssignmentExpression()
     {
-        if (_Current.Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.EqualsToken)
+        if (_Current.Kind == SyntaxKind.IdentifierToken && _Lookahead.Kind == SyntaxKind.EqualsToken)
         {
             SyntaxToken identifierToken = NextToken();
             SyntaxToken equalsToken = MatchToken(SyntaxKind.EqualsToken);
@@ -350,30 +398,31 @@ internal sealed class Parser
         SyntaxToken identifierToken = MatchToken(SyntaxKind.IdentifierToken);
         SyntaxToken openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
 
-        SeparatedSyntaxList<ExpressionSyntax> arguments = ParseArgumentList();
+        SeparatedSyntaxList<ExpressionSyntax> arguments = ParseSeparatedSyntaxList(ParseExpression);
 
         SyntaxToken closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
 
         return new CallExpressionSyntax(identifierToken, openParenthesisToken, arguments, closeParenthesisToken);
     }
 
-    private SeparatedSyntaxList<ExpressionSyntax> ParseArgumentList()
+    private SeparatedSyntaxList<TNode> ParseSeparatedSyntaxList<TNode>(Func<TNode> nodeParser)
+        where TNode : SyntaxNode
     {
-        ImmutableArray<SyntaxNode>.Builder argumentsAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
-;
+        ImmutableArray<SyntaxNode>.Builder nodesAndSeparators = ImmutableArray.CreateBuilder<SyntaxNode>();
+
         while (_Current.Kind is not SyntaxKind.CloseParenthesisToken and not SyntaxKind.EndOfFileToken)
         {
-            ExpressionSyntax expression = ParseExpression();
-            argumentsAndSeparators.Add(expression);
+            TNode node = nodeParser();
+            nodesAndSeparators.Add(node);
 
             if (_Current.Kind is not SyntaxKind.CloseParenthesisToken)
             {
                 SyntaxToken commaToken = MatchToken(SyntaxKind.CommaToken);
-                argumentsAndSeparators.Add(commaToken);
+                nodesAndSeparators.Add(commaToken);
             }
         }
 
-        return new SeparatedSyntaxList<ExpressionSyntax>(argumentsAndSeparators.ToImmutable());
+        return new SeparatedSyntaxList<TNode>(nodesAndSeparators.ToImmutable());
     }
 
     private NameExpressionSyntax ParseNameExpression()

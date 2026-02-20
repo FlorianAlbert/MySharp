@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 
 public sealed class EvaluationResult
 {

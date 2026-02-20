@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
@@ -377,7 +378,7 @@ public class EvaluatorTests
     [Fact]
     public void Evaluator_CallExpression_Reports_WrongArgumentsCount()
     {
-        string text = "[print(\"Hello \", \"World\")];";
+        string text = "[print](\"Hello \", \"World\");";
         string expectedDiagnosticTexts = @"
             Function 'print' expects 1 argument(s) but was called with 2.
         ";

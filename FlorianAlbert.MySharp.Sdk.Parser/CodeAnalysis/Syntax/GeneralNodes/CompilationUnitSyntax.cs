@@ -1,27 +1,32 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class CompilationUnitSyntax : SyntaxNode
 {
-    public CompilationUnitSyntax(StatementSyntax statement, SyntaxToken endOfFileToken)
+    public CompilationUnitSyntax(ImmutableArray<CompilationUnitSyntaxMember> compilationUnitMembers, SyntaxToken endOfFileToken)
     {
-        Statement = statement;
+        CompilationUnitMembers = compilationUnitMembers;
         EndOfFileToken = endOfFileToken;
     }
 
     public override SyntaxKind Kind => SyntaxKind.CompilationUnit;
 
-    public override TextSpan Span => TextSpan.FromBounds(Statement.Span.Start, EndOfFileToken.Span.End);
+    public override TextSpan Span => TextSpan.FromBounds(CompilationUnitMembers.FirstOrDefault()?.Span.Start ?? EndOfFileToken.Span.Start, EndOfFileToken.Span.End);
 
-    public StatementSyntax Statement { get; }
+    public ImmutableArray<CompilationUnitSyntaxMember> CompilationUnitMembers { get; }
 
     public SyntaxToken EndOfFileToken { get; }
 
     public override IEnumerable<SyntaxNode> GetChildren()
     {
-        yield return Statement;
+        foreach (CompilationUnitSyntaxMember compilationUnitMember in CompilationUnitMembers)
+        {
+            yield return compilationUnitMember;
+        }
+
         yield return EndOfFileToken;
     }
 }

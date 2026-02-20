@@ -123,7 +123,7 @@ public class ParserTests
     {
         SyntaxTree syntaxTree = SyntaxTree.Parse(text);
         CompilationUnitSyntax root = syntaxTree.Root;
-        StatementSyntax statement = root.Statement;
+        StatementSyntax statement = root.CompilationUnitMembers.OfType<GlobalStatementSyntax>().First().Statement;
         return Assert.IsType<ExpressionStatementSyntax>(statement).Expression;
     }
 

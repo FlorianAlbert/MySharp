@@ -20,31 +20,44 @@ internal sealed class Binder
 
     public DiagnosticBag Diagnostics { get; } = [];
 
-    public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax compilationUnitSyntax)
+    public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, CompilationUnitSyntax compilationUnitSyntax)
     {
         BoundScope parentScope = CreateParentScope(previous);
         Binder binder = new(parentScope);
-        BoundStatement boundStatement = binder.BindStatement(compilationUnitSyntax.Statement);
 
-        ImmutableArray<VariableSymbol> variables = binder._scope.GetDeclaredVariables();
+        IEnumerable<FunctionDefinitionSyntax> functionDefinitions = compilationUnitSyntax.CompilationUnitMembers.Where(member => member.Kind is SyntaxKind.FunctionDefinition).Cast<FunctionDefinitionSyntax>();
+        IEnumerable<GlobalStatementSyntax> globalStatements = compilationUnitSyntax.CompilationUnitMembers.Where(member => member.Kind is SyntaxKind.GlobalStatement).Cast<GlobalStatementSyntax>();
+
+        // We first iterate to get to know all of the function symbols
+        binder.BindFunctionDeclarations(functionDefinitions);
+
+        BoundGlobalScope boundGlobalScope = binder.BindGlobalScope(globalStatements);
+        BoundProgram boundProgram = binder.BindFunctionDefinitions(previous, functionDefinitions);
+
         ImmutableArray<Diagnostic> diagnostics = [.. binder.Diagnostics];
 
-        return new BoundGlobalScope(previous, diagnostics, variables, boundStatement);
+        return new BoundCompilationUnit(previous, diagnostics, boundGlobalScope, boundProgram);
     }
 
-    private static BoundScope CreateParentScope(BoundGlobalScope? previousGlobalScope)
+    private static BoundScope CreateParentScope(BoundCompilationUnit? previousCompilationUnit)
     {
-        if (previousGlobalScope is null)
+        if (previousCompilationUnit is null)
         {
             return CreateRootScope();
         }
 
-        BoundScope parent = CreateParentScope(previousGlobalScope.Previous);
+        BoundScope parent = CreateParentScope(previousCompilationUnit.Previous);
 
         BoundScope scope = new(parent);
-        foreach (VariableSymbol variable in previousGlobalScope.Variables)
+
+        foreach (VariableSymbol variable in previousCompilationUnit.GlobalScope.Variables)
         {
             scope.TryDeclareVariable(variable);
+        }
+
+        foreach (FunctionSymbol function in previousCompilationUnit.GlobalScope.Functions)
+        {
+            scope.TryDeclareFunction(function);
         }
 
         return scope;
@@ -67,6 +80,108 @@ internal sealed class Binder
         return rootScope;
     }
 
+    private void BindFunctionDeclarations(IEnumerable<FunctionDefinitionSyntax> functionDefinitions)
+    {
+        foreach (FunctionDefinitionSyntax functionDefinitionSyntax in functionDefinitions)
+        {
+            BindFunctionDeclaration(functionDefinitionSyntax);
+        }
+    }
+
+    private void BindFunctionDeclaration(FunctionDefinitionSyntax functionDefinitionSyntax)
+    {
+        string name = functionDefinitionSyntax.IdentifierToken.Text;
+
+        ImmutableArray<ParameterSymbol>.Builder parameterSymbols = ImmutableArray.CreateBuilder<ParameterSymbol>();
+        foreach (ParameterSyntax parameterSyntax in functionDefinitionSyntax.Parameters)
+        {
+            string parameterName = parameterSyntax.Identifier.Text;
+            TypeSymbol? parameterType = BindTypeClause(parameterSyntax.TypeClause);
+
+            if (parameterSymbols.Any(existingSymbol => existingSymbol.Name.Equals(parameterName, StringComparison.Ordinal)))
+            {
+                Diagnostics.ReportDuplicateParameterName(parameterSyntax.Identifier.Span, parameterName);
+            }
+
+            ParameterSymbol parameterSymbol = new(parameterName, parameterType ?? TypeSymbol.Error);
+            parameterSymbols.Add(parameterSymbol);
+        }
+
+        TypeSymbol returnType = TypeSymbol.Void;
+        if (functionDefinitionSyntax.TypeClause is TypeClauseSyntax typeClause)
+        {
+            returnType = BindTypeClause(typeClause) ?? TypeSymbol.Error;
+        }
+
+        FunctionSymbol functionSymbol = new(name, parameterSymbols.ToImmutable(), returnType);
+
+        if (!_scope.TryDeclareFunction(functionSymbol))
+        {
+            Diagnostics.ReportFunctionAlreadyDeclared(functionDefinitionSyntax.IdentifierToken.Span, name);
+        }
+    }
+
+    private BoundGlobalScope BindGlobalScope(IEnumerable<GlobalStatementSyntax> globalStatements)
+    {
+        BoundStatement boundStatement = BindGlobalBlockStatement(globalStatements);
+
+        ImmutableArray<VariableSymbol> variables = _scope.GetDeclaredVariables();
+        ImmutableArray<FunctionSymbol> functions = _scope.GetDeclaredFunctions();
+
+        return new BoundGlobalScope(variables, functions, boundStatement);
+    }
+
+    private BoundBlockStatement BindGlobalBlockStatement(IEnumerable<GlobalStatementSyntax> globalStatements)
+    {
+        ImmutableArray<BoundStatement>.Builder boundGlobalStatements = ImmutableArray.CreateBuilder<BoundStatement>();
+        foreach (GlobalStatementSyntax globalStatement in globalStatements)
+        {
+            BoundStatement boundGlobalStatement = BindStatement(globalStatement.Statement);
+            boundGlobalStatements.Add(boundGlobalStatement);
+        }
+
+        BoundBlockStatement globalBlockStatement = new([.. boundGlobalStatements.ToImmutable()]);
+
+        return globalBlockStatement;
+    }
+
+    private BoundProgram BindFunctionDefinitions(BoundCompilationUnit? previous, IEnumerable<FunctionDefinitionSyntax> functionDefinitions)
+    {
+        ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Builder functionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
+
+        if (previous is not null)
+        {
+            // We only need the function bodies of the previous
+            // Compilation unit, since it already contains all
+            // function bodies of its predecessor Compilation units
+            functionBodies.AddRange(previous.Program.FunctionBodies);
+        }
+        
+        foreach (FunctionDefinitionSyntax functionDefinition in functionDefinitions)
+        {
+            (FunctionSymbol, BoundBlockStatement)? functionBody = BindFunctionBody(functionDefinition);
+            if (functionBody is (FunctionSymbol functionSymbol, BoundBlockStatement functionStatement))
+            {
+                functionBodies.Add(functionSymbol, functionStatement);
+            }
+        }
+
+        return new BoundProgram(functionBodies.ToImmutable());
+    }
+
+    private (FunctionSymbol, BoundBlockStatement)? BindFunctionBody(FunctionDefinitionSyntax functionDefinitionSyntax)
+    {
+        if (!_scope.TryLookupFunction(functionDefinitionSyntax.IdentifierToken.Text, out FunctionSymbol? declaredFunction, out _))
+        {
+            // Something went wrong when declaring the function, so we just ignore it to not produce cascading errors
+            return null;
+        }
+
+        BoundBlockStatement boundBlockStatement = BindBlockStatement(functionDefinitionSyntax.BodyStatement, [.. declaredFunction.Parameters]);
+
+        return (declaredFunction, boundBlockStatement);
+    }
+
     private BoundStatement BindStatement(StatementSyntax statementSyntax)
     {
         return statementSyntax.Kind switch
@@ -81,20 +196,35 @@ internal sealed class Binder
         };
     }
 
-    private BoundBlockStatement BindBlockStatement(BlockStatementSyntax statementSyntax)
+    private BoundBlockStatement BindBlockStatement(BlockStatementSyntax statementSyntax, ImmutableArray<VariableSymbol>? additionalScopeVariables = null)
     {
-        ImmutableArray<BoundStatement>.Builder boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
         _scope = new(_scope);
 
-        foreach (StatementSyntax statement in statementSyntax.Statements)
+        if (additionalScopeVariables is not null)
+        {
+            foreach (VariableSymbol variable in additionalScopeVariables)
+            {
+                _scope.TryDeclareVariable(variable);
+            }
+        }
+
+        ImmutableArray<BoundStatement> boundStatements = BindStatements(statementSyntax.Statements);
+
+        _scope = _scope.Parent!;
+
+        return new BoundBlockStatement(boundStatements);
+    }
+
+    private ImmutableArray<BoundStatement> BindStatements(ImmutableArray<StatementSyntax> statements)
+    {
+        ImmutableArray<BoundStatement>.Builder boundStatements = ImmutableArray.CreateBuilder<BoundStatement>();
+        foreach (StatementSyntax statement in statements)
         {
             BoundStatement boundStatement = BindStatement(statement);
             boundStatements.Add(boundStatement);
         }
 
-        _scope = _scope.Parent!;
-
-        return new BoundBlockStatement(boundStatements.ToImmutable());
+        return boundStatements.ToImmutable();
     }
 
     private BoundVariableDeclarationStatement BindVariableDeclarationStatement(VariableDeclarationStatementSyntax statementSyntax)
@@ -238,7 +368,7 @@ internal sealed class Binder
 
         if (expressionSyntax.Parameters.Count != function.Parameters.Length)
         {
-            Diagnostics.ReportWrongNumberOfArguments(expressionSyntax.Span, function.Name, function.Parameters.Length, expressionSyntax.Parameters.Count);
+            Diagnostics.ReportWrongNumberOfArguments(expressionSyntax.IdentifierToken.Span, function.Name, function.Parameters.Length, expressionSyntax.Parameters.Count);
             return BoundErrorExpression.Instance;
         }
 
@@ -274,7 +404,7 @@ internal sealed class Binder
                 Diagnostics.ReportExplicitConversionNeeded(diagnosticSpan, boundExpression.Type, targetType);
                 return boundExpression;
             default:
-                throw new Exception($"Unexpected conversion type: { conversion }");
+                throw new Exception($"Unexpected conversion type: {conversion}");
         }
     }
 

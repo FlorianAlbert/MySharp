@@ -49,9 +49,13 @@ public enum SyntaxKind
     WhileKeyword,
     ForKeyword,
     ToKeyword,
+    FunctionKeyword,
 
     // Nodes
     CompilationUnit,
+    GlobalStatement,
+    FunctionDefinition,
+    Parameter,
     ElseClause,
     TypeClause,
 
