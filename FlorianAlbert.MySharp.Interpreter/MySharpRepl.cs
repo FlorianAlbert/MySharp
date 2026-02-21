@@ -96,7 +96,7 @@ internal sealed class MySharpRepl : Repl
 
         if (result.Diagnostics.Length > 0)
         {
-            foreach (Diagnostic diagnostic in result.Diagnostics)
+            foreach (Diagnostic diagnostic in result.Diagnostics.OrderBy(diagnostic => diagnostic.Span, TextSpan.Comparer))
             {
                 Console.WriteLine();
 

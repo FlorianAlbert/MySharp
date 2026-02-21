@@ -2,6 +2,8 @@
 
 public sealed class TextSpan : IEquatable<TextSpan>
 {
+    public static readonly IComparer<TextSpan> Comparer = new TextSpanComparer();
+
     public TextSpan(int start, int length)
     {
         Start = start;
@@ -43,5 +45,34 @@ public sealed class TextSpan : IEquatable<TextSpan>
     public override int GetHashCode()
     {
         return HashCode.Combine(Start, Length);
+    }
+
+    private class TextSpanComparer : IComparer<TextSpan>
+    {
+        public int Compare(TextSpan? first, TextSpan? second)
+        {
+            if (first is null && second is null)
+            {
+                return 0;
+            }
+
+            if (first is null)
+            {
+                return -1;
+            }
+
+            if (second is null)
+            {
+                return 1;
+            }
+
+            int startComparison = first.Start.CompareTo(second.Start);
+            if (startComparison != 0)
+            {
+                return startComparison;
+            }
+
+            return first.Length.CompareTo(second.Length);
+        }
     }
 }
