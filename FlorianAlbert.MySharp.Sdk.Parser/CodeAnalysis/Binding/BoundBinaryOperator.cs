@@ -66,6 +66,8 @@ internal sealed class BoundBinaryOperator
         new(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, TypeSymbol.BuiltIns.String, TypeSymbol.BuiltIns.Bool),
 
         new(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Concatenation, TypeSymbol.BuiltIns.Character, TypeSymbol.BuiltIns.String),
+        new(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, TypeSymbol.BuiltIns.Character, TypeSymbol.BuiltIns.Bool),
+        new(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, TypeSymbol.BuiltIns.Character, TypeSymbol.BuiltIns.Bool),
         new(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Concatenation, TypeSymbol.BuiltIns.Character, TypeSymbol.BuiltIns.String, TypeSymbol.BuiltIns.String),
         new(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Concatenation, TypeSymbol.BuiltIns.String, TypeSymbol.BuiltIns.Character, TypeSymbol.BuiltIns.String)
     ];
