@@ -200,7 +200,9 @@ internal sealed class ConsoleDocumentView
 
     private void HandleEscape()
     {
-        _lines[CurrentLineIndex] = string.Empty;
+        _lines.Clear();
+        _lines.Add(string.Empty);
+        CurrentLineIndex = 0;
         CurrentCharIndex = 0;
 
         _renderer.Render(Lines, CurrentLineIndex, CurrentCharIndex);
