@@ -159,9 +159,9 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         Report(span, message);
     }
 
-    internal void ReportBreakOutsideOfLoop(TextSpan span)
+    internal void ReportBreakOrContinueOutsideOfLoop(TextSpan span, string keyword)
     {
-        string message = $"The break keyword is only valid in the body of a loop.";
+        string message = $"The keyword '{keyword}' is only valid in the body of a loop.";
         Report(span, message);
     }
 }

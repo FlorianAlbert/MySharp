@@ -12,7 +12,7 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 internal sealed class Binder
 {
     private BoundScope _scope;
-    private readonly Stack<BoundLabel> _breakLabels = [];
+    private readonly Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopLabels = [];
     private int _labelCounter;
 
     public Binder(BoundScope parent)
@@ -204,6 +204,7 @@ internal sealed class Binder
             SyntaxKind.WhileStatement => BindWhileStatement((WhileStatementSyntax) statementSyntax),
             SyntaxKind.ForStatement => BindForStatement((ForStatementSyntax) statementSyntax),
             SyntaxKind.BreakStatement => BindBreakStatement((BreakStatementSyntax) statementSyntax),
+            SyntaxKind.ContinueStatement => BindContinueStatement((ContinueStatementSyntax) statementSyntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
@@ -297,9 +298,9 @@ internal sealed class Binder
     private BoundWhileStatement BindWhileStatement(WhileStatementSyntax statementSyntax)
     {
         BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.BuiltIns.Bool);
-        BoundStatement boundBodyStatement = BindLoopBody(statementSyntax.BodyStatement, out BoundLabel breakLabel);
+        BoundStatement boundBodyStatement = BindLoopBody(statementSyntax.BodyStatement, out BoundLabel breakLabel, out BoundLabel continueLabel);
 
-        return new BoundWhileStatement(boundConditionExpression, boundBodyStatement, breakLabel);
+        return new BoundWhileStatement(boundConditionExpression, boundBodyStatement, breakLabel, continueLabel);
     }
 
     private BoundForStatement BindForStatement(ForStatementSyntax statementSyntax)
@@ -313,33 +314,45 @@ internal sealed class Binder
         VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, TypeSymbol.BuiltIns.Int32);
         _scope.TryDeclareVariable(variableSymbol);
 
-        BoundStatement boundBodyStatement = BindLoopBody(statementSyntax.Body, out BoundLabel breakLabel);
+        BoundStatement boundBodyStatement = BindLoopBody(statementSyntax.Body, out BoundLabel breakLabel, out BoundLabel continueLabel);
 
         _scope = _scope.Parent!;
 
-        return new BoundForStatement(variableSymbol, boundLowerBoundExpression, boundUpperBoundExpression, boundBodyStatement, breakLabel);
+        return new BoundForStatement(variableSymbol, boundLowerBoundExpression, boundUpperBoundExpression, boundBodyStatement, breakLabel, continueLabel);
     }
 
-    private BoundStatement BindLoopBody(StatementSyntax statementSyntax, out BoundLabel breakLabel)
+    private BoundStatement BindLoopBody(StatementSyntax statementSyntax, out BoundLabel breakLabel, out BoundLabel continueLabel)
     {
         breakLabel = GenerateLabelSymbol();
+        continueLabel = GenerateLabelSymbol();
 
-        _breakLabels.Push(breakLabel);
+        _loopLabels.Push((breakLabel, continueLabel));
         BoundStatement boundLoopBodyStatement = BindStatement(statementSyntax);
-        _breakLabels.Pop();
+        _loopLabels.Pop();
 
         return boundLoopBodyStatement;
     }
 
     private BoundStatement BindBreakStatement(BreakStatementSyntax statementSyntax)
     {
-        if (_breakLabels.Count <= 0)
+        if (_loopLabels.Count <= 0)
         {
-            Diagnostics.ReportBreakOutsideOfLoop(statementSyntax.Span);
+            Diagnostics.ReportBreakOrContinueOutsideOfLoop(statementSyntax.Span, statementSyntax.BreakKeyword.Text);
             return BindErrorStatement();
         }
 
-        return new BoundGotoStatement(_breakLabels.Peek());
+        return new BoundGotoStatement(_loopLabels.Peek().BreakLabel);
+    }
+
+    private BoundStatement BindContinueStatement(ContinueStatementSyntax statementSyntax)
+    {
+        if (_loopLabels.Count <= 0)
+        {
+            Diagnostics.ReportBreakOrContinueOutsideOfLoop(statementSyntax.Span, statementSyntax.ContinueKeyword.Text);
+            return BindErrorStatement();
+        }
+
+        return new BoundGotoStatement(_loopLabels.Peek().ContinueLabel);
     }
 
     private BoundExpressionStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)

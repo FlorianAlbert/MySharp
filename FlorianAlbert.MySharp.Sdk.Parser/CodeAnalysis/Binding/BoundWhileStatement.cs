@@ -3,7 +3,7 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundWhileStatement : BoundLoopStatement
 {
-    public BoundWhileStatement(BoundExpression condition, BoundStatement statement, BoundLabel breakLabel) : base(breakLabel)
+    public BoundWhileStatement(BoundExpression condition, BoundStatement statement, BoundLabel breakLabel, BoundLabel continueLabel) : base(breakLabel, continueLabel)
     {
         Condition = condition;
         Body = statement;

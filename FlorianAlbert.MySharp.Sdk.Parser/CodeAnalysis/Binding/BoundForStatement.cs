@@ -9,7 +9,8 @@ internal sealed class BoundForStatement : BoundLoopStatement
         BoundExpression lowerBoundExpression,
         BoundExpression upperBoundExpression,
         BoundStatement body,
-        BoundLabel breakLabel) : base(breakLabel)
+        BoundLabel breakLabel,
+        BoundLabel continueLabel) : base(breakLabel, continueLabel)
     {
         IteratorSymbol = iteratorSymbol;
         LowerBound = lowerBoundExpression;

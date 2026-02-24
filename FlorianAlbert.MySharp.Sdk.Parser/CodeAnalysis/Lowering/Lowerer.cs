@@ -100,7 +100,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
     protected override BoundStatement RewriteWhileStatement(BoundWhileStatement whileStatement)
     {
-        BoundLabel beginLabel = GenerateLabelSymbol();
+        BoundLabel beginLabel = whileStatement.ContinueLabel;
         BoundLabelStatement beginLabelStatement = new(beginLabel);
 
         BoundLabel endLabel = whileStatement.BreakLabel;
@@ -142,6 +142,8 @@ internal sealed class Lowerer : BoundTreeRewriter
             BoundBinaryOperator.Bind(SyntaxKind.LessToken, TypeSymbol.BuiltIns.Int32, TypeSymbol.BuiltIns.Int32)!,
             upperBoundExpression);
 
+        BoundLabelStatement continueLabelStatement = new(forStatement.ContinueLabel);
+
         BoundExpressionStatement incrementStatement = new(
             new BoundAssignmentExpression(
                 forStatement.IteratorSymbol,
@@ -150,9 +152,9 @@ internal sealed class Lowerer : BoundTreeRewriter
                     BoundBinaryOperator.Bind(SyntaxKind.PlusToken, forStatement.IteratorSymbol.Type, TypeSymbol.BuiltIns.Int32)!,
                     new BoundLiteralExpression(1))));
 
-        BoundBlockStatement whileBlockStatement = new([forStatement.Body, incrementStatement]);
+        BoundBlockStatement whileBlockStatement = new([forStatement.Body, continueLabelStatement, incrementStatement]);
 
-        BoundWhileStatement whileStatement = new(conditionExpression, whileBlockStatement, forStatement.BreakLabel);
+        BoundWhileStatement whileStatement = new(conditionExpression, whileBlockStatement, forStatement.BreakLabel, GenerateLabelSymbol());
 
         BoundBlockStatement result = new([variableDeclarationStatement, upperBoundVariableDeclarationStatement, whileStatement]);
 

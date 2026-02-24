@@ -140,6 +140,7 @@ internal sealed class Parser
             SyntaxKind.WhileKeyword => ParseWhileStatement(),
             SyntaxKind.ForKeyword => ParseForStatement(),
             SyntaxKind.BreakKeyword => ParseBreakStatement(),
+            SyntaxKind.ContinueKeyword => ParseContinueStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -278,6 +279,14 @@ internal sealed class Parser
         SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
 
         return new BreakStatementSyntax(breakKeyword, semicolonToken);
+    }
+
+    private ContinueStatementSyntax ParseContinueStatement()
+    {
+        SyntaxToken continueKeyword = MatchToken(SyntaxKind.ContinueKeyword);
+        SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
+
+        return new ContinueStatementSyntax(continueKeyword, semicolonToken);
     }
 
     private ExpressionStatementSyntax ParseExpressionStatement()
