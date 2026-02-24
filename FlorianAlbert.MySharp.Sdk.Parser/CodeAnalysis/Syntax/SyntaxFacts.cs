@@ -68,6 +68,7 @@ public static class SyntaxFacts
         "for" => SyntaxKind.ForKeyword,
         "to" => SyntaxKind.ToKeyword,
         "function" => SyntaxKind.FunctionKeyword,
+        "break" => SyntaxKind.BreakKeyword,
         _ => SyntaxKind.IdentifierToken
     };
 
@@ -111,6 +112,7 @@ public static class SyntaxFacts
         SyntaxKind.ForKeyword => "for",
         SyntaxKind.ToKeyword => "to",
         SyntaxKind.FunctionKeyword => "function",
+        SyntaxKind.BreakKeyword => "break",
         _ => null
     };
 }

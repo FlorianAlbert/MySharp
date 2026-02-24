@@ -1,5 +1,6 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Collections;
 
@@ -155,6 +156,12 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
     internal void ReportFunctionAlreadyDeclared(TextSpan span, string name)
     {
         string message = $"Function '{name}' is already declared.";
+        Report(span, message);
+    }
+
+    internal void ReportBreakOutsideOfLoop(TextSpan span)
+    {
+        string message = $"The break keyword is only valid in the body of a loop.";
         Report(span, message);
     }
 }

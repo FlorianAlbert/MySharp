@@ -3,12 +3,13 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
-internal sealed class BoundForStatement : BoundStatement
+internal sealed class BoundForStatement : BoundLoopStatement
 {
     public BoundForStatement(VariableSymbol iteratorSymbol,
         BoundExpression lowerBoundExpression,
         BoundExpression upperBoundExpression,
-        BoundStatement body)
+        BoundStatement body,
+        BoundLabel breakLabel) : base(breakLabel)
     {
         IteratorSymbol = iteratorSymbol;
         LowerBound = lowerBoundExpression;

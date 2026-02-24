@@ -12,6 +12,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 internal sealed class Binder
 {
     private BoundScope _scope;
+    private readonly Stack<BoundLabel> _breakLabels = [];
+    private int _labelCounter;
 
     public Binder(BoundScope parent)
     {
@@ -19,6 +21,11 @@ internal sealed class Binder
     }
 
     public DiagnosticBag Diagnostics { get; } = [];
+
+    private BoundLabel GenerateLabelSymbol()
+    {
+        return new BoundLabel($"<Binder_Label{_labelCounter++}>");
+    }
 
     public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, CompilationUnitSyntax compilationUnitSyntax)
     {
@@ -182,6 +189,11 @@ internal sealed class Binder
         return (declaredFunction, boundBlockStatement);
     }
 
+    private BoundExpressionStatement BindErrorStatement()
+    {
+        return new BoundExpressionStatement(BoundErrorExpression.Instance);
+    }
+
     private BoundStatement BindStatement(StatementSyntax statementSyntax)
     {
         return statementSyntax.Kind switch
@@ -191,6 +203,7 @@ internal sealed class Binder
             SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax) statementSyntax),
             SyntaxKind.WhileStatement => BindWhileStatement((WhileStatementSyntax) statementSyntax),
             SyntaxKind.ForStatement => BindForStatement((ForStatementSyntax) statementSyntax),
+            SyntaxKind.BreakStatement => BindBreakStatement((BreakStatementSyntax) statementSyntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
@@ -284,9 +297,9 @@ internal sealed class Binder
     private BoundWhileStatement BindWhileStatement(WhileStatementSyntax statementSyntax)
     {
         BoundExpression boundConditionExpression = BindExpression(statementSyntax.ConditionExpression, TypeSymbol.BuiltIns.Bool);
-        BoundStatement boundBodyStatement = BindStatement(statementSyntax.BodyStatement);
+        BoundStatement boundBodyStatement = BindLoopBody(statementSyntax.BodyStatement, out BoundLabel breakLabel);
 
-        return new BoundWhileStatement(boundConditionExpression, boundBodyStatement);
+        return new BoundWhileStatement(boundConditionExpression, boundBodyStatement, breakLabel);
     }
 
     private BoundForStatement BindForStatement(ForStatementSyntax statementSyntax)
@@ -300,11 +313,33 @@ internal sealed class Binder
         VariableSymbol variableSymbol = new(iteratorName, isReadOnly: true, TypeSymbol.BuiltIns.Int32);
         _scope.TryDeclareVariable(variableSymbol);
 
-        BoundStatement boundBodyStatement = BindStatement(statementSyntax.Body);
+        BoundStatement boundBodyStatement = BindLoopBody(statementSyntax.Body, out BoundLabel breakLabel);
 
         _scope = _scope.Parent!;
 
-        return new BoundForStatement(variableSymbol, boundLowerBoundExpression, boundUpperBoundExpression, boundBodyStatement);
+        return new BoundForStatement(variableSymbol, boundLowerBoundExpression, boundUpperBoundExpression, boundBodyStatement, breakLabel);
+    }
+
+    private BoundStatement BindLoopBody(StatementSyntax statementSyntax, out BoundLabel breakLabel)
+    {
+        breakLabel = GenerateLabelSymbol();
+
+        _breakLabels.Push(breakLabel);
+        BoundStatement boundLoopBodyStatement = BindStatement(statementSyntax);
+        _breakLabels.Pop();
+
+        return boundLoopBodyStatement;
+    }
+
+    private BoundStatement BindBreakStatement(BreakStatementSyntax statementSyntax)
+    {
+        if (_breakLabels.Count <= 0)
+        {
+            Diagnostics.ReportBreakOutsideOfLoop(statementSyntax.Span);
+            return BindErrorStatement();
+        }
+
+        return new BoundGotoStatement(_breakLabels.Peek());
     }
 
     private BoundExpressionStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)

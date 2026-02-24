@@ -139,6 +139,7 @@ internal sealed class Parser
             SyntaxKind.IfKeyword => ParseIfStatement(),
             SyntaxKind.WhileKeyword => ParseWhileStatement(),
             SyntaxKind.ForKeyword => ParseForStatement(),
+            SyntaxKind.BreakKeyword => ParseBreakStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -269,6 +270,14 @@ internal sealed class Parser
             upperBoundExpression,
             closeParenthesesToken,
             bodyStatement);
+    }
+
+    private BreakStatementSyntax ParseBreakStatement()
+    {
+        SyntaxToken breakKeyword = MatchToken(SyntaxKind.BreakKeyword);
+        SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
+
+        return new BreakStatementSyntax(breakKeyword, semicolonToken);
     }
 
     private ExpressionStatementSyntax ParseExpressionStatement()

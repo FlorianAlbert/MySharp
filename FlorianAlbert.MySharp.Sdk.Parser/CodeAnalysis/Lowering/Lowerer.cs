@@ -21,7 +21,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
     private BoundLabel GenerateLabelSymbol()
     {
-        return new BoundLabel($"<Label{_labelCounter++}>");
+        return new BoundLabel($"<Lowerer_Label{_labelCounter++}>");
     }
 
     private static BoundBlockStatement Flatten(BoundStatement statement)
@@ -103,7 +103,7 @@ internal sealed class Lowerer : BoundTreeRewriter
         BoundLabel beginLabel = GenerateLabelSymbol();
         BoundLabelStatement beginLabelStatement = new(beginLabel);
 
-        BoundLabel endLabel = GenerateLabelSymbol();
+        BoundLabel endLabel = whileStatement.BreakLabel;
         BoundLabelStatement endLabelStatement = new(endLabel);
 
         BoundConditionalGotoStatement falseGotoStatement = new(
@@ -152,7 +152,7 @@ internal sealed class Lowerer : BoundTreeRewriter
 
         BoundBlockStatement whileBlockStatement = new([forStatement.Body, incrementStatement]);
 
-        BoundWhileStatement whileStatement = new(conditionExpression, whileBlockStatement);
+        BoundWhileStatement whileStatement = new(conditionExpression, whileBlockStatement, forStatement.BreakLabel);
 
         BoundBlockStatement result = new([variableDeclarationStatement, upperBoundVariableDeclarationStatement, whileStatement]);
 

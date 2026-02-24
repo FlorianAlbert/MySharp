@@ -195,7 +195,7 @@ internal abstract class BoundTreeRewriter
             return whileStatement;
         }
 
-        return new BoundWhileStatement(rewrittenCondition, rewrittenBody);
+        return new BoundWhileStatement(rewrittenCondition, rewrittenBody, whileStatement.BreakLabel);
     }
 
     protected virtual BoundStatement RewriteForStatement(BoundForStatement forStatement)
@@ -211,7 +211,7 @@ internal abstract class BoundTreeRewriter
             return forStatement;
         }
 
-        return new BoundForStatement(forStatement.IteratorSymbol, rewrittenLowerBound, rewrittenUpperBound, rewrittenBody);
+        return new BoundForStatement(forStatement.IteratorSymbol, rewrittenLowerBound, rewrittenUpperBound, rewrittenBody, forStatement.BreakLabel);
     }
 
     protected virtual BoundLabelStatement RewriteLabelStatement(BoundLabelStatement labelStatement)

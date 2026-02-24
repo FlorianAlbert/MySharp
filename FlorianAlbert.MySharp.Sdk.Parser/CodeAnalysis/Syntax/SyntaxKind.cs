@@ -50,6 +50,7 @@ public enum SyntaxKind
     ForKeyword,
     ToKeyword,
     FunctionKeyword,
+    BreakKeyword,
 
     // Nodes
     CompilationUnit,
@@ -66,6 +67,7 @@ public enum SyntaxKind
     WhileStatement,
     ForStatement,
     ExpressionStatement,
+    BreakStatement,
 
     // Expressions
     LiteralExpression,
