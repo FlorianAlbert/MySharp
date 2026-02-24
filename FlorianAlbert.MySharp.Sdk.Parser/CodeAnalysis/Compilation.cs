@@ -4,6 +4,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Lowering;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
+using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
@@ -62,8 +63,38 @@ public sealed class Compilation
 
     public void EmitTree(TextWriter writer)
     {
+        IndentedTextWriter indentedTextWriter = writer as IndentedTextWriter ?? new IndentedTextWriter(writer);
+
+        if (CompilationUnit.GlobalScope.Functions.Length > 0)
+        {
+            indentedTextWriter.WriteLine("Functions:");
+            indentedTextWriter.Indent++;
+
+            foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in GetFunctionBodies())
+            {
+                if (!CompilationUnit.GlobalScope.Functions.Contains(functionSymbol))
+                {
+                    continue;
+                }
+
+                functionSymbol.WriteTo(indentedTextWriter);
+                indentedTextWriter.WriteLine();
+                functionBody.WriteTo(indentedTextWriter);
+                indentedTextWriter.WriteLine();
+            }
+
+            indentedTextWriter.Indent--;
+        }
+
         BoundBlockStatement blockStatement = GetStatement();
-        blockStatement.WriteTo(writer);
+        if (blockStatement.Statements.Length > 0)
+        {
+            indentedTextWriter.WriteLine("Main:");
+            indentedTextWriter.Indent++;
+            blockStatement.WriteTo(indentedTextWriter);
+            indentedTextWriter.Indent--;
+        }
+
     }
 
     private BoundBlockStatement GetStatement()
