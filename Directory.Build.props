@@ -5,7 +5,7 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
 	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	<WarningsAsErrors>IDE0090</WarningsAsErrors>
+	<WarningsAsErrors>IDE0090;IDE0011</WarningsAsErrors>
   </PropertyGroup>
 	
 </Project>
