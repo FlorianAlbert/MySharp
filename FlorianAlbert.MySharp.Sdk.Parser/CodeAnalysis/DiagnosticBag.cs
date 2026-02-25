@@ -161,7 +161,25 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
 
     internal void ReportBreakOrContinueOutsideOfLoop(TextSpan span, string keyword)
     {
-        string message = $"The keyword '{keyword}' is only valid in the body of a loop.";
+        string message = $"The '{keyword}' keyword is only valid in the body of a loop.";
+        Report(span, message);
+    }
+
+    internal void ReportReturnOutsideOfFunction(TextSpan span)
+    {
+        string message = "The 'return' keyword is only valid in the body of a function.";
+        Report(span, message);
+    }
+
+    internal void ReportReturnExpressionNotAllowed(TextSpan span)
+    {
+        string message = "The 'return' keyword cannot be followed by an expression in a void function.";
+        Report(span, message);
+    }
+
+    internal void ReportReturnExpressionRequired(TextSpan span, TypeSymbol expectedReturnType)
+    {
+        string message = $"The 'return' keyword must be followed by an expression of type '{expectedReturnType}'.";
         Report(span, message);
     }
 }

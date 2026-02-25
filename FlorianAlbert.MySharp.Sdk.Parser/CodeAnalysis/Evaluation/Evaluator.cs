@@ -39,6 +39,15 @@ internal sealed class Evaluator
         while (newFrame.CurrentStatementIndex < statement.Statements.Length)
         {
             BoundStatement nextStatement = statement.Statements[newFrame.CurrentStatementIndex];
+
+            if (nextStatement.Kind == BoundNodeKind.ReturnStatement)
+            {
+                BoundReturnStatement returnStatement = (BoundReturnStatement) nextStatement;
+                object? returnValue = returnStatement.Expression is null ? null : EvaluateExpression(returnStatement.Expression);
+                _stackFrames.Pop();
+                return returnValue;
+            }
+
             EvaluateStatement(nextStatement);
         }
 

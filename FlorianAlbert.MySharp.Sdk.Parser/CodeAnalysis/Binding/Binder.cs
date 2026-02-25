@@ -11,6 +11,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class Binder
 {
+    private FunctionSymbol? _currentFunction;
+
     private BoundScope _scope;
     private readonly Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopLabels = [];
     private int _labelCounter;
@@ -184,7 +186,11 @@ internal sealed class Binder
             return null;
         }
 
+        _currentFunction = declaredFunction;
+
         BoundBlockStatement boundBlockStatement = BindBlockStatement(functionDefinitionSyntax.BodyStatement, [.. declaredFunction.Parameters]);
+
+        _currentFunction = null;
 
         return (declaredFunction, boundBlockStatement);
     }
@@ -205,6 +211,7 @@ internal sealed class Binder
             SyntaxKind.ForStatement => BindForStatement((ForStatementSyntax) statementSyntax),
             SyntaxKind.BreakStatement => BindBreakStatement((BreakStatementSyntax) statementSyntax),
             SyntaxKind.ContinueStatement => BindContinueStatement((ContinueStatementSyntax) statementSyntax),
+            SyntaxKind.ReturnStatement => BindReturnStatement((ReturnStatementSyntax) statementSyntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
@@ -353,6 +360,36 @@ internal sealed class Binder
         }
 
         return new BoundGotoStatement(_loopLabels.Peek().ContinueLabel);
+    }
+
+    private BoundStatement BindReturnStatement(ReturnStatementSyntax statementSyntax)
+    {
+        if (_currentFunction is null)
+        {
+            Diagnostics.ReportReturnOutsideOfFunction(statementSyntax.Span);
+            return BindErrorStatement();
+        }
+
+        if (_currentFunction.ReturnType == TypeSymbol.Void && statementSyntax.Expression is not null)
+        {
+            Diagnostics.ReportReturnExpressionNotAllowed(statementSyntax.Expression.Span);
+            return BindErrorStatement();
+        }
+
+        if (_currentFunction.ReturnType != TypeSymbol.Void && statementSyntax.Expression is null)
+        {
+            Diagnostics.ReportReturnExpressionRequired(statementSyntax.Span, _currentFunction.ReturnType);
+            return BindErrorStatement();
+        }
+
+        BoundExpression? boundExpression = null;
+        if (statementSyntax.Expression is ExpressionSyntax expression)
+        {
+            boundExpression = BindExpression(expression);
+            boundExpression = BindImplicitConversion(boundExpression, _currentFunction.ReturnType, expression.Span);
+        }
+
+        return new BoundReturnStatement(boundExpression);
     }
 
     private BoundExpressionStatement BindExpressionStatement(ExpressionStatementSyntax statementSyntax)

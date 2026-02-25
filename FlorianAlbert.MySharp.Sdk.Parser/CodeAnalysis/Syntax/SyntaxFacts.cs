@@ -70,6 +70,7 @@ public static class SyntaxFacts
         "function" => SyntaxKind.FunctionKeyword,
         "break" => SyntaxKind.BreakKeyword,
         "continue" => SyntaxKind.ContinueKeyword,
+        "return" => SyntaxKind.ReturnKeyword,
         _ => SyntaxKind.IdentifierToken
     };
 
@@ -115,6 +116,7 @@ public static class SyntaxFacts
         SyntaxKind.FunctionKeyword => "function",
         SyntaxKind.BreakKeyword => "break",
         SyntaxKind.ContinueKeyword => "continue",
+        SyntaxKind.ReturnKeyword => "return",
         _ => null
     };
 }

@@ -141,6 +141,7 @@ internal sealed class Parser
             SyntaxKind.ForKeyword => ParseForStatement(),
             SyntaxKind.BreakKeyword => ParseBreakStatement(),
             SyntaxKind.ContinueKeyword => ParseContinueStatement(),
+            SyntaxKind.ReturnKeyword => ParseReturnStatement(),
             _ => ParseExpressionStatement(),
         };
     }
@@ -287,6 +288,21 @@ internal sealed class Parser
         SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
 
         return new ContinueStatementSyntax(continueKeyword, semicolonToken);
+    }
+
+    private ReturnStatementSyntax ParseReturnStatement()
+    {
+        SyntaxToken returnKeyword = MatchToken(SyntaxKind.ReturnKeyword);
+
+        ExpressionSyntax? expression = null;
+        if (_Current.Kind is not SyntaxKind.SemicolonToken)
+        {
+            expression = ParseExpression();
+        }
+
+        SyntaxToken semicolonToken = MatchToken(SyntaxKind.SemicolonToken);
+
+        return new ReturnStatementSyntax(returnKeyword, expression, semicolonToken);
     }
 
     private ExpressionStatementSyntax ParseExpressionStatement()

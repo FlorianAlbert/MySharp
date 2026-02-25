@@ -49,6 +49,9 @@ internal static class BoundNodeExtensions
                 case BoundNodeKind.ConditionalGotoStatement:
                     WriteConditionalGotoStatement((BoundConditionalGotoStatement) boundNode, textWriter);
                     break;
+                case BoundNodeKind.ReturnStatement:
+                    WriteReturnStatement((BoundReturnStatement) boundNode, textWriter);
+                    break;
                 case BoundNodeKind.ExpressionStatement:
                     WriteExpressionStatement((BoundExpressionStatement) boundNode, textWriter);
                     break;
@@ -207,6 +210,20 @@ internal static class BoundNodeExtensions
         }
         textWriter.WriteSpace();
         conditionalGotoStatement.Condition.WriteTo(textWriter);
+        textWriter.WritePunctuation(SyntaxKind.SemicolonToken);
+        textWriter.WriteLine();
+    }
+
+    private static void WriteReturnStatement(BoundReturnStatement returnStatement, IndentedTextWriter textWriter)
+    {
+        textWriter.WriteKeyword(SyntaxKind.ReturnKeyword);
+
+        if (returnStatement.Expression is not null)
+        {
+            textWriter.WriteSpace();
+            returnStatement.Expression.WriteTo(textWriter);
+        }
+
         textWriter.WritePunctuation(SyntaxKind.SemicolonToken);
         textWriter.WriteLine();
     }
