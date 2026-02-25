@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 
@@ -35,42 +36,50 @@ internal static class SymbolExtensions
 
     private static void WriteVariableTo(VariableSymbol variableSymbol, TextWriter textWriter)
     {
-        textWriter.WriteKeyword(variableSymbol.IsReadOnly ? "let " : "var ");
+        textWriter.WriteKeyword(variableSymbol.IsReadOnly ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword);
+        textWriter.WriteSpace();
         textWriter.WriteIdentifier(variableSymbol.Name);
-        textWriter.WritePunctuation(" : ");
-        WriteTypeTo(variableSymbol.Type, textWriter);
+        WriteTypeClause(variableSymbol.Type, textWriter);
     }
 
     private static void WriteFunctionTo(FunctionSymbol functionSymbol, TextWriter textWriter)
     {
-        textWriter.WriteKeyword("function ");
+        textWriter.WriteKeyword(SyntaxKind.FunctionKeyword);
+        textWriter.WriteSpace();
         textWriter.WriteIdentifier(functionSymbol.Name);
-        textWriter.WritePunctuation("(");
+        textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
 
         for (int parameterIndex = 0; parameterIndex < functionSymbol.Parameters.Length; parameterIndex++)
         {
             if (parameterIndex > 0)
             {
-                textWriter.WritePunctuation(", ");
+                textWriter.WritePunctuation(SyntaxKind.CommaToken);
+                textWriter.WriteSpace();
             }
 
             ParameterSymbol parameterSymbol = functionSymbol.Parameters[parameterIndex];
             WriteParameterTo(parameterSymbol, textWriter);
         }
 
-        textWriter.WritePunctuation(")");
+        textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
 
         if (functionSymbol.ReturnType != TypeSymbol.Void)
         {
-            textWriter.WritePunctuation(" : ");
-            WriteTypeTo(functionSymbol.ReturnType, textWriter);
+            WriteTypeClause(functionSymbol.ReturnType, textWriter);
         }
     }
 
     private static void WriteParameterTo(ParameterSymbol parameterSymbol, TextWriter textWriter)
     {
         textWriter.WriteIdentifier(parameterSymbol.Name);
-        textWriter.WritePunctuation(" : ");
-        WriteTypeTo(parameterSymbol.Type, textWriter);
+        WriteTypeClause(parameterSymbol.Type, textWriter);
+    }
+
+    private static void WriteTypeClause(TypeSymbol type, TextWriter textWriter)
+    {
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.ColonToken);
+        textWriter.WriteSpace();
+        WriteTypeTo(type, textWriter);
     }
 }

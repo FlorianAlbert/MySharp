@@ -45,14 +45,14 @@ internal static class IndentedTextWriterExtensions
             bool needsParenthesis = parentPrecedence >= currentPrecedence;
             if (needsParenthesis)
             {
-                textWriter.WritePunctuation("(");
+                textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
             }
 
             currentExpression.WriteTo(textWriter);
 
             if (needsParenthesis)
             {
-                textWriter.WritePunctuation(")");
+                textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
             }
         }
     }

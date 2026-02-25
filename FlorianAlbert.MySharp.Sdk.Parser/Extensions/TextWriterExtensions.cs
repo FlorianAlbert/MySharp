@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using System.CodeDom.Compiler;
 using System.Numerics;
 
@@ -41,6 +42,16 @@ internal static class TextWriterExtensions
             }
         }
 
+        public void WriteKeyword(SyntaxKind syntaxKind)
+        {
+            string? text = SyntaxFacts.GetText(syntaxKind);
+
+            if (text is not null)
+            {
+                textWriter.WriteKeyword(text);
+            }
+        }
+
         public void WriteKeyword(string keyword)
         {
             textWriter.SetForegroundColor(ConsoleColor.Blue);
@@ -59,7 +70,7 @@ internal static class TextWriterExtensions
         {
             if (typeSymbol == TypeSymbol.BuiltIns.Bool)
             {
-                textWriter.WriteKeyword((bool) literalValue ? "true" : "false");
+                textWriter.WriteKeyword((bool) literalValue ? SyntaxKind.TrueKeyword : SyntaxKind.FalseKeyword);
             }
             else if (typeSymbol == TypeSymbol.BuiltIns.Int32)
             {
@@ -105,11 +116,26 @@ internal static class TextWriterExtensions
             textWriter.ResetColor();
         }
 
+        public void WritePunctuation(SyntaxKind syntaxKind)
+        {
+            string? text = SyntaxFacts.GetText(syntaxKind);
+
+            if (text is not null)
+            {
+                textWriter.WritePunctuation(text);
+            }
+        }
+
         public void WritePunctuation(string punctuation)
         {
             textWriter.SetForegroundColor(ConsoleColor.DarkGray);
             textWriter.Write(punctuation);
             textWriter.ResetColor();
+        }
+
+        public void WriteSpace()
+        {
+            textWriter.Write(' ');
         }
     }
 }

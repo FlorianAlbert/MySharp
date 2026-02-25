@@ -84,7 +84,7 @@ internal static class BoundNodeExtensions
 
     private static void WriteBlockStatement(BoundBlockStatement blockStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WritePunctuation("{");
+        textWriter.WritePunctuation(SyntaxKind.OpenBraceToken);
         textWriter.WriteLine();
         textWriter.Indent++;
         foreach (BoundStatement statement in blockStatement.Statements)
@@ -92,33 +92,37 @@ internal static class BoundNodeExtensions
             statement.WriteTo(textWriter);
         }
         textWriter.Indent--;
-        textWriter.WritePunctuation("}");
+        textWriter.WritePunctuation(SyntaxKind.CloseBraceToken);
         textWriter.WriteLine();
     }
 
     private static void WriteVariableDeclarationStatement(BoundVariableDeclarationStatement variableDeclarationStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WriteKeyword(variableDeclarationStatement.Variable.IsReadOnly ? "let " : "var ");
+        textWriter.WriteKeyword(variableDeclarationStatement.Variable.IsReadOnly ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword);
+        textWriter.WriteSpace();
         textWriter.WriteIdentifier(variableDeclarationStatement.Variable.Name);
-        textWriter.WritePunctuation(" = ");
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.EqualsToken);
+        textWriter.WriteSpace();
         variableDeclarationStatement.ValueExpression.WriteTo(textWriter);
-        textWriter.WritePunctuation(";");
+        textWriter.WritePunctuation(SyntaxKind.SemicolonToken);
         textWriter.WriteLine();
     }
 
     private static void WriteIfStatement(BoundIfStatement ifStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WriteKeyword("if");
-        textWriter.WritePunctuation(" (");
+        textWriter.WriteKeyword(SyntaxKind.IfKeyword);
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
         ifStatement.Condition.WriteTo(textWriter);
-        textWriter.WritePunctuation(") ");
+        textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
         textWriter.WriteLine();
         textWriter.WriteNestedStatement(ifStatement.ThenStatement);
 
         if (ifStatement.ElseStatement is not null)
         {
             textWriter.WriteLine();
-            textWriter.WriteKeyword("else");
+            textWriter.WriteKeyword(SyntaxKind.ElseKeyword);
             textWriter.WriteLine();
             textWriter.WriteNestedStatement(ifStatement.ElseStatement);
         }
@@ -128,10 +132,11 @@ internal static class BoundNodeExtensions
 
     private static void WriteWhileStatement(BoundWhileStatement whileStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WriteKeyword("while");
-        textWriter.WritePunctuation(" (");
+        textWriter.WriteKeyword(SyntaxKind.WhileKeyword);
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
         whileStatement.Condition.WriteTo(textWriter);
-        textWriter.WritePunctuation(") ");
+        textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
         textWriter.WriteLine();
         textWriter.WriteNestedStatement(whileStatement.Body);
         textWriter.WriteLine();
@@ -139,15 +144,21 @@ internal static class BoundNodeExtensions
 
     private static void WriteForStatement(BoundForStatement forStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WriteKeyword("for");
-        textWriter.WritePunctuation(" (");
-        textWriter.WriteKeyword("let ");
+        textWriter.WriteKeyword(SyntaxKind.ForKeyword);
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
+        textWriter.WriteKeyword(SyntaxKind.LetKeyword);
+        textWriter.WriteSpace();
         textWriter.WriteIdentifier(forStatement.IteratorSymbol.Name);
-        textWriter.WritePunctuation(" = ");
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.EqualsToken);
+        textWriter.WriteSpace();
         forStatement.LowerBound.WriteTo(textWriter);
-        textWriter.WriteKeyword(" to ");
+        textWriter.WriteSpace();
+        textWriter.WriteKeyword(SyntaxKind.ToKeyword);
+        textWriter.WriteSpace();
         forStatement.UpperBound.WriteTo(textWriter);
-        textWriter.WritePunctuation(") ");
+        textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
         textWriter.WriteLine();
         textWriter.WriteNestedStatement(forStatement.Body);
         textWriter.WriteLine();
@@ -162,7 +173,7 @@ internal static class BoundNodeExtensions
         }
 
         textWriter.WritePunctuation(labelStatement.LabelSymbol.Name);
-        textWriter.WritePunctuation(":");
+        textWriter.WritePunctuation(SyntaxKind.ColonToken);
         textWriter.WriteLine();
 
         if (needsUnindentation)
@@ -173,26 +184,37 @@ internal static class BoundNodeExtensions
 
     private static void WriteGotoStatement(BoundGotoStatement gotoStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WriteKeyword("goto ");
+        textWriter.WriteKeyword("goto");
+        textWriter.WriteSpace();
         textWriter.WriteIdentifier(gotoStatement.LabelSymbol.Name);
-        textWriter.WritePunctuation(";");
+        textWriter.WritePunctuation(SyntaxKind.SemicolonToken);
         textWriter.WriteLine();
     }
 
     private static void WriteConditionalGotoStatement(BoundConditionalGotoStatement conditionalGotoStatement, IndentedTextWriter textWriter)
     {
-        textWriter.WriteKeyword("goto ");
+        textWriter.WriteKeyword("goto");
+        textWriter.WriteSpace();
         textWriter.WriteIdentifier(conditionalGotoStatement.LabelSymbol.Name);
-        textWriter.WriteKeyword(conditionalGotoStatement.JumpIf is true ? " if " : " unless ");
+        textWriter.WriteSpace();
+        if (conditionalGotoStatement.JumpIf)
+        {
+            textWriter.WriteKeyword(SyntaxKind.IfKeyword);
+        }
+        else
+        {
+            textWriter.WriteKeyword("unless");
+        }
+        textWriter.WriteSpace();
         conditionalGotoStatement.Condition.WriteTo(textWriter);
-        textWriter.WritePunctuation(";");
+        textWriter.WritePunctuation(SyntaxKind.SemicolonToken);
         textWriter.WriteLine();
     }
 
     private static void WriteExpressionStatement(BoundExpressionStatement expressionStatement, IndentedTextWriter textWriter)
     {
         expressionStatement.Expression.WriteTo(textWriter);
-        textWriter.WritePunctuation(";");
+        textWriter.WritePunctuation(SyntaxKind.SemicolonToken);
         textWriter.WriteLine();
     }
 
@@ -203,7 +225,7 @@ internal static class BoundNodeExtensions
 
     private static void WriteUnaryExpression(BoundUnaryExpression unaryExpression, IndentedTextWriter textWriter)
     {
-        textWriter.WritePunctuation(SyntaxFacts.GetText(unaryExpression.Operator.SyntaxKind) ?? throw new Exception("Unknown unary operator."));
+        textWriter.WritePunctuation(unaryExpression.Operator.SyntaxKind);
         textWriter.WriteNestedExpression(SyntaxFacts.GetUnaryOperatorPrecedence(unaryExpression.Operator.SyntaxKind), unaryExpression.Operand);
     }
 
@@ -215,7 +237,9 @@ internal static class BoundNodeExtensions
     private static void WriteBinaryExpression(BoundBinaryExpression binaryExpression, IndentedTextWriter textWriter)
     {
         textWriter.WriteNestedExpression(SyntaxFacts.GetBinaryOperatorPrecedence(binaryExpression.Operator.SyntaxKind), binaryExpression.Left);
-        textWriter.WritePunctuation($" {SyntaxFacts.GetText(binaryExpression.Operator.SyntaxKind) ?? throw new Exception("Unknown binary operator.")} ");
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(binaryExpression.Operator.SyntaxKind);
+        textWriter.WriteSpace();
         textWriter.WriteNestedExpression(SyntaxFacts.GetBinaryOperatorPrecedence(binaryExpression.Operator.SyntaxKind), binaryExpression.Right);
     }
 
@@ -227,33 +251,37 @@ internal static class BoundNodeExtensions
     private static void WriteAssignmentExpression(BoundAssignmentExpression assignmentExpression, IndentedTextWriter textWriter)
     {
         textWriter.WriteIdentifier(assignmentExpression.VariableSymbol.Name);
-        textWriter.WritePunctuation(" = ");
+        textWriter.WriteSpace();
+        textWriter.WritePunctuation(SyntaxKind.EqualsToken);
+        textWriter.WriteSpace();
         assignmentExpression.Expression.WriteTo(textWriter);
     }
 
     private static void WriteCallExpression(BoundCallExpression callExpression, IndentedTextWriter textWriter)
     {
         textWriter.WriteIdentifier(callExpression.FunctionSymbol.Name);
-        textWriter.WritePunctuation("(");
+        textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
 
         for (int argumentsIndex = 0; argumentsIndex < callExpression.Arguments.Length; argumentsIndex++)
         {
             if (argumentsIndex > 0)
             {
-                textWriter.WritePunctuation(", ");
+                textWriter.WritePunctuation(SyntaxKind.CommaToken);
+                textWriter.WriteSpace();
             }
 
             callExpression.Arguments[argumentsIndex].WriteTo(textWriter);
         }
 
-        textWriter.WritePunctuation(")");
+        textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
     }
 
     private static void WriteConversionExpression(BoundConversionExpression conversionExpression, IndentedTextWriter textWriter)
     {
-        textWriter.WritePunctuation("(");
+        textWriter.WritePunctuation(SyntaxKind.OpenParenthesisToken);
         textWriter.WriteIdentifier(conversionExpression.Type.Name);
-        textWriter.WritePunctuation(") ");
+        textWriter.WritePunctuation(SyntaxKind.CloseParenthesisToken);
+        textWriter.WriteSpace();
         conversionExpression.Expression.WriteTo(textWriter);
     }
 }
