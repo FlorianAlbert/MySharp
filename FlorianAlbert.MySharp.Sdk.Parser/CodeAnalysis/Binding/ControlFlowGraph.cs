@@ -81,9 +81,76 @@ internal sealed class ControlFlowGraph
 
             ImmutableArray<BasicBlockEdge> edges = ComputeEdges(startBlock, endBlock, blocks, labelToBlockMap);
 
-            ImmutableArray<BasicBlock> allBlocks = [startBlock, .. blocks, endBlock];
+            ImmutableArray<BasicBlock> trimmedBlocks = TrimBlocks(blocks);
 
-            return new ControlFlowGraph(startBlock, endBlock, allBlocks, edges);
+            ImmutableArray<BasicBlock> allBlocks = [startBlock, .. trimmedBlocks, endBlock];
+
+            ImmutableArray<BasicBlockEdge> trimmedEdges = TrimEdges(edges, allBlocks);
+
+            return new ControlFlowGraph(startBlock, endBlock, allBlocks, trimmedEdges);
+        }
+
+        private ImmutableArray<BasicBlockEdge> TrimEdges(ImmutableArray<BasicBlockEdge> edges, ImmutableArray<BasicBlock> trimmedBlocks)
+        {
+            ImmutableArray<BasicBlockEdge>.Builder trimmedEdges = edges.ToBuilder();
+
+            foreach (BasicBlockEdge edge in edges)
+            {
+                if (!trimmedBlocks.Contains(edge.FromBlock) || !trimmedBlocks.Contains(edge.ToBlock))
+                {
+                    trimmedEdges.Remove(edge);
+                }
+            }
+
+            return trimmedEdges.ToImmutable();
+        }
+
+        private ImmutableArray<BasicBlock> TrimBlocks(ImmutableArray<BasicBlock> blocks)
+        {
+            ImmutableArray<BasicBlock>.Builder trimmedBlocks = blocks.ToBuilder();
+
+            bool blockGotRemoved;
+            do
+            {
+                blockGotRemoved = RemoveNextUnreachableBlock(trimmedBlocks);
+            } while (blockGotRemoved);
+
+            return trimmedBlocks.ToImmutable();
+        }
+
+        private bool RemoveNextUnreachableBlock(ImmutableArray<BasicBlock>.Builder trimmedBlocks)
+        {
+            foreach (BasicBlock block in trimmedBlocks)
+            {
+                ImmutableArray<BasicBlockEdge>.Builder incomingEdges = _blockIncomingEdges[block];
+                if (incomingEdges.Count == 0)
+                {
+                    RemoveBlock(block);
+                    trimmedBlocks.Remove(block);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void RemoveBlock(BasicBlock block)
+        {
+            foreach (BasicBlockEdge incomingEdge in _blockIncomingEdges[block])
+            {
+                BasicBlock fromBlock = incomingEdge.FromBlock;
+                _blockOutgoingEdges[fromBlock].Remove(incomingEdge);
+            }
+
+            _blockIncomingEdges.Remove(block);
+
+            foreach (BasicBlockEdge outgoingEdge in _blockOutgoingEdges[block])
+            {
+                BasicBlock toBlock = outgoingEdge.ToBlock;
+                _blockIncomingEdges[toBlock].Remove(outgoingEdge);
+            }
+
+            _blockOutgoingEdges.Remove(block);
         }
 
         private ImmutableArray<BasicBlockEdge> ComputeEdges(BasicBlock startBlock, BasicBlock endBlock, ImmutableArray<BasicBlock> blocks, ImmutableDictionary<BoundLabel, BasicBlock> labelToBlockMap)
