@@ -12,6 +12,7 @@ internal sealed class MySharpRepl : Repl
     private Compilation? _previousCompilation;
     private bool _showSyntaxTree;
     private bool _showBoundTree;
+    private bool _emitControlFlows;
     private readonly Dictionary<VariableSymbol, object?> _variables = [];
 
     public MySharpRepl() : base(new MySharpLineRenderer())
@@ -29,6 +30,11 @@ internal sealed class MySharpRepl : Repl
         {
             _showBoundTree = !_showBoundTree;
             Console.WriteLine(_showBoundTree ? "Showing bound tree" : "Not showing bound tree");
+        }
+        else if (input.Equals($"{_metaCommandPrefix}emitControlFlows", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}ecf", StringComparison.OrdinalIgnoreCase))
+        {
+            _emitControlFlows = !_emitControlFlows;
+            Console.WriteLine(_emitControlFlows ? "Storing control flow graphs" : "Not storing control flow graphs");
         }
         else if (input.Equals($"{_metaCommandPrefix}reset", StringComparison.OrdinalIgnoreCase))
         {
@@ -90,6 +96,17 @@ internal sealed class MySharpRepl : Repl
             Console.WriteLine();
             Console.WriteLine("Bound tree:");
             compilation.EmitTree(Console.Out);
+        }
+
+        if (_emitControlFlows)
+        {
+            string appPath = Environment.GetCommandLineArgs()[0];
+            string appDirectory = Path.GetDirectoryName(appPath)!;
+            string controlFlowsDirectory = Path.Combine(appDirectory, "ControlFlows");
+
+            Console.WriteLine();
+            Console.WriteLine($"Control flow graphs stored at: {controlFlowsDirectory}");
+            compilation.EmitGraphVizControlFlow(controlFlowsDirectory);
         }
 
         EvaluationResult result = compilation.Evaluate(_variables);

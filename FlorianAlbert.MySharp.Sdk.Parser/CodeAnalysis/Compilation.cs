@@ -94,7 +94,38 @@ public sealed class Compilation
             blockStatement.WriteTo(indentedTextWriter);
             indentedTextWriter.Indent--;
         }
+    }
 
+    public void EmitGraphVizControlFlow(string controlFlowsDirectory)
+    {
+        if (Directory.Exists(controlFlowsDirectory))
+        {
+            Directory.Delete(controlFlowsDirectory, true);
+        }
+
+        Directory.CreateDirectory(controlFlowsDirectory);
+
+        foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in GetFunctionBodies())
+        {
+            if (!CompilationUnit.GlobalScope.Functions.Contains(functionSymbol))
+            {
+                continue;
+            }
+
+            ControlFlowGraph functionControlFlowGraph = ControlFlowGraph.Create(functionBody);
+
+            using StreamWriter functionWriter = new(Path.Combine(controlFlowsDirectory, $"{functionSymbol.Name}.dot"));
+            functionControlFlowGraph.WriteGraphVizTo(functionWriter);
+
+            functionWriter.Flush();
+        }
+
+        ControlFlowGraph globalScopeControlFlowGraph = ControlFlowGraph.Create(GetStatement());
+
+        using StreamWriter globalScopeWriter = new(Path.Combine(controlFlowsDirectory, "#GlobalScope.dot"));
+        globalScopeControlFlowGraph.WriteGraphVizTo(globalScopeWriter);
+
+        globalScopeWriter.Flush();
     }
 
     private BoundBlockStatement GetStatement()
