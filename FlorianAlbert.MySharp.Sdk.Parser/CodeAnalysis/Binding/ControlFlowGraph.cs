@@ -136,11 +136,17 @@ internal sealed class ControlFlowGraph
                     BoundExpression jumpCondition = conditionalGotoStatement.JumpIf ? conditionalGotoStatement.Condition : negatedCondition;
                     BoundExpression fallThroughCondition = conditionalGotoStatement.JumpIf ? negatedCondition : conditionalGotoStatement.Condition;
 
-                    BasicBlockEdge jumpEdge = Connect(currentBlock, labelToBlockMap[conditionalGotoStatement.LabelSymbol], jumpCondition);
-                    edges.Add(jumpEdge);
+                    BasicBlockEdge? jumpEdge = Connect(currentBlock, labelToBlockMap[conditionalGotoStatement.LabelSymbol], jumpCondition);
+                    if (jumpEdge is not null)
+                    {
+                        edges.Add(jumpEdge);
+                    }
 
-                    BasicBlockEdge fallThroughEdge = Connect(currentBlock, nextBlock, fallThroughCondition);
-                    edges.Add(fallThroughEdge);
+                    BasicBlockEdge? fallThroughEdge = Connect(currentBlock, nextBlock, fallThroughCondition);
+                    if (fallThroughEdge is not null)
+                    {
+                        edges.Add(fallThroughEdge);
+                    }
                     break;
                 case BoundNodeKind.ReturnStatement:
                     BasicBlockEdge returnEdge = Connect(currentBlock, endBlock);
@@ -256,8 +262,31 @@ internal sealed class ControlFlowGraph
             return labelToBlockMap.ToImmutable();
         }
 
-        private BasicBlockEdge Connect(BasicBlock fromBlock, BasicBlock toBlock, BoundExpression? condition = null)
+        private BasicBlockEdge Connect(BasicBlock fromBlock, BasicBlock toBlock)
         {
+
+            BasicBlockEdge edge = new(fromBlock, toBlock, null);
+            _blockOutgoingEdges[fromBlock].Add(edge);
+            _blockIncomingEdges[toBlock].Add(edge);
+
+            return edge;
+        }
+
+        private BasicBlockEdge? Connect(BasicBlock fromBlock, BasicBlock toBlock, BoundExpression condition)
+        {
+            if (condition.Kind is BoundNodeKind.LiteralExpression)
+            {
+                BoundLiteralExpression literalCondition = (BoundLiteralExpression) condition;
+                if ((bool) literalCondition.Value)
+                {
+                    return Connect(fromBlock, toBlock);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
             BasicBlockEdge edge = new(fromBlock, toBlock, condition);
             _blockOutgoingEdges[fromBlock].Add(edge);
             _blockIncomingEdges[toBlock].Add(edge);
