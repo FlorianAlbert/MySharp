@@ -7,7 +7,7 @@ internal sealed class BoundGlobalScope
 {
     public BoundGlobalScope(ImmutableArray<VariableSymbol> variableSymbols,
         ImmutableArray<FunctionSymbol> functionSymbols,
-        BoundStatement boundStatement)
+        BoundBlockStatement boundStatement)
     {
         Variables = variableSymbols;
         Functions = functionSymbols;
@@ -18,5 +18,5 @@ internal sealed class BoundGlobalScope
 
     public ImmutableArray<FunctionSymbol> Functions { get; }
 
-    public BoundStatement Statement { get; }
+    public BoundBlockStatement Statement { get; }
 }

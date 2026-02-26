@@ -21,6 +21,27 @@ internal sealed class ControlFlowGraph
 
     public ImmutableArray<BasicBlockEdge> Edges { get; }
 
+    public bool AllPathsReturn
+    {
+        get
+        {
+            if (Edges.Length == 1 && Edges[0].FromBlock == StartBlock && Edges[0].ToBlock == EndBlock)
+            {
+                return false;
+            }
+
+            foreach (BasicBlockEdge edge in EndBlock.IncomingEdges)
+            {
+                if (edge.FromBlock.Statements.Length is 0 || edge.FromBlock.Statements[^1].Kind is not BoundNodeKind.ReturnStatement)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
     public static ControlFlowGraph Create(BoundBlockStatement body)
     {
         Builder builder = new();

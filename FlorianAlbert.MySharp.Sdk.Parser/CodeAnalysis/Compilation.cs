@@ -53,8 +53,8 @@ public sealed class Compilation
             return new EvaluationResult([.. diagnostics], null);
         }
 
-        BoundBlockStatement blockStatement = GetStatement();
-        ImmutableDictionary<FunctionSymbol, BoundBlockStatement> functionBodies = GetFunctionBodies();
+        BoundBlockStatement blockStatement = CompilationUnit.GlobalScope.Statement;
+        ImmutableDictionary<FunctionSymbol, BoundBlockStatement> functionBodies = CompilationUnit.Program.FunctionBodies;
         Evaluator evaluator = new(blockStatement, functionBodies, variables);
         object? result = evaluator.Evaluate();
 
@@ -70,7 +70,7 @@ public sealed class Compilation
             indentedTextWriter.WriteLine("Functions:");
             indentedTextWriter.Indent++;
 
-            foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in GetFunctionBodies())
+            foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in CompilationUnit.Program.FunctionBodies)
             {
                 if (!CompilationUnit.GlobalScope.Functions.Contains(functionSymbol))
                 {
@@ -86,7 +86,7 @@ public sealed class Compilation
             indentedTextWriter.Indent--;
         }
 
-        BoundBlockStatement blockStatement = GetStatement();
+        BoundBlockStatement blockStatement = CompilationUnit.GlobalScope.Statement;
         if (blockStatement.Statements.Length > 0)
         {
             indentedTextWriter.WriteLine("Main:");
@@ -105,7 +105,7 @@ public sealed class Compilation
 
         Directory.CreateDirectory(controlFlowsDirectory);
 
-        foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in GetFunctionBodies())
+        foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in CompilationUnit.Program.FunctionBodies)
         {
             if (!CompilationUnit.GlobalScope.Functions.Contains(functionSymbol))
             {
@@ -120,29 +120,11 @@ public sealed class Compilation
             functionWriter.Flush();
         }
 
-        ControlFlowGraph globalScopeControlFlowGraph = ControlFlowGraph.Create(GetStatement());
+        ControlFlowGraph globalScopeControlFlowGraph = ControlFlowGraph.Create(CompilationUnit.GlobalScope.Statement);
 
         using StreamWriter globalScopeWriter = new(Path.Combine(controlFlowsDirectory, "#GlobalScope.dot"));
         globalScopeControlFlowGraph.WriteGraphVizTo(globalScopeWriter);
 
         globalScopeWriter.Flush();
-    }
-
-    private BoundBlockStatement GetStatement()
-    {
-        BoundStatement statement = CompilationUnit.GlobalScope.Statement;
-        return Lowerer.Lower(statement);
-    }
-
-    private ImmutableDictionary<FunctionSymbol, BoundBlockStatement> GetFunctionBodies()
-    {
-        ImmutableDictionary<FunctionSymbol, BoundBlockStatement>.Builder loweredFunctionBodies = ImmutableDictionary.CreateBuilder<FunctionSymbol, BoundBlockStatement>();
-        foreach ((FunctionSymbol functionSymbol, BoundBlockStatement functionBody) in CompilationUnit.Program.FunctionBodies)
-        {
-            BoundBlockStatement loweredFunctionBody = Lowerer.Lower(functionBody);
-            loweredFunctionBodies.Add(functionSymbol, loweredFunctionBody);
-        }
-
-        return loweredFunctionBodies.ToImmutable();
     }
 }

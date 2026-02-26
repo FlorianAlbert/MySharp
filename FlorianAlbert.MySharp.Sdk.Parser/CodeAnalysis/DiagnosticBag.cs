@@ -182,4 +182,10 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"The 'return' keyword must be followed by an expression of type '{expectedReturnType}'.";
         Report(span, message);
     }
+
+    internal void ReportNotAllPathsReturn(TextSpan span, string name)
+    {
+        string message = $"Not all code paths in function '{name}' return a value.";
+        Report(span, message);
+    }
 }

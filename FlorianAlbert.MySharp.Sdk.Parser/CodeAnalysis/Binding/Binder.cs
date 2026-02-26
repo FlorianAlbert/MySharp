@@ -1,4 +1,5 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Lowering;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
@@ -134,10 +135,12 @@ internal sealed class Binder
     {
         BoundStatement boundStatement = BindGlobalBlockStatement(globalStatements);
 
+        BoundBlockStatement loweredStatement = Lowerer.Lower(boundStatement);
+
         ImmutableArray<VariableSymbol> variables = _scope.GetDeclaredVariables();
         ImmutableArray<FunctionSymbol> functions = _scope.GetDeclaredFunctions();
 
-        return new BoundGlobalScope(variables, functions, boundStatement);
+        return new BoundGlobalScope(variables, functions, loweredStatement);
     }
 
     private BoundBlockStatement BindGlobalBlockStatement(IEnumerable<GlobalStatementSyntax> globalStatements)
@@ -171,7 +174,19 @@ internal sealed class Binder
             (FunctionSymbol, BoundBlockStatement)? functionBody = BindFunctionBody(functionDefinition);
             if (functionBody is (FunctionSymbol functionSymbol, BoundBlockStatement functionStatement))
             {
-                functionBodies.Add(functionSymbol, functionStatement);
+                BoundBlockStatement loweredFunctionBody = Lowerer.Lower(functionStatement);
+
+                if (functionSymbol.ReturnType != TypeSymbol.Void)
+                {
+                    ControlFlowGraph controlFlowGraph = ControlFlowGraph.Create(loweredFunctionBody);
+
+                    if (!controlFlowGraph.AllPathsReturn)
+                    {
+                        Diagnostics.ReportNotAllPathsReturn(functionDefinition.IdentifierToken.Span, functionSymbol.Name);
+                    }
+                }
+
+                functionBodies.Add(functionSymbol, loweredFunctionBody);
             }
         }
 
