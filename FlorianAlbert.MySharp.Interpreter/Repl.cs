@@ -51,6 +51,7 @@ internal abstract class Repl
     {
         if (input.Equals($"{_metaCommandPrefix}cls", StringComparison.OrdinalIgnoreCase))
         {
+            Console.Write("\x1b[3J"); // Clear scrollback buffer
             Console.Clear();
         }
         else
