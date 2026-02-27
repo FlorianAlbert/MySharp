@@ -1,4 +1,5 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
+using System.CodeDom.Compiler;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 
@@ -19,15 +20,15 @@ internal static class ControlFlowGraphExtensions
 
                 if (blockIndex == 0)
                 {
-                    textWriter.WriteLine($"    {blockId} [label = \"<Start>\" shape = box];");
+                    textWriter.WriteLine($"    {blockId} [label = \"<Start>\", shape = box];");
                 }
                 else if (blockIndex == controlFlowGraph.Blocks.Length - 1)
                 {
-                    textWriter.WriteLine($"    {blockId} [label = \"<End>\" shape = box];");
+                    textWriter.WriteLine($"    {blockId} [label = \"<End>\", shape = box];");
                 }
                 else
                 {
-                    textWriter.WriteLine($"    {blockId} [label = \"{WriteBlockStatements(block)}\" shape = box];");
+                    textWriter.WriteLine($"    {blockId} [label = \"{WriteBlockStatements(block)}\", shape = box];");
                 }
             }
 
@@ -49,12 +50,14 @@ internal static class ControlFlowGraphExtensions
     private static string WriteBlockStatements(ControlFlowGraph.BasicBlock block)
     {
         using StringWriter stringWriter = new();
+        using IndentedTextWriter indentedTextWriter = new(stringWriter);
         foreach (BoundStatement statement in block.Statements)
         {
-            statement.WriteTo(stringWriter);
+            statement.WriteTo(indentedTextWriter);
         }
 
         string escapedStatements = stringWriter.ToString()
+                                               .Replace("\\", "\\\\")
                                                .Replace("\"", "\\\"")
                                                .Replace(Environment.NewLine, "\\l");
         return escapedStatements;
