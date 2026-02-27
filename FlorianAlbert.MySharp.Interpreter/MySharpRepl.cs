@@ -109,46 +109,16 @@ internal sealed class MySharpRepl : Repl
             compilation.EmitGraphVizControlFlow(controlFlowsDirectory);
         }
 
-        EvaluationResult result = compilation.Evaluate(_variables);
-
-        if (result.Diagnostics.Length > 0)
+        if (compilation.HasDiagnostics)
         {
-            foreach (Diagnostic diagnostic in result.Diagnostics.OrderBy(diagnostic => diagnostic.Span, TextSpan.Comparer))
-            {
-                Console.WriteLine();
-
-                int lineIndexStart = syntaxTree.SourceText.GetLineIndex(diagnostic.Span.Start);
-                int lineIndexEnd = syntaxTree.SourceText.GetLineIndex(diagnostic.Span.End);
-                int lineNumber = lineIndexStart + 1;
-                TextLine lineStart = syntaxTree.SourceText.Lines[lineIndexStart];
-                TextLine lineEnd = syntaxTree.SourceText.Lines[lineIndexEnd];
-                int characterLineIndex = diagnostic.Span.Start - lineStart.Start + 1;
-
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write($"({lineNumber}, {characterLineIndex}): ");
-                Console.WriteLine(diagnostic);
-                Console.ResetColor();
-
-                Console.WriteLine();
-
-                TextSpan prefixSpan = TextSpan.FromBounds(lineStart.Start, diagnostic.Span.Start);
-                TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, lineEnd.End);
-
-                string prefix = syntaxTree.SourceText.ToString(prefixSpan);
-                string error = syntaxTree.SourceText.ToString(diagnostic.Span);
-                string suffix = syntaxTree.SourceText.ToString(suffixSpan);
-
-                Console.Write(prefix);
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write(error);
-                Console.ResetColor();
-                Console.WriteLine(suffix);
-            }
+            compilation.EmitDiagnostics(Console.Out);
 
             Console.WriteLine();
         }
         else
         {
+            EvaluationResult result = compilation.Evaluate(_variables);
+
             if (result.Value is not null)
             {
                 Console.ForegroundColor = ConsoleColor.White;

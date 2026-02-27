@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FlorianAlbert.MySharp.Sdk.Parser\FlorianAlbert.MySharp.Sdk.Parser.csproj" />
+  </ItemGroup>
+
+</Project>

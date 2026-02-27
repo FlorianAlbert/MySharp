@@ -1,8 +1,8 @@
 ﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Lowering;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 using System.CodeDom.Compiler;
 using System.Collections.Immutable;
@@ -25,6 +25,8 @@ public sealed class Compilation
     public Compilation? Previous { get; }
 
     public SyntaxTree SyntaxTree { get; }
+
+    public bool HasDiagnostics => SyntaxTree.Diagnostics.Length > 0 || CompilationUnit.Diagnostics.Length > 0;
 
     internal BoundCompilationUnit CompilationUnit
     {
@@ -59,6 +61,49 @@ public sealed class Compilation
         object? result = evaluator.Evaluate();
 
         return new EvaluationResult([], result);
+    }
+
+    public void EmitDiagnostics(TextWriter textWriter)
+    {
+        DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. CompilationUnit.Diagnostics];
+        Diagnostic[] orderedDiagnostics = [.. diagnostics.OrderBy(diagnostic => diagnostic.Span, TextSpan.Comparer)];
+
+        for (int diagnosticIndex = 0; diagnosticIndex < orderedDiagnostics.Length; diagnosticIndex++)
+        {
+            Diagnostic diagnostic = orderedDiagnostics[diagnosticIndex];
+
+            if (diagnosticIndex > 0)
+            {
+                textWriter.WriteLine();
+            }
+
+            int lineIndexStart = SyntaxTree.SourceText.GetLineIndex(diagnostic.Span.Start);
+            int lineIndexEnd = SyntaxTree.SourceText.GetLineIndex(diagnostic.Span.End);
+            int lineNumber = lineIndexStart + 1;
+            TextLine lineStart = SyntaxTree.SourceText.Lines[lineIndexStart];
+            TextLine lineEnd = SyntaxTree.SourceText.Lines[lineIndexEnd];
+            int characterLineIndex = diagnostic.Span.Start - lineStart.Start + 1;
+
+            textWriter.SetForegroundColor(ConsoleColor.DarkRed);
+            textWriter.Write($"({lineNumber}, {characterLineIndex}): ");
+            textWriter.WriteLine(diagnostic);
+            textWriter.ResetColor();
+
+            textWriter.WriteLine();
+
+            TextSpan prefixSpan = TextSpan.FromBounds(lineStart.Start, diagnostic.Span.Start);
+            TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, lineEnd.End);
+
+            string prefix = SyntaxTree.SourceText.ToString(prefixSpan);
+            string error = SyntaxTree.SourceText.ToString(diagnostic.Span);
+            string suffix = SyntaxTree.SourceText.ToString(suffixSpan);
+
+            textWriter.Write(prefix);
+            textWriter.SetForegroundColor(ConsoleColor.DarkRed);
+            textWriter.Write(error);
+            textWriter.ResetColor();
+            textWriter.WriteLine(suffix);
+        }
     }
 
     public void EmitTree(TextWriter writer)
