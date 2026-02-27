@@ -117,24 +117,28 @@ internal sealed class MySharpRepl : Repl
             {
                 Console.WriteLine();
 
-                int lineIndex = syntaxTree.SourceText.GetLineIndex(diagnostic.Span.Start);
-                int lineNumber = lineIndex + 1;
-                TextLine line = syntaxTree.SourceText.Lines[lineIndex];
-                int characterLineIndex = diagnostic.Span.Start - line.Start + 1;
+                int lineIndexStart = syntaxTree.SourceText.GetLineIndex(diagnostic.Span.Start);
+                int lineIndexEnd = syntaxTree.SourceText.GetLineIndex(diagnostic.Span.End);
+                int lineNumber = lineIndexStart + 1;
+                TextLine lineStart = syntaxTree.SourceText.Lines[lineIndexStart];
+                TextLine lineEnd = syntaxTree.SourceText.Lines[lineIndexEnd];
+                int characterLineIndex = diagnostic.Span.Start - lineStart.Start + 1;
 
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.Write($"({lineNumber}, {characterLineIndex}): ");
                 Console.WriteLine(diagnostic);
                 Console.ResetColor();
 
-                TextSpan prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
-                TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+                Console.WriteLine();
+
+                TextSpan prefixSpan = TextSpan.FromBounds(lineStart.Start, diagnostic.Span.Start);
+                TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, lineEnd.End);
 
                 string prefix = syntaxTree.SourceText.ToString(prefixSpan);
                 string error = syntaxTree.SourceText.ToString(diagnostic.Span);
                 string suffix = syntaxTree.SourceText.ToString(suffixSpan);
 
-                Console.Write($"\t{prefix}");
+                Console.Write(prefix);
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.Write(error);
                 Console.ResetColor();
