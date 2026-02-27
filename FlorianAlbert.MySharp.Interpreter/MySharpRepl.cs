@@ -78,7 +78,7 @@ internal sealed class MySharpRepl : Repl
             return true;
         }
 
-        var syntaxTree = SyntaxTree.Parse(text);
+        SyntaxTree syntaxTree = SyntaxTree.Parse(text);
 
         Compilation compilation = _previousCompilation is null ?
             new(syntaxTree) :
