@@ -10,7 +10,7 @@ public sealed class SyntaxTree
     {
         SourceText = sourceText;
 
-        var parser = new Parser(sourceText);
+        Parser parser = new(sourceText);
         Root = parser.ParseCompilationUnit();
         Diagnostics = parser.Diagnostics;
     }
