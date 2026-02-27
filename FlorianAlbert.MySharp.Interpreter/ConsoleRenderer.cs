@@ -26,6 +26,10 @@ internal sealed class ConsoleRenderer
         Console.SetCursorPosition(0, firstLineIndex);
 
         RenderLines(lines);
+
+        // Recompute after rendering to account for any console buffer scrolls caused by Console.WriteLine
+        firstLineIndex = Console.CursorTop - lines.Length;
+
         ClearRemainingLines(lines.Length);
 
         Console.SetCursorPosition(cursorCharIndex + _linePrefixLength, firstLineIndex + cursorLineIndex);
