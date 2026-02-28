@@ -8,7 +8,7 @@ if (args.Length is 0)
     return;
 }
 
-string[] sourceFilePaths = GetSourceFilePaths(args);
+string[] sourceFilePaths = GetFullSourceFilePaths(args);
 
 SyntaxTree[] syntaxTrees = new SyntaxTree[sourceFilePaths.Length];
 bool anyFileDoesNotExist = false;
@@ -56,7 +56,7 @@ else
     }
 }
 
-static string[] GetSourceFilePaths(IEnumerable<string> paths)
+static string[] GetFullSourceFilePaths(IEnumerable<string> paths)
 {
     SortedSet<string> sourceFilePaths = [];
     foreach (string path in paths)
@@ -72,7 +72,7 @@ static string[] GetSourceFilePaths(IEnumerable<string> paths)
             continue;
         }
 
-        sourceFilePaths.Add(trimmedPath);
+        sourceFilePaths.Add(Path.GetFullPath(trimmedPath));
     }
 
     return [.. sourceFilePaths];
