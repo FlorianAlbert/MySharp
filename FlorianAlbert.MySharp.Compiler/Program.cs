@@ -8,7 +8,7 @@ if (args.Length is 0)
     return;
 }
 
-string[] sourceFilePaths = args;
+string[] sourceFilePaths = GetSourceFilePaths(args);
 
 SyntaxTree[] syntaxTrees = new SyntaxTree[sourceFilePaths.Length];
 bool anyFileDoesNotExist = false;
@@ -54,4 +54,26 @@ else
         Console.WriteLine(result.Value);
         Console.ResetColor();
     }
+}
+
+static string[] GetSourceFilePaths(IEnumerable<string> paths)
+{
+    SortedSet<string> sourceFilePaths = [];
+    foreach (string path in paths)
+    {
+        // We trim the trailing double quote from the path, because when we pass a directory
+        // path with a trailing backslash to the compiler, the command line parser will interpret
+        // the trailing backslash as an escape character for the closing double quote.
+        string trimmedPath = path.TrimEnd('"');
+        if (Directory.Exists(trimmedPath))
+        {
+            IEnumerable<string> directorySourceFilePaths = Directory.EnumerateFiles(trimmedPath, "*.ms", SearchOption.AllDirectories);
+            sourceFilePaths.UnionWith(directorySourceFilePaths);
+            continue;
+        }
+
+        sourceFilePaths.Add(trimmedPath);
+    }
+
+    return [.. sourceFilePaths];
 }
