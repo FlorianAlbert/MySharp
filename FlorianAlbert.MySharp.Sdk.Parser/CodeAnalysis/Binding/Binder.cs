@@ -30,13 +30,17 @@ internal sealed class Binder
         return new BoundLabel($"<Binder_Label{_labelCounter++}>");
     }
 
-    public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, CompilationUnitSyntax compilationUnitSyntax)
+    public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, ImmutableArray<SyntaxTree> syntaxTrees)
     {
         BoundScope parentScope = CreateParentScope(previous);
         Binder binder = new(parentScope);
 
-        IEnumerable<FunctionDefinitionSyntax> functionDefinitions = compilationUnitSyntax.CompilationUnitMembers.Where(member => member.Kind is SyntaxKind.FunctionDefinition).Cast<FunctionDefinitionSyntax>();
-        IEnumerable<GlobalStatementSyntax> globalStatements = compilationUnitSyntax.CompilationUnitMembers.Where(member => member.Kind is SyntaxKind.GlobalStatement).Cast<GlobalStatementSyntax>();
+        IEnumerable<FunctionDefinitionSyntax> functionDefinitions = syntaxTrees.SelectMany(syntaxTree => syntaxTree.Root.CompilationUnitMembers)
+                                                                               .Where(member => member.Kind is SyntaxKind.FunctionDefinition)
+                                                                               .Cast<FunctionDefinitionSyntax>();
+        IEnumerable<GlobalStatementSyntax> globalStatements = syntaxTrees.SelectMany(syntaxTree => syntaxTree.Root.CompilationUnitMembers)
+                                                                         .Where(member => member.Kind is SyntaxKind.GlobalStatement)
+                                                                         .Cast<GlobalStatementSyntax>();
 
         // We first iterate to get to know all of the function symbols
         binder.BindFunctionDeclarations(functionDefinitions);

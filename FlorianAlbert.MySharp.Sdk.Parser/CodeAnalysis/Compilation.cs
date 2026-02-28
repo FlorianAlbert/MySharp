@@ -11,22 +11,22 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
 public sealed class Compilation
 {
-    public Compilation(SyntaxTree syntaxTree)
-        : this(null, syntaxTree)
+    public Compilation(params IEnumerable<SyntaxTree> syntaxTrees)
+        : this(null, syntaxTrees)
     {
     }
 
-    private Compilation(Compilation? previous, SyntaxTree syntaxTree)
+    private Compilation(Compilation? previous, params IEnumerable<SyntaxTree> syntaxTrees)
     {
         Previous = previous;
-        SyntaxTree = syntaxTree;
+        SyntaxTrees = [.. syntaxTrees];
     }
 
     public Compilation? Previous { get; }
 
-    public SyntaxTree SyntaxTree { get; }
+    public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
 
-    public bool HasDiagnostics => SyntaxTree.Diagnostics.Length > 0 || CompilationUnit.Diagnostics.Length > 0;
+    public bool HasDiagnostics => SyntaxTrees.SelectMany(syntaxTree => syntaxTree.Diagnostics).Any() || CompilationUnit.Diagnostics.Length > 0;
 
     internal BoundCompilationUnit CompilationUnit
     {
@@ -34,7 +34,7 @@ public sealed class Compilation
         {
             if (field is null)
             {
-                BoundCompilationUnit compilationUnit = Binder.BindCompilationUnit(Previous?.CompilationUnit, SyntaxTree.Root);
+                BoundCompilationUnit compilationUnit = Binder.BindCompilationUnit(Previous?.CompilationUnit, SyntaxTrees);
                 Interlocked.CompareExchange(ref field, compilationUnit, null);
             }
 
@@ -49,7 +49,7 @@ public sealed class Compilation
 
     public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)
     {
-        DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. CompilationUnit.Diagnostics];
+        DiagnosticBag diagnostics = [.. SyntaxTrees.SelectMany(syntaxTree => syntaxTree.Diagnostics), .. CompilationUnit.Diagnostics];
         if (diagnostics.Count > 0)
         {
             return new EvaluationResult([.. diagnostics], null);
@@ -65,7 +65,7 @@ public sealed class Compilation
 
     public void EmitDiagnostics(TextWriter textWriter)
     {
-        DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. CompilationUnit.Diagnostics];
+        DiagnosticBag diagnostics = [.. SyntaxTrees.SelectMany(syntaxTree => syntaxTree.Diagnostics), .. CompilationUnit.Diagnostics];
         Diagnostic[] orderedDiagnostics = [.. diagnostics.OrderBy(diagnostic => diagnostic.Location.FileName)
                                                          .ThenBy(diagnostic => diagnostic.Location.Span.Start)
                                                          .ThenBy(diagnostic => diagnostic.Location.Span.Length)];
@@ -82,8 +82,8 @@ public sealed class Compilation
             string fileName = diagnostic.Location.FileName;
             int lineIndexStart = diagnostic.Location.StartLineIndex;
             int lineIndexEnd = diagnostic.Location.EndLineIndex;
-            TextLine lineStart = SyntaxTree.SourceText.Lines[lineIndexStart];
-            TextLine lineEnd = SyntaxTree.SourceText.Lines[lineIndexEnd];
+            TextLine lineStart = diagnostic.Location.SourceText.Lines[lineIndexStart];
+            TextLine lineEnd = diagnostic.Location.SourceText.Lines[lineIndexEnd];
 
             int lineNumber = lineIndexStart + 1;
             int characterNumber = diagnostic.Location.StartCharacterIndex + 1;
@@ -98,9 +98,9 @@ public sealed class Compilation
             TextSpan prefixSpan = TextSpan.FromBounds(lineStart.Start, diagnostic.Location.Span.Start);
             TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Location.Span.End, lineEnd.End);
 
-            string prefix = SyntaxTree.SourceText.ToString(prefixSpan);
-            string error = SyntaxTree.SourceText.ToString(diagnostic.Location.Span);
-            string suffix = SyntaxTree.SourceText.ToString(suffixSpan);
+            string prefix = diagnostic.Location.SourceText.ToString(prefixSpan);
+            string error = diagnostic.Location.SourceText.ToString(diagnostic.Location.Span);
+            string suffix = diagnostic.Location.SourceText.ToString(suffixSpan);
 
             textWriter.Write(prefix);
             textWriter.SetForegroundColor(ConsoleColor.DarkRed);

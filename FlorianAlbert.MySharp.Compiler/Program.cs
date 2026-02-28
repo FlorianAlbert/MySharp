@@ -8,23 +8,37 @@ if (args.Length is 0)
     return;
 }
 
-if (args.Length > 1)
+string[] sourceFilePaths = args;
+
+SyntaxTree[] syntaxTrees = new SyntaxTree[sourceFilePaths.Length];
+bool anyFileDoesNotExist = false;
+for (int sourceFilePathIndex = 0; sourceFilePathIndex < sourceFilePaths.Length; sourceFilePathIndex++)
 {
-    Console.Error.WriteLine("Error: Too many arguments provided. Please provide only one source file.");
+    string sourceFilePath = sourceFilePaths[sourceFilePathIndex];
+    if (!File.Exists(sourceFilePath))
+    {
+        Console.Error.WriteLine($"Error: The file '{sourceFilePath}' does not exist.");
+        anyFileDoesNotExist = true;
+        continue;
+    }
+
+    // We only load the SyntaxTree for a source file if all previous source files already existed.
+    // Otherwise we can skip the overhead of unnecessary loading and parsing of the SyntaxTree,
+    // because if any source file does not exist, we won't be able to compile the program anyway
+    // and make an early return after the loading loop.
+    if (!anyFileDoesNotExist)
+    {
+        SyntaxTree syntaxTree = SyntaxTree.Load(sourceFilePath);
+        syntaxTrees[sourceFilePathIndex] = syntaxTree;
+    }
+}
+
+if (anyFileDoesNotExist)
+{
     return;
 }
 
-string sourceFilePath = args[0];
-
-if (!File.Exists(sourceFilePath))
-{
-    Console.Error.WriteLine($"Error: The file '{sourceFilePath}' does not exist.");
-    return;
-}
-
-SyntaxTree syntaxTree = SyntaxTree.Load(sourceFilePath);
-
-Compilation compilation = new(syntaxTree);
+Compilation compilation = new(syntaxTrees);
 
 if (compilation.HasDiagnostics)
 {
