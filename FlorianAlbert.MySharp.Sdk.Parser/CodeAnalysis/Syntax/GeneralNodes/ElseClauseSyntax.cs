@@ -5,7 +5,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class ElseClauseSyntax : SyntaxNode
 {
-    public ElseClauseSyntax(SyntaxToken elseKeyword, StatementSyntax elseStatement)
+    public ElseClauseSyntax(SyntaxTree syntaxTree, SyntaxToken elseKeyword, StatementSyntax elseStatement)
+        : base(syntaxTree)
     {
         ElseKeyword = elseKeyword;
         ElseStatement = elseStatement;

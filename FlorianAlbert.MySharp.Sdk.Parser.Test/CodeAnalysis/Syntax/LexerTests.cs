@@ -81,7 +81,7 @@ public class LexerTests
         Assert.Equal(text, token.Text);
 
         Diagnostic diagnostic = Assert.Single(diagnostics);
-        Assert.Equal(new TextSpan(0, text.Length), diagnostic.Span);
+        Assert.Equal(new TextSpan(0, text.Length), diagnostic.Location.Span);
         Assert.Equal("Unterminated string literal.", diagnostic.Message);
     }
 

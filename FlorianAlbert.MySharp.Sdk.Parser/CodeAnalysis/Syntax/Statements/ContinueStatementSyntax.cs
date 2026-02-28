@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class ContinueStatementSyntax : StatementSyntax
 {
-    public ContinueStatementSyntax(SyntaxToken continueKeyword, SyntaxToken semicolonToken)
+    public ContinueStatementSyntax(SyntaxTree syntaxTree, SyntaxToken continueKeyword, SyntaxToken semicolonToken)
+        : base(syntaxTree)
     {
         ContinueKeyword = continueKeyword;
         SemicolonToken = semicolonToken;

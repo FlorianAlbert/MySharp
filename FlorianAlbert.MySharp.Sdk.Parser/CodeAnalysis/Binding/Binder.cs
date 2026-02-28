@@ -110,7 +110,7 @@ internal sealed class Binder
 
             if (parameterSymbols.Any(existingSymbol => existingSymbol.Name.Equals(parameterName, StringComparison.Ordinal)))
             {
-                Diagnostics.ReportDuplicateParameterName(parameterSyntax.Identifier.Span, parameterName);
+                Diagnostics.ReportDuplicateParameterName(parameterSyntax.Identifier.Location, parameterName);
             }
 
             ParameterSymbol parameterSymbol = new(parameterName, parameterType ?? TypeSymbol.Error);
@@ -127,7 +127,7 @@ internal sealed class Binder
 
         if (!_scope.TryDeclareFunction(functionSymbol))
         {
-            Diagnostics.ReportFunctionAlreadyDeclared(functionDefinitionSyntax.IdentifierToken.Span, name);
+            Diagnostics.ReportFunctionAlreadyDeclared(functionDefinitionSyntax.IdentifierToken.Location, name);
         }
     }
 
@@ -182,7 +182,7 @@ internal sealed class Binder
 
                     if (!controlFlowGraph.AllPathsReturn)
                     {
-                        Diagnostics.ReportNotAllPathsReturn(functionDefinition.IdentifierToken.Span, functionSymbol.Name);
+                        Diagnostics.ReportNotAllPathsReturn(functionDefinition.IdentifierToken.Location, functionSymbol.Name);
                     }
                 }
 
@@ -276,12 +276,12 @@ internal sealed class Binder
             variableType = BindTypeClause(typeClause) ?? variableType;
         }
 
-        boundValueExpression = BindImplicitConversion(boundValueExpression, variableType, statementSyntax.ValueExpression.Span);
+        boundValueExpression = BindImplicitConversion(boundValueExpression, variableType, statementSyntax.ValueExpression.Location);
 
         VariableSymbol variableSymbol = new(name, isReadOnly, variableType);
         if (!_scope.TryDeclareVariable(variableSymbol))
         {
-            Diagnostics.ReportVariableAlreadyDeclared(statementSyntax.IdentifierToken.Span, name);
+            Diagnostics.ReportVariableAlreadyDeclared(statementSyntax.IdentifierToken.Location, name);
         }
 
         return new BoundVariableDeclarationStatement(variableSymbol, boundValueExpression);
@@ -293,11 +293,11 @@ internal sealed class Binder
         {
             if (symbolExists)
             {
-                Diagnostics.ReportUnexpectedSymbolKind(typeClause.IdentifierToken.Span, typeClause.IdentifierToken.Text, SymbolKind.Type, _scope.GetSymbolKind(typeClause.IdentifierToken.Text));
+                Diagnostics.ReportUnexpectedSymbolKind(typeClause.IdentifierToken.Location, typeClause.IdentifierToken.Text, SymbolKind.Type, _scope.GetSymbolKind(typeClause.IdentifierToken.Text));
             }
             else
             {
-                Diagnostics.ReportUndefinedType(typeClause.IdentifierToken.Span, typeClause.IdentifierToken.Text);
+                Diagnostics.ReportUndefinedType(typeClause.IdentifierToken.Location, typeClause.IdentifierToken.Text);
             }
 
             return null;
@@ -359,7 +359,7 @@ internal sealed class Binder
     {
         if (_loopLabels.Count <= 0)
         {
-            Diagnostics.ReportBreakOrContinueOutsideOfLoop(statementSyntax.Span, statementSyntax.BreakKeyword.Text);
+            Diagnostics.ReportBreakOrContinueOutsideOfLoop(statementSyntax.Location, statementSyntax.BreakKeyword.Text);
             return BindErrorStatement();
         }
 
@@ -370,7 +370,7 @@ internal sealed class Binder
     {
         if (_loopLabels.Count <= 0)
         {
-            Diagnostics.ReportBreakOrContinueOutsideOfLoop(statementSyntax.Span, statementSyntax.ContinueKeyword.Text);
+            Diagnostics.ReportBreakOrContinueOutsideOfLoop(statementSyntax.Location, statementSyntax.ContinueKeyword.Text);
             return BindErrorStatement();
         }
 
@@ -381,19 +381,19 @@ internal sealed class Binder
     {
         if (_currentFunction is null)
         {
-            Diagnostics.ReportReturnOutsideOfFunction(statementSyntax.Span);
+            Diagnostics.ReportReturnOutsideOfFunction(statementSyntax.Location);
             return BindErrorStatement();
         }
 
         if (_currentFunction.ReturnType == TypeSymbol.Void && statementSyntax.Expression is not null)
         {
-            Diagnostics.ReportReturnExpressionNotAllowed(statementSyntax.Expression.Span);
+            Diagnostics.ReportReturnExpressionNotAllowed(statementSyntax.Expression.Location);
             return BindErrorStatement();
         }
 
         if (_currentFunction.ReturnType != TypeSymbol.Void && statementSyntax.Expression is null)
         {
-            Diagnostics.ReportReturnExpressionRequired(statementSyntax.Span, _currentFunction.ReturnType);
+            Diagnostics.ReportReturnExpressionRequired(statementSyntax.Location, _currentFunction.ReturnType);
             return BindErrorStatement();
         }
 
@@ -401,7 +401,7 @@ internal sealed class Binder
         if (statementSyntax.Expression is ExpressionSyntax expression)
         {
             boundExpression = BindExpression(expression);
-            boundExpression = BindImplicitConversion(boundExpression, _currentFunction.ReturnType, expression.Span);
+            boundExpression = BindImplicitConversion(boundExpression, _currentFunction.ReturnType, expression.Location);
         }
 
         return new BoundReturnStatement(boundExpression);
@@ -417,7 +417,7 @@ internal sealed class Binder
     {
         BoundExpression boundExpression = BindExpression(expression);
 
-        return BindImplicitConversion(boundExpression, expectedType, expression.Span);
+        return BindImplicitConversion(boundExpression, expectedType, expression.Location);
     }
 
     private BoundExpression BindExpression(ExpressionSyntax expressionSyntax, bool canBeVoid = false)
@@ -436,7 +436,7 @@ internal sealed class Binder
 
         if (!canBeVoid && boundExpression.Type == TypeSymbol.Void)
         {
-            Diagnostics.ReportExpressionMustHaveValue(expressionSyntax.Span);
+            Diagnostics.ReportExpressionMustHaveValue(expressionSyntax.Location);
             return BoundErrorExpression.Instance;
         }
 
@@ -456,11 +456,11 @@ internal sealed class Binder
         {
             if (symbolExists)
             {
-                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text, SymbolKind.Function, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
+                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Location, expressionSyntax.IdentifierToken.Text, SymbolKind.Function, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
             }
             else
             {
-                Diagnostics.ReportUndefinedFunction(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text);
+                Diagnostics.ReportUndefinedFunction(expressionSyntax.IdentifierToken.Location, expressionSyntax.IdentifierToken.Text);
             }
 
             return BoundErrorExpression.Instance;
@@ -468,7 +468,7 @@ internal sealed class Binder
 
         if (expressionSyntax.Parameters.Count != function.Parameters.Length)
         {
-            Diagnostics.ReportWrongNumberOfArguments(expressionSyntax.IdentifierToken.Span, function.Name, function.Parameters.Length, expressionSyntax.Parameters.Count);
+            Diagnostics.ReportWrongNumberOfArguments(expressionSyntax.IdentifierToken.Location, function.Name, function.Parameters.Length, expressionSyntax.Parameters.Count);
             return BoundErrorExpression.Instance;
         }
 
@@ -477,13 +477,13 @@ internal sealed class Binder
             BoundExpression boundArgumentExpression = boundArgumentExpressions[i];
             TypeSymbol parameterType = function.Parameters[i].Type;
 
-            boundArgumentExpressions[i] = BindImplicitConversion(boundArgumentExpression, parameterType, expressionSyntax.Parameters[i].Span);
+            boundArgumentExpressions[i] = BindImplicitConversion(boundArgumentExpression, parameterType, expressionSyntax.Parameters[i].Location);
         }
 
         return new BoundCallExpression(function, boundArgumentExpressions.ToImmutable());
     }
 
-    private BoundExpression BindImplicitConversion(BoundExpression boundExpression, TypeSymbol targetType, TextSpan diagnosticSpan)
+    private BoundExpression BindImplicitConversion(BoundExpression boundExpression, TypeSymbol targetType, TextLocation diagnosticLocation)
     {
         if (boundExpression.Type == TypeSymbol.Error || targetType == TypeSymbol.Error)
         {
@@ -494,14 +494,14 @@ internal sealed class Binder
         switch (conversion)
         {
             case Conversion.None:
-                Diagnostics.ReportCannotConvert(diagnosticSpan, boundExpression.Type, targetType);
+                Diagnostics.ReportCannotConvert(diagnosticLocation, boundExpression.Type, targetType);
                 return boundExpression;
             case Conversion.Identity:
                 return boundExpression;
             case Conversion.Implicit:
                 return new BoundConversionExpression(boundExpression, targetType);
             case Conversion.Explicit:
-                Diagnostics.ReportExplicitConversionNeeded(diagnosticSpan, boundExpression.Type, targetType);
+                Diagnostics.ReportExplicitConversionNeeded(diagnosticLocation, boundExpression.Type, targetType);
                 return boundExpression;
             default:
                 throw new Exception($"Unexpected conversion type: {conversion}");
@@ -518,11 +518,11 @@ internal sealed class Binder
         {
             if (symbolExists)
             {
-                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text, SymbolKind.Variable, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
+                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Location, expressionSyntax.IdentifierToken.Text, SymbolKind.Variable, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
             }
             else
             {
-                Diagnostics.ReportUndefinedVariable(expressionSyntax.IdentifierToken.Span, name);
+                Diagnostics.ReportUndefinedVariable(expressionSyntax.IdentifierToken.Location, name);
             }
 
             return boundExpression;
@@ -530,11 +530,11 @@ internal sealed class Binder
 
         if (existingVariableSymbol.IsReadOnly)
         {
-            Diagnostics.ReportCannotAssignToReadOnlyVariable(expressionSyntax.Span, name);
+            Diagnostics.ReportCannotAssignToReadOnlyVariable(expressionSyntax.Location, name);
             return boundExpression;
         }
 
-        boundExpression = BindImplicitConversion(boundExpression, existingVariableSymbol.Type, expressionSyntax.Expression.Span);
+        boundExpression = BindImplicitConversion(boundExpression, existingVariableSymbol.Type, expressionSyntax.Expression.Location);
 
         return new BoundAssignmentExpression(existingVariableSymbol, boundExpression);
     }
@@ -553,11 +553,11 @@ internal sealed class Binder
         {
             if (symbolExists)
             {
-                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Span, expressionSyntax.IdentifierToken.Text, SymbolKind.Variable, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
+                Diagnostics.ReportUnexpectedSymbolKind(expressionSyntax.IdentifierToken.Location, expressionSyntax.IdentifierToken.Text, SymbolKind.Variable, _scope.GetSymbolKind(expressionSyntax.IdentifierToken.Text));
             }
             else
             {
-                Diagnostics.ReportUndefinedVariable(expressionSyntax.IdentifierToken.Span, name);
+                Diagnostics.ReportUndefinedVariable(expressionSyntax.IdentifierToken.Location, name);
             }
 
             return BoundErrorExpression.Instance;
@@ -582,7 +582,7 @@ internal sealed class Binder
 
         if (boundBinaryOperator is null)
         {
-            Diagnostics.ReportUndefindedBinaryOperator(expressionSyntax.OperatorToken.Span, expressionSyntax.OperatorToken.Text, boundLeftExpression.Type, boundRightExpression.Type);
+            Diagnostics.ReportUndefindedBinaryOperator(expressionSyntax.OperatorToken.Location, expressionSyntax.OperatorToken.Text, boundLeftExpression.Type, boundRightExpression.Type);
             return BoundErrorExpression.Instance;
         }
 
@@ -602,7 +602,7 @@ internal sealed class Binder
 
         if (boundUnaryOperator is null)
         {
-            Diagnostics.ReportUndefindedUnaryOperator(expressionSyntax.OperatorToken.Span, expressionSyntax.OperatorToken.Text, boundOperandExpression.Type);
+            Diagnostics.ReportUndefindedUnaryOperator(expressionSyntax.OperatorToken.Location, expressionSyntax.OperatorToken.Text, boundOperandExpression.Type);
             return BoundErrorExpression.Instance;
         }
 

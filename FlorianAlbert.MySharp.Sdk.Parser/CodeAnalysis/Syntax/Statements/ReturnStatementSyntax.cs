@@ -5,7 +5,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class ReturnStatementSyntax : StatementSyntax
 {
-    public ReturnStatementSyntax(SyntaxToken returnKeyword, ExpressionSyntax? expression, SyntaxToken semicolonToken)
+    public ReturnStatementSyntax(SyntaxTree syntaxTree, SyntaxToken returnKeyword, ExpressionSyntax? expression, SyntaxToken semicolonToken)
+        : base(syntaxTree)
     {
         ReturnKeyword = returnKeyword;
         Expression = expression;

@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 
 public sealed class BinaryExpressionSyntax : ExpressionSyntax
 {
-    public BinaryExpressionSyntax(ExpressionSyntax leftExpression, SyntaxToken operatorToken, ExpressionSyntax rightExpression)
+    public BinaryExpressionSyntax(SyntaxTree syntaxTree, ExpressionSyntax leftExpression, SyntaxToken operatorToken, ExpressionSyntax rightExpression)
+        : base(syntaxTree)
     {
         LeftExpression = leftExpression;
         OperatorToken = operatorToken;

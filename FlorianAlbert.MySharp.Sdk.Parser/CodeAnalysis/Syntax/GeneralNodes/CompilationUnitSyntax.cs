@@ -1,12 +1,12 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class CompilationUnitSyntax : SyntaxNode
 {
-    public CompilationUnitSyntax(ImmutableArray<CompilationUnitSyntaxMember> compilationUnitMembers, SyntaxToken endOfFileToken)
+    public CompilationUnitSyntax(SyntaxTree syntaxTree, ImmutableArray<CompilationUnitSyntaxMember> compilationUnitMembers, SyntaxToken endOfFileToken)
+        : base(syntaxTree)
     {
         CompilationUnitMembers = compilationUnitMembers;
         EndOfFileToken = endOfFileToken;

@@ -66,7 +66,9 @@ public sealed class Compilation
     public void EmitDiagnostics(TextWriter textWriter)
     {
         DiagnosticBag diagnostics = [.. SyntaxTree.Diagnostics, .. CompilationUnit.Diagnostics];
-        Diagnostic[] orderedDiagnostics = [.. diagnostics.OrderBy(diagnostic => diagnostic.Span, TextSpan.Comparer)];
+        Diagnostic[] orderedDiagnostics = [.. diagnostics.OrderBy(diagnostic => diagnostic.Location.FileName)
+                                                         .ThenBy(diagnostic => diagnostic.Location.Span.Start)
+                                                         .ThenBy(diagnostic => diagnostic.Location.Span.Length)];
 
         for (int diagnosticIndex = 0; diagnosticIndex < orderedDiagnostics.Length; diagnosticIndex++)
         {
@@ -77,25 +79,27 @@ public sealed class Compilation
                 textWriter.WriteLine();
             }
 
-            int lineIndexStart = SyntaxTree.SourceText.GetLineIndex(diagnostic.Span.Start);
-            int lineIndexEnd = SyntaxTree.SourceText.GetLineIndex(diagnostic.Span.End);
-            int lineNumber = lineIndexStart + 1;
+            string fileName = diagnostic.Location.FileName;
+            int lineIndexStart = diagnostic.Location.StartLineIndex;
+            int lineIndexEnd = diagnostic.Location.EndLineIndex;
             TextLine lineStart = SyntaxTree.SourceText.Lines[lineIndexStart];
             TextLine lineEnd = SyntaxTree.SourceText.Lines[lineIndexEnd];
-            int characterLineIndex = diagnostic.Span.Start - lineStart.Start + 1;
+
+            int lineNumber = lineIndexStart + 1;
+            int characterNumber = diagnostic.Location.StartCharacterIndex + 1;
 
             textWriter.SetForegroundColor(ConsoleColor.DarkRed);
-            textWriter.Write($"({lineNumber}, {characterLineIndex}): ");
+            textWriter.Write($"{fileName}({lineNumber}, {characterNumber}): ");
             textWriter.WriteLine(diagnostic);
             textWriter.ResetColor();
 
             textWriter.WriteLine();
 
-            TextSpan prefixSpan = TextSpan.FromBounds(lineStart.Start, diagnostic.Span.Start);
-            TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, lineEnd.End);
+            TextSpan prefixSpan = TextSpan.FromBounds(lineStart.Start, diagnostic.Location.Span.Start);
+            TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Location.Span.End, lineEnd.End);
 
             string prefix = SyntaxTree.SourceText.ToString(prefixSpan);
-            string error = SyntaxTree.SourceText.ToString(diagnostic.Span);
+            string error = SyntaxTree.SourceText.ToString(diagnostic.Location.Span);
             string suffix = SyntaxTree.SourceText.ToString(suffixSpan);
 
             textWriter.Write(prefix);

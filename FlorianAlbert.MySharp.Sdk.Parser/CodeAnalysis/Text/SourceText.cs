@@ -6,9 +6,10 @@ public sealed class SourceText
 {
     private readonly string _text;
 
-    private SourceText(string text)
+    private SourceText(string text, string fileName)
     {
         _text = text;
+        FileName = fileName;
         Lines = ParseLines(this, text);
     }
 
@@ -18,7 +19,9 @@ public sealed class SourceText
 
     public int Length => _text.Length;
 
-    public static SourceText From(string text) => new(text);
+    public string FileName { get; }
+
+    public static SourceText From(string text, string fileName = "") => new(text, fileName);
 
     public int GetLineIndex(int position)
     {

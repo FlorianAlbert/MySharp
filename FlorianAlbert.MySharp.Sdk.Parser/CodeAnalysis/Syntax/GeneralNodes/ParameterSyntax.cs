@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class ParameterSyntax : SyntaxNode
 {
-    public ParameterSyntax(SyntaxToken identifier, TypeClauseSyntax typeClause)
+    public ParameterSyntax(SyntaxTree syntaxTree, SyntaxToken identifier, TypeClauseSyntax typeClause)
+        : base(syntaxTree)
     {
         Identifier = identifier;
         TypeClause = typeClause;

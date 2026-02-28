@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 
 public sealed class UnaryExpressionSyntax : ExpressionSyntax
 {
-    public UnaryExpressionSyntax(SyntaxToken operatorToken, ExpressionSyntax operand)
+    public UnaryExpressionSyntax(SyntaxTree syntaxTree, SyntaxToken operatorToken, ExpressionSyntax operand)
+        : base(syntaxTree)
     {
         OperatorToken = operatorToken;
         Operand = operand;

@@ -426,7 +426,7 @@ public class EvaluatorTests
 
     private static void AssertValue(string expression, object expectedResult)
     {
-        var syntaxTree = SyntaxTree.Parse(expression);
+        SyntaxTree syntaxTree = SyntaxTree.Parse(expression);
         Compilation compilation = new(syntaxTree);
 
         Dictionary<VariableSymbol, object?> variables = [];
@@ -461,7 +461,7 @@ public class EvaluatorTests
             Assert.Equal(expectedMessage, diagnostic.Message);
 
             TextSpan expectedSpan = annotatedText.Spans[i];
-            Assert.Equal(expectedSpan, diagnostic.Span);
+            Assert.Equal(expectedSpan, diagnostic.Location.Span);
         }
     }
 }

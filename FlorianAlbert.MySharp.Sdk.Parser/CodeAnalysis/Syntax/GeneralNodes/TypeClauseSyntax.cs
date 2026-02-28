@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class TypeClauseSyntax : SyntaxNode
 {
-    public TypeClauseSyntax(SyntaxToken colonToken, SyntaxToken identifierToken)
+    public TypeClauseSyntax(SyntaxTree syntaxTree, SyntaxToken colonToken, SyntaxToken identifierToken)
+        : base(syntaxTree)
     {
         ColonToken = colonToken;
         IdentifierToken = identifierToken;

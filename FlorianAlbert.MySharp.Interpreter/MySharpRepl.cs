@@ -3,7 +3,6 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 

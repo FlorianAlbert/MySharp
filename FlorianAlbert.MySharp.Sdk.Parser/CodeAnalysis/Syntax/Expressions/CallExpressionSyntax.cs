@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 
 public class CallExpressionSyntax : ExpressionSyntax
 {
-    public CallExpressionSyntax(SyntaxToken identifierToken, SyntaxToken openParenthesisToken, SeparatedSyntaxList<ExpressionSyntax> parameters, SyntaxToken closeParenthesisToken)
+    public CallExpressionSyntax(SyntaxTree syntaxTree, SyntaxToken identifierToken, SyntaxToken openParenthesisToken, SeparatedSyntaxList<ExpressionSyntax> parameters, SyntaxToken closeParenthesisToken)
+        : base(syntaxTree)
     {
         IdentifierToken = identifierToken;
         OpenParenthesisToken = openParenthesisToken;

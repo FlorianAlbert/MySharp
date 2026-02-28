@@ -6,12 +6,14 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class IfStatementSyntax : StatementSyntax
 {
-    public IfStatementSyntax(SyntaxToken ifKeyword,
+    public IfStatementSyntax(SyntaxTree syntaxTree, 
+        SyntaxToken ifKeyword,
         SyntaxToken openParenthesesToken,
         ExpressionSyntax conditionExpression,
         SyntaxToken closeParenthesesToken,
         StatementSyntax thenStatement,
         ElseClauseSyntax? elseClause = null)
+        : base(syntaxTree)
     {
         IfKeyword = ifKeyword;
         OpenParenthesesToken = openParenthesesToken;

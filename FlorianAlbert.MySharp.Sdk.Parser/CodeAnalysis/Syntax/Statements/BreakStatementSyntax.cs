@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class BreakStatementSyntax : StatementSyntax
 {
-    public BreakStatementSyntax(SyntaxToken breakKeyword, SyntaxToken semicolonToken)
+    public BreakStatementSyntax(SyntaxTree syntaxTree, SyntaxToken breakKeyword, SyntaxToken semicolonToken)
+        : base(syntaxTree)
     {
         BreakKeyword = breakKeyword;
         SemicolonToken = semicolonToken;

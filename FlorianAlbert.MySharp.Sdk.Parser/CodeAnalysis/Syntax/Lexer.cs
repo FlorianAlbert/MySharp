@@ -1,6 +1,4 @@
-﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
-using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
-using System.Runtime.CompilerServices;
+﻿using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using System.Text;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
@@ -8,14 +6,16 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 internal sealed class Lexer
 {
     private readonly SourceText _text;
+    private readonly SyntaxTree _syntaxTree;
     private int _position;
     private int _start;
     private SyntaxKind _kind;
     private object? _value;
 
-    public Lexer(SourceText text)
+    public Lexer(SyntaxTree syntaxTree)
     {
-        _text = text;
+        _syntaxTree = syntaxTree;
+        _text = syntaxTree.SourceText;
         _position = 0;
 
         Diagnostics = [];
@@ -266,14 +266,16 @@ internal sealed class Lexer
                     // Kept for Unicode support
                     ReadWhitespace();
                 }
-                else if(char.IsLetter(_Current))
+                else if (char.IsLetter(_Current))
                 {
                     // Kept for Unicode support
                     ReadIdentifierOrKeyword();
                 }
                 else
                 {
-                    Diagnostics.ReportBadCharacter(_position, _Current);
+                    TextSpan span = new(_position, 1);
+                    TextLocation location = new(_syntaxTree.SourceText, span);
+                    Diagnostics.ReportBadCharacter(location, _Current);
                     _position++;
                 }
                 break;
@@ -286,7 +288,7 @@ internal sealed class Lexer
             tokenText = _text.ToString(_start, length);
         }
 
-        return new SyntaxToken(_kind, _start, tokenText, _value);
+        return new SyntaxToken(_syntaxTree, _kind, _start, tokenText, _value);
     }
 
     private void ReadWhitespace()
@@ -307,11 +309,12 @@ internal sealed class Lexer
         }
 
         TextSpan span = TextSpan.FromBounds(_start, _position);
+        TextLocation location = new(_syntaxTree.SourceText, span);
         string tokenText = _text.ToString(span);
 
         if (!int.TryParse(tokenText, out int value))
         {
-            Diagnostics.ReportInvalidNumber(span, tokenText);
+            Diagnostics.ReportInvalidNumber(location, tokenText);
         }
 
         _value = value;
@@ -328,7 +331,9 @@ internal sealed class Lexer
             switch (_Current)
             {
                 case '\0' or '\n' or '\r':
-                    Diagnostics.ReportUnterminatedString(TextSpan.FromBounds(_start, _position));
+                    TextSpan span = TextSpan.FromBounds(_start, _position);
+                    TextLocation location = new(_syntaxTree.SourceText, span);
+                    Diagnostics.ReportUnterminatedString(location);
                     isDone = true;
                     break;
                 case '\\':
@@ -365,7 +370,9 @@ internal sealed class Lexer
                 _position++;
                 break;
             default:
-                Diagnostics.ReportInvalidEscapeSequence(new(_position, 1));
+                TextSpan span = new(_position, 1);
+                TextLocation location = new(_syntaxTree.SourceText, span);
+                Diagnostics.ReportInvalidEscapeSequence(location);
                 break;
         }
     }
@@ -380,7 +387,9 @@ internal sealed class Lexer
             switch (_Current)
             {
                 case '\0' or '\n' or '\r':
-                    Diagnostics.ReportUnterminatedCharacter(TextSpan.FromBounds(_start, _position));
+                    TextSpan span = TextSpan.FromBounds(_start, _position);
+                    TextLocation location = new(_syntaxTree.SourceText, span);
+                    Diagnostics.ReportUnterminatedCharacter(location);
                     isDone = true;
                     break;
                 case '\\':
@@ -400,7 +409,9 @@ internal sealed class Lexer
         if (stringTokenBuilder.Length > 1)
         {
             int endPosition = _Current == '\'' ? _position + 1 : _position;
-            Diagnostics.ReportTooManyCharactersInCharacterLiteral(TextSpan.FromBounds(_start, endPosition));
+            TextSpan span = TextSpan.FromBounds(_start, endPosition);
+            TextLocation location = new(_syntaxTree.SourceText, span);
+            Diagnostics.ReportTooManyCharactersInCharacterLiteral(location);
         }
 
         if (_Current == '\'')
@@ -431,7 +442,9 @@ internal sealed class Lexer
                 _position++;
                 break;
             default:
-                Diagnostics.ReportInvalidEscapeSequence(new(_position, 1));
+                TextSpan span = new(_position, 1);
+                TextLocation location = new(_syntaxTree.SourceText, span);
+                Diagnostics.ReportInvalidEscapeSequence(location);
                 break;
         }
     }

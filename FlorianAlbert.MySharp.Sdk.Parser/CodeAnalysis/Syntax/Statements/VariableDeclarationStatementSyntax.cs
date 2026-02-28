@@ -6,12 +6,14 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class VariableDeclarationStatementSyntax : StatementSyntax
 {
-    public VariableDeclarationStatementSyntax(SyntaxToken keywordToken, 
+    public VariableDeclarationStatementSyntax(SyntaxTree syntaxTree, 
+        SyntaxToken keywordToken, 
         SyntaxToken identifierToken,
         TypeClauseSyntax? typeClause, 
         SyntaxToken equalsToken, 
         ExpressionSyntax valueExpression, 
         SyntaxToken semicolonToken)
+        : base(syntaxTree)
     {
         KeywordToken = keywordToken;
         IdentifierToken = identifierToken;

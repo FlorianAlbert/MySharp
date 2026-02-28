@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Expressions;
 
 public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 {
-    public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expressionSyntax, SyntaxToken closeParenthesisToken)
+    public ParenthesizedExpressionSyntax(SyntaxTree syntaxTree, SyntaxToken openParenthesisToken, ExpressionSyntax expressionSyntax, SyntaxToken closeParenthesisToken)
+        : base(syntaxTree)
     {
         OpenParenthesisToken = openParenthesisToken;
         ExpressionSyntax = expressionSyntax;

@@ -4,7 +4,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 public sealed class SyntaxToken : SyntaxNode
 {
-    public SyntaxToken(SyntaxKind kind, int start, string text, object? value)
+    public SyntaxToken(SyntaxTree syntaxTree, SyntaxKind kind, int start, string text, object? value)
+        : base(syntaxTree)
     {
         Kind = kind;
         Span = new(start, text.Length);

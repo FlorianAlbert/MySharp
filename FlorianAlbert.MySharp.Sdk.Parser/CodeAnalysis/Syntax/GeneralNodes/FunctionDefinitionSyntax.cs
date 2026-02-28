@@ -5,13 +5,15 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class FunctionDefinitionSyntax : CompilationUnitSyntaxMember
 {
-    public FunctionDefinitionSyntax(SyntaxToken functionKeyword,
+    public FunctionDefinitionSyntax(SyntaxTree syntaxTree,
+        SyntaxToken functionKeyword,
         SyntaxToken identifierToken,
         SyntaxToken openParenthesisToken,
         SeparatedSyntaxList<ParameterSyntax> parameters,
         SyntaxToken closeParenthesisToken,
         TypeClauseSyntax? typeClause,
         BlockStatementSyntax bodyStatement)
+        : base(syntaxTree)
     {
         FunctionKeyword = functionKeyword;
         IdentifierToken = identifierToken;

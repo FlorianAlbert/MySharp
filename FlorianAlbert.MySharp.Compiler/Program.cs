@@ -16,9 +16,13 @@ if (args.Length > 1)
 
 string sourceFilePath = args[0];
 
-string text = File.ReadAllText(sourceFilePath);
+if (!File.Exists(sourceFilePath))
+{
+    Console.Error.WriteLine($"Error: The file '{sourceFilePath}' does not exist.");
+    return;
+}
 
-SyntaxTree syntaxTree = SyntaxTree.Parse(text);
+SyntaxTree syntaxTree = SyntaxTree.Load(sourceFilePath);
 
 Compilation compilation = new(syntaxTree);
 

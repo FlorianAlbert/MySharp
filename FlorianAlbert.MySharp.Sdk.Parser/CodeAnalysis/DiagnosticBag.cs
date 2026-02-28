@@ -10,9 +10,9 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
 {
     private readonly List<Diagnostic> _diagnostics = [];
 
-    private void Report(TextSpan span, string message)
+    private void Report(TextLocation location, string message)
     {
-        Diagnostic diagnostic = new(span, message);
+        Diagnostic diagnostic = new(location, message);
         _diagnostics.Add(diagnostic);
     }
 
@@ -32,160 +32,159 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         _diagnostics.AddRange(diagnosticBag);
     }
 
-    internal void ReportInvalidNumber(TextSpan textSpan, string tokenText)
+    internal void ReportInvalidNumber(TextLocation location, string tokenText)
     {
         string message = $"The number '{tokenText}' is not a valid number.";
-        Report(textSpan, message);
+        Report(location, message);
     }
 
-    internal void ReportBadCharacter(int position, char current)
+    internal void ReportBadCharacter(TextLocation location, char current)
     {
-        TextSpan span = new(position, 1);
         string message = $"Bad character input: '{current}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUnexpectedToken(TextSpan span, SyntaxKind actualKind, SyntaxKind expectedKind)
+    internal void ReportUnexpectedToken(TextLocation location, SyntaxKind actualKind, SyntaxKind expectedKind)
     {
         string message = $"Unexpected token <{actualKind}>, expected <{expectedKind}>.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUndefindedBinaryOperator(TextSpan span, string text, TypeSymbol leftType, TypeSymbol rightType)
+    internal void ReportUndefindedBinaryOperator(TextLocation location, string text, TypeSymbol leftType, TypeSymbol rightType)
     {
         string message = $"Binary operator '{text}' is not defined for types '{leftType}' and '{rightType}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUndefindedUnaryOperator(TextSpan span, string text, TypeSymbol type)
+    internal void ReportUndefindedUnaryOperator(TextLocation location, string text, TypeSymbol type)
     {
         string message = $"Unary operator '{text}' is not defined for type '{type}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportVariableAlreadyDeclared(TextSpan span, string name)
+    internal void ReportVariableAlreadyDeclared(TextLocation location, string name)
     {
         string message = $"Variable '{name}' is already declared.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUndefinedVariable(TextSpan span, string name)
+    internal void ReportUndefinedVariable(TextLocation location, string name)
     {
         string message = $"Undefined variable '{name}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportCannotConvert(TextSpan span, TypeSymbol fromType, TypeSymbol toType)
+    internal void ReportCannotConvert(TextLocation location, TypeSymbol fromType, TypeSymbol toType)
     {
         string message = $"Cannot convert type '{fromType}' to '{toType}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportCannotAssignToReadOnlyVariable(TextSpan span, string name)
+    internal void ReportCannotAssignToReadOnlyVariable(TextLocation location, string name)
     {
         string message = $"Cannot assign to read-only variable '{name}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUnterminatedString(TextSpan span)
+    internal void ReportUnterminatedString(TextLocation location)
     {
         string message = "Unterminated string literal.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUnterminatedCharacter(TextSpan span)
+    internal void ReportUnterminatedCharacter(TextLocation location)
     {
         string message = "Unterminated character literal.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportTooManyCharactersInCharacterLiteral(TextSpan span)
+    internal void ReportTooManyCharactersInCharacterLiteral(TextLocation location)
     {
         string message = "Too many characters in character literal.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportInvalidEscapeSequence(TextSpan textSpan)
+    internal void ReportInvalidEscapeSequence(TextLocation location)
     {
         string message = $"Invalid escape sequence.";
-        Report(textSpan, message);
+        Report(location, message);
     }
 
-    internal void ReportUndefinedFunction(TextSpan span, string text)
+    internal void ReportUndefinedFunction(TextLocation location, string text)
     {
         string message = $"Undefined function '{text}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportWrongNumberOfArguments(TextSpan span, string name, int length, int count)
+    internal void ReportWrongNumberOfArguments(TextLocation location, string name, int length, int count)
     {
         string message = $"Function '{name}' expects {length} argument(s) but was called with {count}.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportExpressionMustHaveValue(TextSpan span)
+    internal void ReportExpressionMustHaveValue(TextLocation location)
     {
         string message = "Expression must have a value.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportExplicitConversionNeeded(TextSpan span, TypeSymbol fromType, TypeSymbol targetType)
+    internal void ReportExplicitConversionNeeded(TextLocation location, TypeSymbol fromType, TypeSymbol targetType)
     {
         string message = $"Cannot implicitly convert from {fromType} to {targetType}. An explicit cast is needed.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUnexpectedSymbolKind(TextSpan span, string symbolName, SymbolKind expectedSymbolKind, SymbolKind actualSymbolKind)
+    internal void ReportUnexpectedSymbolKind(TextLocation location, string symbolName, SymbolKind expectedSymbolKind, SymbolKind actualSymbolKind)
     {
         string message = $"The symbol '{symbolName}' is not of type '{expectedSymbolKind}' but of type '{actualSymbolKind}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportUndefinedType(TextSpan span, string typeName)
+    internal void ReportUndefinedType(TextLocation location, string typeName)
     {
         string message = $"Undefined type '{typeName}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportDuplicateParameterName(TextSpan span, string parameterName)
+    internal void ReportDuplicateParameterName(TextLocation location, string parameterName)
     {
         string message = $"The parameter name '{parameterName}' is a duplicate.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportFunctionAlreadyDeclared(TextSpan span, string name)
+    internal void ReportFunctionAlreadyDeclared(TextLocation location, string name)
     {
         string message = $"Function '{name}' is already declared.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportBreakOrContinueOutsideOfLoop(TextSpan span, string keyword)
+    internal void ReportBreakOrContinueOutsideOfLoop(TextLocation location, string keyword)
     {
         string message = $"The '{keyword}' keyword is only valid in the body of a loop.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportReturnOutsideOfFunction(TextSpan span)
+    internal void ReportReturnOutsideOfFunction(TextLocation location)
     {
         string message = "The 'return' keyword is only valid in the body of a function.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportReturnExpressionNotAllowed(TextSpan span)
+    internal void ReportReturnExpressionNotAllowed(TextLocation location)
     {
         string message = "The 'return' keyword cannot be followed by an expression in a void function.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportReturnExpressionRequired(TextSpan span, TypeSymbol expectedReturnType)
+    internal void ReportReturnExpressionRequired(TextLocation location, TypeSymbol expectedReturnType)
     {
         string message = $"The 'return' keyword must be followed by an expression of type '{expectedReturnType}'.";
-        Report(span, message);
+        Report(location, message);
     }
 
-    internal void ReportNotAllPathsReturn(TextSpan span, string name)
+    internal void ReportNotAllPathsReturn(TextLocation location, string name)
     {
         string message = $"Not all code paths in function '{name}' return a value.";
-        Report(span, message);
+        Report(location, message);
     }
 }

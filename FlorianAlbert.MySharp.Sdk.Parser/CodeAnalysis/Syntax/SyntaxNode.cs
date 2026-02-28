@@ -5,9 +5,18 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 public abstract class SyntaxNode
 {
+    protected SyntaxNode(SyntaxTree syntaxTree)
+    {
+        SyntaxTree = syntaxTree;
+    }
+
+    public SyntaxTree SyntaxTree { get; }
+
     public abstract SyntaxKind Kind { get; }
 
     public abstract TextSpan Span { get; }
+
+    public TextLocation Location => new(SyntaxTree.SourceText, Span);
 
     public abstract IEnumerable<SyntaxNode> GetChildren();
 

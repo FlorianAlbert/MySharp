@@ -5,7 +5,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class ForStatementSyntax : StatementSyntax
 {
-    public ForStatementSyntax(SyntaxToken forKeyword,
+    public ForStatementSyntax(SyntaxTree syntaxTree, 
+        SyntaxToken forKeyword,
         SyntaxToken openParenthesisToken,
         SyntaxToken letKeyword,
         SyntaxToken identifierToken,
@@ -15,6 +16,7 @@ public sealed class ForStatementSyntax : StatementSyntax
         ExpressionSyntax upperBoundExpression,
         SyntaxToken closeParenthesisToken,
         StatementSyntax body)
+        : base(syntaxTree)
     {
         ForKeyword = forKeyword;
         OpenParenthesisToken = openParenthesisToken;

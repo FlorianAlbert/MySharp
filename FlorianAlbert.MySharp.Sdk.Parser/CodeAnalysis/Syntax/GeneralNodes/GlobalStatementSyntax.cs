@@ -5,7 +5,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.GeneralNodes;
 
 public sealed class GlobalStatementSyntax : CompilationUnitSyntaxMember
 {
-    public GlobalStatementSyntax(StatementSyntax statement)
+    public GlobalStatementSyntax(SyntaxTree syntaxTree, StatementSyntax statement)
+        : base(syntaxTree)
     {
         Statement = statement;
     }

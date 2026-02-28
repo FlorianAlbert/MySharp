@@ -5,12 +5,13 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 
 public sealed class WhileStatementSyntax : StatementSyntax
 {
-    public WhileStatementSyntax(
+    public WhileStatementSyntax(SyntaxTree syntaxTree,
         SyntaxToken whileKeyword,
         SyntaxToken openParenthesesToken,
         ExpressionSyntax conditionExpression,
         SyntaxToken closeParenthesesToken,
         StatementSyntax bodyStatement)
+        : base(syntaxTree)
     {
         WhileKeyword = whileKeyword;
         OpenParenthesesToken = openParenthesesToken;
