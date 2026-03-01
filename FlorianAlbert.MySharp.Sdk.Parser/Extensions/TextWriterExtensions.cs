@@ -9,26 +9,32 @@ internal static class TextWriterExtensions
 {
     extension(TextWriter textWriter)
     {
-        public bool IsConsoleOut => textWriter.IsConsoleOutPrivate();
-
-        private bool IsConsoleOutPrivate()
+        public bool IsConsole
         {
-            if (textWriter == Console.Out)
+            get
             {
-                return true;
-            }
+                if (textWriter == Console.Out)
+                {
+                    return !Console.IsOutputRedirected;
+                }
 
-            if (textWriter is IndentedTextWriter indentedTextWriter)
-            {
-                return indentedTextWriter.InnerWriter.IsConsoleOutPrivate();
-            }
+                if (textWriter == Console.Error)
+                {
+                    return !Console.IsErrorRedirected;
+                }
 
-            return false;
+                if (textWriter is IndentedTextWriter indentedTextWriter)
+                {
+                    return indentedTextWriter.InnerWriter.IsConsole;
+                }
+
+                return false;
+            }
         }
 
         public void SetForegroundColor(ConsoleColor color)
         {
-            if (textWriter.IsConsoleOut)
+            if (textWriter.IsConsole)
             {
                 Console.ForegroundColor = color;
             }
@@ -36,7 +42,7 @@ internal static class TextWriterExtensions
 
         public void ResetColor()
         {
-            if (textWriter.IsConsoleOut)
+            if (textWriter.IsConsole)
             {
                 Console.ResetColor();
             }

@@ -110,9 +110,9 @@ internal sealed class MySharpRepl : Repl
 
         if (compilation.HasDiagnostics)
         {
-            compilation.EmitDiagnostics(Console.Out);
+            compilation.EmitDiagnostics(Console.Error);
 
-            Console.WriteLine();
+            Console.Error.WriteLine();
         }
         else
         {

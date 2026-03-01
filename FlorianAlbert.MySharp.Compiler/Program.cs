@@ -5,7 +5,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 if (args.Length is 0)
 {
     Console.Error.WriteLine("Usage: msc <source-file>");
-    return;
+    return 1;
 }
 
 string[] sourceFilePaths = GetFullSourceFilePaths(args);
@@ -35,14 +35,15 @@ for (int sourceFilePathIndex = 0; sourceFilePathIndex < sourceFilePaths.Length; 
 
 if (anyFileDoesNotExist)
 {
-    return;
+    return 1;
 }
 
 Compilation compilation = new(syntaxTrees);
 
 if (compilation.HasDiagnostics)
 {
-    compilation.EmitDiagnostics(Console.Out);
+    compilation.EmitDiagnostics(Console.Error);
+    return 1;
 }
 else
 {
@@ -54,6 +55,8 @@ else
         Console.WriteLine(result.Value);
         Console.ResetColor();
     }
+
+    return 0;
 }
 
 static string[] GetFullSourceFilePaths(IEnumerable<string> paths)

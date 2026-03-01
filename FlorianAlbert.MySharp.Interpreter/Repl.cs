@@ -57,7 +57,7 @@ internal abstract class Repl
         else
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine($"Unknown command '{input}'.");
+            Console.Error.WriteLine($"Unknown command '{input}'.");
             Console.ResetColor();
         }
     }
