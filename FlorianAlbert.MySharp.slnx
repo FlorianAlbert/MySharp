@@ -1,11 +1,15 @@
 <Solution>
+  <Folder Name="/Interpreter/">
+    <Project Path="FlorianAlbert.MySharp.Interpreter.Annotations/FlorianAlbert.MySharp.Interpreter.Annotations.csproj" Id="79f78d9b-4dfb-43e2-b3a7-0edb99c39def" />
+    <Project Path="Interpreter/FlorianAlbert.MySharp.Interpreter.Generators/FlorianAlbert.MySharp.Interpreter.Generators.csproj" Id="9e51cef5-5a1a-4373-b159-ce044150694c" />
+    <Project Path="Interpreter/FlorianAlbert.MySharp.Interpreter/FlorianAlbert.MySharp.Interpreter.csproj" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".github/workflows/build-and-test.yml" />
     <File Path="Directory.Build.props" />
   </Folder>
   <Project Path="FlorianAlbert.MySharp.Compiler/FlorianAlbert.MySharp.Compiler.csproj" Id="52bbf82d-72f0-43f9-af22-281290b1b03e" />
-  <Project Path="FlorianAlbert.MySharp.Interpreter/FlorianAlbert.MySharp.Interpreter.csproj" />
   <Project Path="FlorianAlbert.MySharp.Sdk.Parser.Test/FlorianAlbert.MySharp.Sdk.Parser.Test.csproj" Id="03b0e905-a203-4800-9b78-2c177dbaa064" />
   <Project Path="FlorianAlbert.MySharp.Sdk.Parser/FlorianAlbert.MySharp.Sdk.Parser.csproj" />
 </Solution>

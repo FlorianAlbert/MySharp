@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+	<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FlorianAlbert.MySharp.Interpreter.Annotations\FlorianAlbert.MySharp.Interpreter.Annotations.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+    <ProjectReference Include="..\..\FlorianAlbert.MySharp.Sdk.Parser\FlorianAlbert.MySharp.Sdk.Parser.csproj" />
+    <ProjectReference Include="..\FlorianAlbert.MySharp.Interpreter.Generators\FlorianAlbert.MySharp.Interpreter.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

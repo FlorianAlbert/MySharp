@@ -1,4 +1,5 @@
-﻿using FlorianAlbert.MySharp.Interpreter.LineRendering;
+﻿using FlorianAlbert.MySharp.Interpreter.Annotations;
+using FlorianAlbert.MySharp.Interpreter.LineRendering;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
@@ -6,7 +7,8 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
-internal sealed class MySharpRepl : Repl
+[MetaCommandEvaluator(nameof(EvaluateMetaCommand))]
+internal sealed partial class MySharpRepl : Repl
 {
     private Compilation? _previousCompilation;
     private bool _showSyntaxTree;
@@ -18,33 +20,64 @@ internal sealed class MySharpRepl : Repl
     {
     }
 
-    protected override void EvaluateMetaCommand(string input)
+    //protected override void EvaluateMetaCommand(string input)
+    //{
+    //    if (input.Equals($"{_metaCommandPrefix}showSyntaxTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sst", StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        _showSyntaxTree = !_showSyntaxTree;
+    //        Console.WriteLine(_showSyntaxTree ? "Showing syntax tree" : "Not showing syntax tree");
+    //    }
+    //    else if (input.Equals($"{_metaCommandPrefix}showBoundTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sbt", StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        _showBoundTree = !_showBoundTree;
+    //        Console.WriteLine(_showBoundTree ? "Showing bound tree" : "Not showing bound tree");
+    //    }
+    //    else if (input.Equals($"{_metaCommandPrefix}emitControlFlows", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}ecf", StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        _emitControlFlows = !_emitControlFlows;
+    //        Console.WriteLine(_emitControlFlows ? "Storing control flow graphs" : "Not storing control flow graphs");
+    //    }
+    //    else if (input.Equals($"{_metaCommandPrefix}reset", StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        _previousCompilation = null;
+    //        _variables.Clear();
+    //        Console.WriteLine("Resetting compilation.");
+    //    }
+    //    else
+    //    {
+    //        base.EvaluateMetaCommand(input);
+    //    }
+    //}
+
+    public override partial void EvaluateMetaCommand(string input);
+
+    [MetaCommand("showSyntaxTree", "Toggles displaying of the syntax tree of the submission.", Aliases = ["sst"])]
+    private void EvaluateMetaCommand_ShowSyntaxTree()
     {
-        if (input.Equals($"{_metaCommandPrefix}showSyntaxTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sst", StringComparison.OrdinalIgnoreCase))
-        {
-            _showSyntaxTree = !_showSyntaxTree;
-            Console.WriteLine(_showSyntaxTree ? "Showing syntax tree" : "Not showing syntax tree");
-        }
-        else if (input.Equals($"{_metaCommandPrefix}showBoundTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sbt", StringComparison.OrdinalIgnoreCase))
-        {
-            _showBoundTree = !_showBoundTree;
-            Console.WriteLine(_showBoundTree ? "Showing bound tree" : "Not showing bound tree");
-        }
-        else if (input.Equals($"{_metaCommandPrefix}emitControlFlows", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}ecf", StringComparison.OrdinalIgnoreCase))
-        {
-            _emitControlFlows = !_emitControlFlows;
-            Console.WriteLine(_emitControlFlows ? "Storing control flow graphs" : "Not storing control flow graphs");
-        }
-        else if (input.Equals($"{_metaCommandPrefix}reset", StringComparison.OrdinalIgnoreCase))
-        {
-            _previousCompilation = null;
-            _variables.Clear();
-            Console.WriteLine("Resetting compilation.");
-        }
-        else
-        {
-            base.EvaluateMetaCommand(input);
-        }
+        _showSyntaxTree = !_showSyntaxTree;
+        Console.WriteLine(_showSyntaxTree ? "Showing syntax tree" : "Not showing syntax tree");
+    }
+
+    [MetaCommand("showBoundTree", "Toggles displaying of the bound tree of the submission.", Aliases = ["sbt"])]
+    private void EvaluateMetaCommand_ShowBoundTree()
+    {
+        _showBoundTree = !_showBoundTree;
+        Console.WriteLine(_showBoundTree ? "Showing bound tree" : "Not showing bound tree");
+    }
+
+    [MetaCommand("emitControlFlows", "Toggles emission of the control flows of the submission as GraphViz diagrams.", Aliases = ["ecf"])]
+    private void EvaluateMetaCommand_EmitControlFlows()
+    {
+        _emitControlFlows = !_emitControlFlows;
+        Console.WriteLine(_emitControlFlows ? "Storing control flow graphs" : "Not storing control flow graphs");
+    }
+
+    [MetaCommand("reset", "Resets the current session.")]
+    private void EvaluateMetaCommand_Reset()
+    {
+        _previousCompilation = null;
+        _variables.Clear();
+        Console.WriteLine("Resetting compilation.");
     }
 
     protected override bool IsCompleteSubmission(string text)

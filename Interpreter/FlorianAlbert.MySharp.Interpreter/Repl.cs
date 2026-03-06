@@ -1,8 +1,10 @@
-﻿using FlorianAlbert.MySharp.Interpreter.LineRendering;
+﻿using FlorianAlbert.MySharp.Interpreter.Annotations;
+using FlorianAlbert.MySharp.Interpreter.LineRendering;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
-internal abstract class Repl
+[MetaCommandEvaluator(nameof(EvaluateMetaCommand))]
+internal abstract partial class Repl
 {
     protected const char _metaCommandPrefix = '/';
     private const string _exitString = "";
@@ -47,19 +49,28 @@ internal abstract class Repl
         return documentView.Text;
     }
 
-    protected virtual void EvaluateMetaCommand(string input)
+    //protected virtual void EvaluateMetaCommand(string input)
+    //{
+    //    if (input.Equals($"{_metaCommandPrefix}cls", StringComparison.OrdinalIgnoreCase))
+    //    {
+    //        Console.Write("\x1b[3J"); // Clear scrollback buffer
+    //        Console.Clear();
+    //    }
+    //    else
+    //    {
+    //        Console.ForegroundColor = ConsoleColor.DarkRed;
+    //        Console.Error.WriteLine($"Unknown command '{input}'.");
+    //        Console.ResetColor();
+    //    }
+    //}
+
+    public virtual partial void EvaluateMetaCommand(string input);
+
+    [MetaCommand("cls", "Clears the screen")]
+    private void EvaluateMetaCommand_Cls()
     {
-        if (input.Equals($"{_metaCommandPrefix}cls", StringComparison.OrdinalIgnoreCase))
-        {
-            Console.Write("\x1b[3J"); // Clear scrollback buffer
-            Console.Clear();
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.Error.WriteLine($"Unknown command '{input}'.");
-            Console.ResetColor();
-        }
+        Console.Write("\x1b[3J"); // Clear scrollback buffer
+        Console.Clear();
     }
 
     protected virtual bool IsCompleteSubmission(string text)
