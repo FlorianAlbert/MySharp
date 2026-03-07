@@ -18,13 +18,15 @@ public sealed class Compilation
 
     private Compilation(Compilation? previous, params IEnumerable<SyntaxTree> syntaxTrees)
     {
-        Previous = previous;
+        _Previous = previous;
         SyntaxTrees = [.. syntaxTrees];
     }
 
-    public Compilation? Previous { get; }
+    private Compilation? _Previous { get; }
 
     public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
+
+    public ImmutableArray<FunctionSymbol> Functions => CompilationUnit.GlobalScope.Functions;
 
     public bool HasDiagnostics => SyntaxTrees.SelectMany(syntaxTree => syntaxTree.Diagnostics).Any() || CompilationUnit.Diagnostics.Length > 0;
 
@@ -34,7 +36,7 @@ public sealed class Compilation
         {
             if (field is null)
             {
-                BoundCompilationUnit compilationUnit = Binder.BindCompilationUnit(Previous?.CompilationUnit, SyntaxTrees);
+                BoundCompilationUnit compilationUnit = Binder.BindCompilationUnit(_Previous?.CompilationUnit, SyntaxTrees);
                 Interlocked.CompareExchange(ref field, compilationUnit, null);
             }
 
@@ -143,6 +145,26 @@ public sealed class Compilation
             blockStatement.WriteTo(indentedTextWriter);
             indentedTextWriter.Indent--;
         }
+    }
+
+    public void EmitTree(FunctionSymbol functionSymbol, TextWriter writer)
+    {
+        IndentedTextWriter indentedTextWriter = writer as IndentedTextWriter ?? new IndentedTextWriter(writer);
+        BoundCompilationUnit? compilationUnit = CompilationUnit;
+        BoundBlockStatement? functionBody = null;
+        while (compilationUnit is not null && !compilationUnit.Program.FunctionBodies.TryGetValue(functionSymbol, out functionBody))
+        {
+            compilationUnit = compilationUnit.Previous;
+        }
+
+        if (functionBody is null)
+        {
+            throw new InvalidOperationException($"Function '{functionSymbol.Name}' not found in any compilation unit.");
+        }
+
+        functionSymbol.WriteTo(indentedTextWriter);
+        indentedTextWriter.WriteLine();
+        functionBody.WriteTo(indentedTextWriter);
     }
 
     public void EmitGraphVizControlFlow(string controlFlowsDirectory)

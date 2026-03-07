@@ -80,6 +80,21 @@ internal sealed partial class MySharpRepl : Repl
         Console.WriteLine("Resetting compilation.");
     }
 
+    [MetaCommand("dump", "Displays the bound tree of the given function.")]
+    private void EvaluateMetaCommand_Dump(string symbolName)
+    {
+        FunctionSymbol? function = _previousCompilation?.Functions.SingleOrDefault(symbol => symbol.Name.Equals(symbolName, StringComparison.Ordinal));
+        if (function is null)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Error.WriteLine($"Unknown function: {symbolName}");
+            Console.ResetColor();
+            return;
+        }
+
+        _previousCompilation!.EmitTree(function, Console.Out);
+    }
+
     protected override bool IsCompleteSubmission(string text)
     {
         if (base.IsCompleteSubmission(text))
