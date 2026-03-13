@@ -13,6 +13,7 @@ internal class MetaCommandEvaluatorModel
         string handlerMethodAccessibility,
         bool isHandlerMethodVirtual,
         bool isHandlerMethodOverride,
+        string? infoMethodName,
         IEnumerable<MetaCommandModel> metaCommands,
         IEnumerable<string> duplicateCommandNames,
         Location attributeLocation)
@@ -26,6 +27,7 @@ internal class MetaCommandEvaluatorModel
         HandlerMethodAccessibility = handlerMethodAccessibility;
         IsHandlerMethodVirtual = isHandlerMethodVirtual;
         IsHandlerMethodOverride = isHandlerMethodOverride;
+        InfoMethodName = infoMethodName;
         MetaCommands = metaCommands;
         DuplicateCommandNames = duplicateCommandNames;
         AttributeLocation = attributeLocation;
@@ -48,6 +50,8 @@ internal class MetaCommandEvaluatorModel
     public bool IsHandlerMethodVirtual { get; }
 
     public bool IsHandlerMethodOverride { get; }
+
+    public string? InfoMethodName { get; }
 
     public IEnumerable<MetaCommandModel> MetaCommands { get; }
 

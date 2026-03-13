@@ -3,7 +3,7 @@ using FlorianAlbert.MySharp.Interpreter.LineRendering;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
-[MetaCommandEvaluator(nameof(EvaluateMetaCommand))]
+[MetaCommandEvaluator(nameof(EvaluateMetaCommand), nameof(GetAvailableMetaCommandInfos))]
 internal abstract partial class Repl
 {
     protected const char _metaCommandPrefix = '/';
@@ -48,21 +48,6 @@ internal abstract partial class Repl
 
         return documentView.Text;
     }
-
-    //protected virtual void EvaluateMetaCommand(string input)
-    //{
-    //    if (input.Equals($"{_metaCommandPrefix}cls", StringComparison.OrdinalIgnoreCase))
-    //    {
-    //        Console.Write("\x1b[3J"); // Clear scrollback buffer
-    //        Console.Clear();
-    //    }
-    //    else
-    //    {
-    //        Console.ForegroundColor = ConsoleColor.DarkRed;
-    //        Console.Error.WriteLine($"Unknown command '{input}'.");
-    //        Console.ResetColor();
-    //    }
-    //}
 
     public virtual partial void EvaluateMetaCommand(string input);
 

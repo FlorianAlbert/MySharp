@@ -55,6 +55,10 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
             .ConstructorArguments.FirstOrDefault();
         string? handlerMethodName = firstMetaCommandEvaluatorConstructorArgument?.IsNull ?? true ? null : firstMetaCommandEvaluatorConstructorArgument?.Value as string;
 
+        TypedConstant? secondMetaCommandEvaluatorConstructorArgument = metaCommandEvaluatorAttribute?
+            .ConstructorArguments.Skip(1).FirstOrDefault();
+        string? infoMethodName = secondMetaCommandEvaluatorConstructorArgument?.IsNull ?? true ? null : secondMetaCommandEvaluatorConstructorArgument?.Value as string;
+
         IEnumerable<IMethodSymbol> typeMethods = typeSymbol.GetMembers()
             .Where(member => member.Kind is SymbolKind.Method)
             .Cast<IMethodSymbol>();
@@ -97,7 +101,7 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
             .Where(g => g.Count() > 1)
             .Select(g => g.Key);
 
-        return new MetaCommandEvaluatorModel(containingNamespace, evaluatorTypeName, typeAccessibility, isTypeAbstract, isTypeSealed, handlerMethodName, handlerMethodAccessibility, isHandlerMethodVirtual, isHandlerMethodOverride, metaCommandCandidates, duplicateNames, attributeLocation);
+        return new MetaCommandEvaluatorModel(containingNamespace, evaluatorTypeName, typeAccessibility, isTypeAbstract, isTypeSealed, handlerMethodName, handlerMethodAccessibility, isHandlerMethodVirtual, isHandlerMethodOverride, infoMethodName, metaCommandCandidates, duplicateNames, attributeLocation);
     }
 
     private static string AccessibilityToKeyword(Accessibility accessibility)
@@ -321,12 +325,109 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
         }
         else
         {
+            // /help dispatch (only in the root handler, not in overrides — they fall through to base)
+            if (metaCommandEvaluatorModel.InfoMethodName is not null)
+            {
+                sb.AppendLine(indent + "if (string.Equals(commandName, \"help\", global::System.StringComparison.OrdinalIgnoreCase))");
+                sb.AppendLine(indent + "{");
+                sb.AppendLine(indent + "    if (args.Count == 0)");
+                sb.AppendLine(indent + "    {");
+                sb.AppendLine(indent + "        var metaCommandInfos = global::System.Linq.Enumerable.ToList(" + metaCommandEvaluatorModel.InfoMethodName + "());");
+                sb.AppendLine(indent + "        var prefixes = new global::System.Collections.Generic.List<string>(metaCommandInfos.Count);");
+                sb.AppendLine(indent + "        int maxLen = 0;");
+                sb.AppendLine(indent + "        foreach (var info in metaCommandInfos)");
+                sb.AppendLine(indent + "        {");
+                sb.AppendLine(indent + "            string aliasText = info.Aliases.Length > 0");
+                sb.AppendLine(indent + "                ? \" (aliases: \" + string.Join(\", \", global::System.Linq.Enumerable.Select(info.Aliases, a => \"/\" + a)) + \")\"");
+                sb.AppendLine(indent + "                : \"\";");
+                sb.AppendLine(indent + "            string prefix = \"/\" + info.Name + aliasText;");
+                sb.AppendLine(indent + "            prefixes.Add(prefix);");
+                sb.AppendLine(indent + "            if (prefix.Length > maxLen) maxLen = prefix.Length;");
+                sb.AppendLine(indent + "        }");
+                sb.AppendLine(indent + "        for (int i = 0; i < metaCommandInfos.Count; i++)");
+                sb.AppendLine(indent + "        {");
+                sb.AppendLine(indent + "            global::System.Console.WriteLine(prefixes[i].PadRight(maxLen + 3) + metaCommandInfos[i].Description);");
+                sb.AppendLine(indent + "        }");
+                sb.AppendLine(indent + "        return;");
+                sb.AppendLine(indent + "    }");
+                sb.AppendLine(indent + "    global::System.Console.ForegroundColor = global::System.ConsoleColor.DarkRed;");
+                sb.AppendLine(indent + "    global::System.Console.Error.WriteLine(\"Command 'help' expects 0 argument(s), but got \" + args.Count + \".\");");
+                sb.AppendLine(indent + "    global::System.Console.ResetColor();");
+                sb.AppendLine(indent + "    return;");
+                sb.AppendLine(indent + "}");
+                sb.AppendLine();
+            }
+
             sb.AppendLine(indent + "global::System.Console.ForegroundColor = global::System.ConsoleColor.DarkRed;");
             sb.AppendLine(indent + "global::System.Console.Error.WriteLine($\"Unknown command '{input}'.\");");
             sb.AppendLine(indent + "global::System.Console.ResetColor();");
         }
 
         sb.AppendLine("    }");
+
+        // Info method — emits metadata about all meta commands for /help
+        if (metaCommandEvaluatorModel.InfoMethodName is not null)
+        {
+            sb.AppendLine();
+            sb.Append("    protected");
+            if (metaCommandEvaluatorModel.IsHandlerMethodOverride)
+            {
+                sb.Append(" override");
+            }
+            else
+            {
+                sb.Append(" virtual");
+            }
+            sb.AppendLine(" global::System.Collections.Generic.IEnumerable<(string Name, string Description, string[] Aliases)> " + metaCommandEvaluatorModel.InfoMethodName + "()");
+            sb.AppendLine("    {");
+
+            if (metaCommandEvaluatorModel.IsHandlerMethodOverride)
+            {
+                // Override: concat own commands onto base
+                sb.Append(indent + "return global::System.Linq.Enumerable.Concat(base." + metaCommandEvaluatorModel.InfoMethodName + "(), ");
+                sb.AppendLine("new (string Name, string Description, string[] Aliases)[]");
+                sb.AppendLine(indent + "{");
+            }
+            else
+            {
+                // Root: return own commands + hardcoded help entry
+                sb.AppendLine(indent + "return new (string Name, string Description, string[] Aliases)[]");
+                sb.AppendLine(indent + "{");
+                sb.AppendLine(indent + "    (\"help\", \"Lists all available meta commands.\", new string[] { }),");
+            }
+
+            foreach (MetaCommandModel metaCommand in metaCommandEvaluatorModel.MetaCommands)
+            {
+                StringBuilder aliasArray = new();
+                aliasArray.Append("new string[] { ");
+                bool firstAlias = true;
+                foreach (string alias in metaCommand.Aliases)
+                {
+                    if (!firstAlias)
+                    {
+                        aliasArray.Append(", ");
+                    }
+
+                    aliasArray.Append("\"" + alias + "\"");
+                    firstAlias = false;
+                }
+                aliasArray.Append(" }");
+
+                sb.AppendLine(indent + "    (\"" + metaCommand.Name + "\", \"" + metaCommand.Description + "\", " + aliasArray + "),");
+            }
+
+            if (metaCommandEvaluatorModel.IsHandlerMethodOverride)
+            {
+                sb.AppendLine(indent + "});");
+            }
+            else
+            {
+                sb.AppendLine(indent + "};");
+            }
+
+            sb.AppendLine("    }");
+        }
+
         sb.AppendLine("}");
 
         context.AddSource(metaCommandEvaluatorModel.EvaluatorTypeName + ".g.cs", sb.ToString());

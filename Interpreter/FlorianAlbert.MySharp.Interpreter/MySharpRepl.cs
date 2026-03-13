@@ -7,7 +7,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
-[MetaCommandEvaluator(nameof(EvaluateMetaCommand))]
+[MetaCommandEvaluator(nameof(EvaluateMetaCommand), nameof(GetAvailableMetaCommandInfos))]
 internal sealed partial class MySharpRepl : Repl
 {
     private Compilation? _previousCompilation;
@@ -19,35 +19,6 @@ internal sealed partial class MySharpRepl : Repl
     public MySharpRepl() : base(new MySharpLineRenderer())
     {
     }
-
-    //protected override void EvaluateMetaCommand(string input)
-    //{
-    //    if (input.Equals($"{_metaCommandPrefix}showSyntaxTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sst", StringComparison.OrdinalIgnoreCase))
-    //    {
-    //        _showSyntaxTree = !_showSyntaxTree;
-    //        Console.WriteLine(_showSyntaxTree ? "Showing syntax tree" : "Not showing syntax tree");
-    //    }
-    //    else if (input.Equals($"{_metaCommandPrefix}showBoundTree", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}sbt", StringComparison.OrdinalIgnoreCase))
-    //    {
-    //        _showBoundTree = !_showBoundTree;
-    //        Console.WriteLine(_showBoundTree ? "Showing bound tree" : "Not showing bound tree");
-    //    }
-    //    else if (input.Equals($"{_metaCommandPrefix}emitControlFlows", StringComparison.OrdinalIgnoreCase) || input.Equals($"{_metaCommandPrefix}ecf", StringComparison.OrdinalIgnoreCase))
-    //    {
-    //        _emitControlFlows = !_emitControlFlows;
-    //        Console.WriteLine(_emitControlFlows ? "Storing control flow graphs" : "Not storing control flow graphs");
-    //    }
-    //    else if (input.Equals($"{_metaCommandPrefix}reset", StringComparison.OrdinalIgnoreCase))
-    //    {
-    //        _previousCompilation = null;
-    //        _variables.Clear();
-    //        Console.WriteLine("Resetting compilation.");
-    //    }
-    //    else
-    //    {
-    //        base.EvaluateMetaCommand(input);
-    //    }
-    //}
 
     public override partial void EvaluateMetaCommand(string input);
 
