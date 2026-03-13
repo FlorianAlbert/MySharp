@@ -3,7 +3,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 
-internal static class SymbolExtensions
+public static class SymbolExtensions
 {
     extension(Symbol symbol)
     {

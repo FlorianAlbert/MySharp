@@ -26,7 +26,38 @@ public sealed class Compilation
 
     public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
 
-    public ImmutableArray<FunctionSymbol> Functions => CompilationUnit.GlobalScope.Functions;
+    private ImmutableArray<Symbol>? _symbols;
+    public ImmutableArray<Symbol> Symbols => GetOrCreateCombinedSymbols(ref _symbols, CompilationUnit.GlobalScope.Symbols, _Previous?.Symbols ?? []);
+
+    private ImmutableArray<FunctionSymbol>? _functions;
+    public ImmutableArray<FunctionSymbol> Functions => GetOrCreateCombinedSymbols(ref _functions, CompilationUnit.GlobalScope.Functions, _Previous?.Functions ?? []);
+
+    private ImmutableArray<VariableSymbol>? _variables;
+    public ImmutableArray<VariableSymbol> Variables => GetOrCreateCombinedSymbols(ref _variables, CompilationUnit.GlobalScope.Variables, _Previous?.Variables ?? []);
+
+    private ImmutableArray<TSymbol> GetOrCreateCombinedSymbols<TSymbol>(ref ImmutableArray<TSymbol>? field, ImmutableArray<TSymbol> currentCompilationUnitSymbols, ImmutableArray<TSymbol> previousCompilationUnitSymbols)
+        where TSymbol : Symbol
+    {
+        if (field is null)
+        {
+            ImmutableArray<TSymbol> symbols = GetAllSymbols(currentCompilationUnitSymbols, previousCompilationUnitSymbols);
+            Interlocked.CompareExchange(ref field, symbols, null);
+        }
+
+        return field.Value;
+    }
+
+    private ImmutableArray<TSymbol> GetAllSymbols<TSymbol>(ImmutableArray<TSymbol> currentCompilationUnitSymbols, ImmutableArray<TSymbol> previousCompilationUnitSymbols)
+        where TSymbol : Symbol
+    {
+        ImmutableArray<TSymbol>.Builder builder = ImmutableArray.CreateBuilder<TSymbol>();
+        builder.AddRange(currentCompilationUnitSymbols);
+        HashSet<string> seenSymbolNames = [.. currentCompilationUnitSymbols.Select(symbol => symbol.Name)];
+        
+        builder.AddRange(previousCompilationUnitSymbols.Where(symbol => !seenSymbolNames.Contains(symbol.Name)));
+
+        return builder.ToImmutable();
+    }
 
     public bool HasDiagnostics => SyntaxTrees.SelectMany(syntaxTree => syntaxTree.Diagnostics).Any() || CompilationUnit.Diagnostics.Length > 0;
 

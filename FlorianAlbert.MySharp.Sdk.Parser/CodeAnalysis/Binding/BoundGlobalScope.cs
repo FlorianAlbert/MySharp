@@ -9,10 +9,13 @@ internal sealed class BoundGlobalScope
         ImmutableArray<FunctionSymbol> functionSymbols,
         BoundBlockStatement boundStatement)
     {
+        Symbols = [.. variableSymbols, .. functionSymbols];
         Variables = variableSymbols;
         Functions = functionSymbols;
         Statement = boundStatement;
     }
+
+    public ImmutableArray<Symbol> Symbols { get; }
 
     public ImmutableArray<VariableSymbol> Variables { get; }
 

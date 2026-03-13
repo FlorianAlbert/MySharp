@@ -4,6 +4,8 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
+using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
+using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
@@ -80,6 +82,17 @@ internal sealed partial class MySharpRepl : Repl
 
         string code = File.ReadAllText(filePath);
         EvaluateSubmission(code);
+    }
+
+    [MetaCommand("ls", "Lists all loaded symbols.")]
+    private void EvaluateMetaCommand_ListSymbols()
+    {
+        IEnumerable<Symbol> symbols = _previousCompilation?.Symbols.OrderBy(symbol => symbol.Kind).ThenBy(symbol => symbol.Name) ?? Enumerable.Empty<Symbol>();
+        foreach (Symbol symbol in symbols)
+        {
+            symbol.WriteTo(Console.Out);
+            Console.WriteLine();
+        }
     }
 
     protected override bool IsCompleteSubmission(string text)
