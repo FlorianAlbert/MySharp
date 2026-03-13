@@ -5,13 +5,13 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
-using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
 [MetaCommandEvaluator(nameof(EvaluateMetaCommand), nameof(GetAvailableMetaCommandInfos))]
 internal sealed partial class MySharpRepl : Repl
 {
+    private bool _saveSubmissions = true;
     private Compilation? _previousCompilation;
     private bool _showSyntaxTree;
     private bool _showBoundTree;
@@ -20,6 +20,7 @@ internal sealed partial class MySharpRepl : Repl
 
     public MySharpRepl() : base(new MySharpLineRenderer())
     {
+        LoadSubmissions();
     }
 
     public override partial void EvaluateMetaCommand(string input);
@@ -50,6 +51,9 @@ internal sealed partial class MySharpRepl : Repl
     {
         _previousCompilation = null;
         _variables.Clear();
+
+        ClearSubmissions();
+
         Console.WriteLine("Resetting compilation.");
     }
 
@@ -174,8 +178,71 @@ internal sealed partial class MySharpRepl : Repl
             }
 
             _previousCompilation = compilation;
+
+            SaveSubmission(text);
         }
 
         return true;
+    }
+
+    private void SaveSubmission(string text)
+    {
+        if (!_saveSubmissions)
+        {
+            return;
+        }
+
+        string submissionsDirectory = GetSubmissionsPath();
+        Directory.CreateDirectory(submissionsDirectory);
+
+        int submissionIndex = Directory.GetFiles(submissionsDirectory).Length;
+        string submissionFilePath = Path.Combine(submissionsDirectory, $"submission{submissionIndex:0000}.ms");
+
+        File.WriteAllText(submissionFilePath, text);
+    }
+
+    private static void ClearSubmissions()
+    {
+        string submissionsDirectory = GetSubmissionsPath();
+        if (Directory.Exists(submissionsDirectory))
+        {
+            Directory.Delete(submissionsDirectory, recursive: true);
+        }
+    }
+
+    private void LoadSubmissions()
+    {
+        string submissionsDirectory = GetSubmissionsPath();
+        if (!Directory.Exists(submissionsDirectory))
+        {
+            return;
+        }
+
+        _saveSubmissions = false;
+
+        try
+        {
+            List<string> submissionFiles = [.. Directory.GetFiles(submissionsDirectory).OrderBy(file => file)];
+            foreach (string submissionFile in submissionFiles)
+            {
+                string submissionText = File.ReadAllText(submissionFile);
+                EvaluateSubmission(submissionText);
+            }
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"Loaded {submissionFiles.Count} submissions from previous sessions.");
+            Console.ResetColor();
+        }
+        finally
+        {
+            _saveSubmissions = true;
+        }
+    }
+
+    private static string GetSubmissionsPath()
+    {
+        string localAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string submissionsDirectory = Path.Combine(localAppDataPath, "MySharp", "Submissions");
+        return submissionsDirectory;
     }
 }
