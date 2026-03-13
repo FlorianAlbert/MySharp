@@ -66,6 +66,22 @@ internal sealed partial class MySharpRepl : Repl
         _previousCompilation!.EmitTree(function, Console.Out);
     }
 
+    [MetaCommand("load", "Loads and evaluates the MySharp code in the given file.")]
+    private void EvaluateMetaCommand_Load(string filePath)
+    {
+        filePath = Path.GetFullPath(filePath);
+        if (!File.Exists(filePath))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Error.WriteLine($"File not found: '{filePath}'");
+            Console.ResetColor();
+            return;
+        }
+
+        string code = File.ReadAllText(filePath);
+        EvaluateSubmission(code);
+    }
+
     protected override bool IsCompleteSubmission(string text)
     {
         if (base.IsCompleteSubmission(text))
