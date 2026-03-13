@@ -38,11 +38,7 @@ public sealed class Compilation
     private ImmutableArray<TSymbol> GetOrCreateCombinedSymbols<TSymbol>(ref ImmutableArray<TSymbol>? field, ImmutableArray<TSymbol> currentCompilationUnitSymbols, ImmutableArray<TSymbol> previousCompilationUnitSymbols)
         where TSymbol : Symbol
     {
-        if (field is null)
-        {
-            ImmutableArray<TSymbol> symbols = GetAllSymbols(currentCompilationUnitSymbols, previousCompilationUnitSymbols);
-            Interlocked.CompareExchange(ref field, symbols, null);
-        }
+        field ??= GetAllSymbols(currentCompilationUnitSymbols, previousCompilationUnitSymbols);
 
         return field.Value;
     }
