@@ -332,7 +332,8 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
                 sb.AppendLine(indent + "{");
                 sb.AppendLine(indent + "    if (args.Count == 0)");
                 sb.AppendLine(indent + "    {");
-                sb.AppendLine(indent + "        var metaCommandInfos = global::System.Linq.Enumerable.ToList(" + metaCommandEvaluatorModel.InfoMethodName + "());");
+                sb.AppendLine(indent + "        var orderedMetaCommandInfos = global::System.Linq.Enumerable.OrderBy(" + metaCommandEvaluatorModel.InfoMethodName + "(), info => info.Name, global::System.StringComparer.OrdinalIgnoreCase);");
+                sb.AppendLine(indent + "        var metaCommandInfos = global::System.Linq.Enumerable.ToList(orderedMetaCommandInfos);");
                 sb.AppendLine(indent + "        var prefixes = new global::System.Collections.Generic.List<string>(metaCommandInfos.Count);");
                 sb.AppendLine(indent + "        int maxLen = 0;");
                 sb.AppendLine(indent + "        foreach (var info in metaCommandInfos)");
