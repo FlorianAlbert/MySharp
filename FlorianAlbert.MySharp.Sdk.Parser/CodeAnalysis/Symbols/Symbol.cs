@@ -40,24 +40,4 @@ public abstract class Symbol
         private readonly ImmutableHashSet<Symbol> _all;
         public override ImmutableHashSet<Symbol> GetAll() => _all;
     }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is not Symbol other)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return Kind == other.Kind && Name.Equals(other.Name, StringComparison.Ordinal);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Kind, Name);
-    }
 }

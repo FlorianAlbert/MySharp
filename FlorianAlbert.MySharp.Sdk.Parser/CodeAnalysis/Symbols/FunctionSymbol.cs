@@ -17,53 +17,6 @@ public sealed class FunctionSymbol : SymbolWithBuiltIns<FunctionSymbol, Function
 
     public TypeSymbol ReturnType { get; }
 
-    public override bool Equals(object? obj)
-    {
-        if (!base.Equals(obj))
-        {
-            return false;
-        }
-
-        if (obj is not FunctionSymbol other)
-        {
-            return false;
-        }
-
-        if (!ReturnType.Equals(other.ReturnType))
-        {
-            return false;
-        }
-
-        if (Parameters.Length != other.Parameters.Length)
-        {
-            return false;
-        }
-
-        for (int parameterIndex = 0; parameterIndex < Parameters.Length; parameterIndex++)
-        {
-            if (!Parameters[parameterIndex].Equals(other.Parameters[parameterIndex]))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public override int GetHashCode()
-    {
-        HashCode hash = new();
-        hash.Add(base.GetHashCode());
-        hash.Add(ReturnType);
-
-        foreach (ParameterSymbol parameter in Parameters)
-        {
-            hash.Add(parameter);
-        }
-
-        return hash.ToHashCode();
-    }
-
     public class BuiltInFunctions : BuiltInSymbols<FunctionSymbol>
     {
         public BuiltInFunctions()
