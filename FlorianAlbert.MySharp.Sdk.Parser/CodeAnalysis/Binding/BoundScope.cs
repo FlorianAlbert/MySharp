@@ -54,7 +54,7 @@ internal sealed class BoundScope
         return true;
     }
 
-    public ImmutableArray<TSymbol> GetDeclaredSymbols<TSymbol>()
+    public ImmutableHashSet<TSymbol> GetDeclaredSymbols<TSymbol>()
     {
         if (_symbols is null)
         {
@@ -84,7 +84,7 @@ internal sealed class BoundScope
         return TryDeclareSymbol(variable);
     }
 
-    public ImmutableArray<VariableSymbol> GetDeclaredVariables()
+    public ImmutableHashSet<VariableSymbol> GetDeclaredVariables()
     {
         return GetDeclaredSymbols<VariableSymbol>();
     }
@@ -99,7 +99,7 @@ internal sealed class BoundScope
         return TryDeclareSymbol(function);
     }
 
-    public ImmutableArray<FunctionSymbol> GetDeclaredFunctions()
+    public ImmutableHashSet<FunctionSymbol> GetDeclaredFunctions()
     {
         return GetDeclaredSymbols<FunctionSymbol>();
     }
@@ -114,7 +114,7 @@ internal sealed class BoundScope
         return TryDeclareSymbol(type);
     }
 
-    public ImmutableArray<TypeSymbol> GetDeclaredTypes()
+    public ImmutableHashSet<TypeSymbol> GetDeclaredTypes()
     {
         return GetDeclaredSymbols<TypeSymbol>();
     }

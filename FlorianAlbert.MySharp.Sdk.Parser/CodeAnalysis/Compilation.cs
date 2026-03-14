@@ -24,40 +24,40 @@ public sealed class Compilation
 
     private Compilation? _Previous { get; }
 
-    public ImmutableArray<SyntaxTree> SyntaxTrees { get; }
+    public ImmutableHashSet<SyntaxTree> SyntaxTrees { get; }
 
-    private ImmutableArray<Symbol>? _symbols;
-    public ImmutableArray<Symbol> Symbols => GetOrCreateCombinedSymbols(ref _symbols, CompilationUnit.GlobalScope.Symbols, _Previous?.Symbols ?? []);
+    private ImmutableHashSet<Symbol>? _symbols;
+    public ImmutableHashSet<Symbol> Symbols => GetOrCreateCombinedSymbols(ref _symbols, CompilationUnit.GlobalScope.Symbols, _Previous?.Symbols ?? []);
 
-    private ImmutableArray<FunctionSymbol>? _functions;
-    public ImmutableArray<FunctionSymbol> Functions => GetOrCreateCombinedSymbols(ref _functions, CompilationUnit.GlobalScope.Functions, _Previous?.Functions ?? []);
+    private ImmutableHashSet<FunctionSymbol>? _functions;
+    public ImmutableHashSet<FunctionSymbol> Functions => GetOrCreateCombinedSymbols(ref _functions, CompilationUnit.GlobalScope.Functions, _Previous?.Functions ?? []);
 
-    private ImmutableArray<VariableSymbol>? _variables;
-    public ImmutableArray<VariableSymbol> Variables => GetOrCreateCombinedSymbols(ref _variables, CompilationUnit.GlobalScope.Variables, _Previous?.Variables ?? []);
+    private ImmutableHashSet<VariableSymbol>? _variables;
+    public ImmutableHashSet<VariableSymbol> Variables => GetOrCreateCombinedSymbols(ref _variables, CompilationUnit.GlobalScope.Variables, _Previous?.Variables ?? []);
 
-    private ImmutableArray<TSymbol> GetOrCreateCombinedSymbols<TSymbol>(ref ImmutableArray<TSymbol>? field, ImmutableArray<TSymbol> currentCompilationUnitSymbols, ImmutableArray<TSymbol> previousCompilationUnitSymbols)
+    private ImmutableHashSet<TSymbol> GetOrCreateCombinedSymbols<TSymbol>(ref ImmutableHashSet<TSymbol>? field, ImmutableHashSet<TSymbol> currentCompilationUnitSymbols, ImmutableHashSet<TSymbol> previousCompilationUnitSymbols)
         where TSymbol : Symbol
     {
         field ??= GetAllSymbols(currentCompilationUnitSymbols, previousCompilationUnitSymbols);
 
-        return field.Value;
+        return field;
     }
 
-    private ImmutableArray<TSymbol> GetAllSymbols<TSymbol>(ImmutableArray<TSymbol> currentCompilationUnitSymbols, ImmutableArray<TSymbol> previousCompilationUnitSymbols)
+    private ImmutableHashSet<TSymbol> GetAllSymbols<TSymbol>(ImmutableHashSet<TSymbol> currentCompilationUnitSymbols, ImmutableHashSet<TSymbol> previousCompilationUnitSymbols)
         where TSymbol : Symbol
     {
-        ImmutableArray<TSymbol>.Builder builder = ImmutableArray.CreateBuilder<TSymbol>();
+        ImmutableHashSet<TSymbol>.Builder builder = ImmutableHashSet.CreateBuilder<TSymbol>();
         HashSet<string> seenSymbolNames = [.. currentCompilationUnitSymbols.Select(symbol => symbol.Name)];
 
-        builder.AddRange(currentCompilationUnitSymbols);
+        builder.UnionWith(currentCompilationUnitSymbols);
 
         if (_Previous is null)
         {
-            builder.AddRange(Symbol.BuiltIns.GetAll().OfType<TSymbol>().Where(symbol => seenSymbolNames.Add(symbol.Name)));
+            builder.UnionWith(Symbol.BuiltIns.GetAll().OfType<TSymbol>().Where(symbol => seenSymbolNames.Add(symbol.Name)));
         }
         else
         {
-            builder.AddRange(previousCompilationUnitSymbols.Where(symbol => seenSymbolNames.Add(symbol.Name)));
+            builder.UnionWith(previousCompilationUnitSymbols.Where(symbol => seenSymbolNames.Add(symbol.Name)));
         }
 
         return builder.ToImmutable();
@@ -151,7 +151,7 @@ public sealed class Compilation
     {
         IndentedTextWriter indentedTextWriter = writer as IndentedTextWriter ?? new IndentedTextWriter(writer);
 
-        if (CompilationUnit.GlobalScope.Functions.Length > 0)
+        if (CompilationUnit.GlobalScope.Functions.Count > 0)
         {
             indentedTextWriter.WriteLine("Functions:");
             indentedTextWriter.Indent++;

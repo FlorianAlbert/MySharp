@@ -30,7 +30,7 @@ internal sealed class Binder
         return new BoundLabel($"<Binder_Label{_labelCounter++}>");
     }
 
-    public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, ImmutableArray<SyntaxTree> syntaxTrees)
+    public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, ImmutableHashSet<SyntaxTree> syntaxTrees)
     {
         BoundScope parentScope = CreateParentScope(previous);
         Binder binder = new(parentScope);
@@ -141,8 +141,8 @@ internal sealed class Binder
 
         BoundBlockStatement loweredStatement = Lowerer.Lower(boundStatement);
 
-        ImmutableArray<VariableSymbol> variables = _scope.GetDeclaredVariables();
-        ImmutableArray<FunctionSymbol> functions = _scope.GetDeclaredFunctions();
+        ImmutableHashSet<VariableSymbol> variables = _scope.GetDeclaredVariables();
+        ImmutableHashSet<FunctionSymbol> functions = _scope.GetDeclaredFunctions();
 
         return new BoundGlobalScope(variables, functions, loweredStatement);
     }

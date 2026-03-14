@@ -5,8 +5,8 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
 internal sealed class BoundGlobalScope
 {
-    public BoundGlobalScope(ImmutableArray<VariableSymbol> variableSymbols,
-        ImmutableArray<FunctionSymbol> functionSymbols,
+    public BoundGlobalScope(ImmutableHashSet<VariableSymbol> variableSymbols,
+        ImmutableHashSet<FunctionSymbol> functionSymbols,
         BoundBlockStatement boundStatement)
     {
         Symbols = [.. variableSymbols, .. functionSymbols];
@@ -15,11 +15,11 @@ internal sealed class BoundGlobalScope
         Statement = boundStatement;
     }
 
-    public ImmutableArray<Symbol> Symbols { get; }
+    public ImmutableHashSet<Symbol> Symbols { get; }
 
-    public ImmutableArray<VariableSymbol> Variables { get; }
+    public ImmutableHashSet<VariableSymbol> Variables { get; }
 
-    public ImmutableArray<FunctionSymbol> Functions { get; }
+    public ImmutableHashSet<FunctionSymbol> Functions { get; }
 
     public BoundBlockStatement Statement { get; }
 }
