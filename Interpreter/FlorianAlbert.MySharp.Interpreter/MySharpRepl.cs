@@ -5,7 +5,6 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Evaluation;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax;
 using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
-using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Interpreter;
 
