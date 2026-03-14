@@ -47,10 +47,18 @@ public sealed class Compilation
         where TSymbol : Symbol
     {
         ImmutableArray<TSymbol>.Builder builder = ImmutableArray.CreateBuilder<TSymbol>();
-        builder.AddRange(currentCompilationUnitSymbols);
         HashSet<string> seenSymbolNames = [.. currentCompilationUnitSymbols.Select(symbol => symbol.Name)];
-        
-        builder.AddRange(previousCompilationUnitSymbols.Where(symbol => !seenSymbolNames.Contains(symbol.Name)));
+
+        builder.AddRange(currentCompilationUnitSymbols);
+
+        if (_Previous is null)
+        {
+            builder.AddRange(Symbol.BuiltIns.GetAll().OfType<TSymbol>().Where(symbol => seenSymbolNames.Add(symbol.Name)));
+        }
+        else
+        {
+            builder.AddRange(previousCompilationUnitSymbols.Where(symbol => seenSymbolNames.Add(symbol.Name)));
+        }
 
         return builder.ToImmutable();
     }

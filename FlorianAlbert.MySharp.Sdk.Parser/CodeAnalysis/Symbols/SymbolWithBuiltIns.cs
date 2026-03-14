@@ -8,5 +8,5 @@ public abstract class SymbolWithBuiltIns<TSymbol, TBuiltInSymbols> : Symbol
     {
     }
 
-    public static TBuiltInSymbols BuiltIns { get; } = new();
+    public static new TBuiltInSymbols BuiltIns { get; } = new();
 }
