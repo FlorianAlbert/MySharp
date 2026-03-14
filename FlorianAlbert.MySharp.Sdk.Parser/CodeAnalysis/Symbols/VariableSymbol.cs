@@ -13,4 +13,24 @@ public class VariableSymbol : Symbol
     public bool IsReadOnly { get; }
 
     public TypeSymbol Type { get; }
+
+    public override bool Equals(object? obj)
+    {
+        if (!base.Equals(obj))
+        {
+            return false;
+        }
+
+        if (obj is not VariableSymbol other)
+        {
+            return false;
+        }
+
+        return IsReadOnly == other.IsReadOnly && Type.Equals(other.Type);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(base.GetHashCode(), IsReadOnly, Type);
+    }
 }

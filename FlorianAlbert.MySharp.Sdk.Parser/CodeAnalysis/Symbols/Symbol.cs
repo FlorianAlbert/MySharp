@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 
-public abstract class Symbol : IEquatable<Symbol>
+public abstract class Symbol
 {
     private protected Symbol(string name)
     {
@@ -41,23 +41,19 @@ public abstract class Symbol : IEquatable<Symbol>
         public override ImmutableHashSet<Symbol> GetAll() => _all;
     }
 
-    public bool Equals(Symbol? other)
+    public override bool Equals(object? obj)
     {
-        if (other is null)
+        if (obj is not Symbol other)
         {
             return false;
         }
+
         if (ReferenceEquals(this, other))
         {
             return true;
         }
 
         return Kind == other.Kind && Name.Equals(other.Name, StringComparison.Ordinal);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj is Symbol symbol && Equals(symbol);
     }
 
     public override int GetHashCode()
