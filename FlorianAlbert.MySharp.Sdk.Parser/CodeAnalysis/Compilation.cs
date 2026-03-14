@@ -192,6 +192,14 @@ public sealed class Compilation
             compilationUnit = compilationUnit.Previous;
         }
 
+        if (FunctionSymbol.BuiltIns.GetAll().Contains(functionSymbol))
+        {
+            functionSymbol.WriteTo(indentedTextWriter);
+            indentedTextWriter.WriteLine();
+
+            return;
+        }
+
         if (functionBody is null)
         {
             throw new InvalidOperationException($"Function '{functionSymbol.Name}' not found in any compilation unit.");

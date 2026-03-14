@@ -25,13 +25,19 @@ public abstract class Symbol
 
     public class BuiltInSymbols : BuiltInSymbols<Symbol>
     {
-        public FunctionSymbol.BuiltInFunctions Functions => FunctionSymbol.BuiltIns;
-
-        public TypeSymbol.BuiltInTypes Types => TypeSymbol.BuiltIns;
-
-        public override ImmutableArray<Symbol> GetAll()
+        public BuiltInSymbols()
         {
-            return [.. Functions.GetAll(), .. Types.GetAll()];
+            Functions = FunctionSymbol.BuiltIns;
+            Types = TypeSymbol.BuiltIns;
+
+            _all = [.. Functions.GetAll(), .. Types.GetAll()];
         }
+
+        public readonly FunctionSymbol.BuiltInFunctions Functions;
+
+        public readonly TypeSymbol.BuiltInTypes Types;
+
+        private readonly ImmutableHashSet<Symbol> _all;
+        public override ImmutableHashSet<Symbol> GetAll() => _all;
     }
 }

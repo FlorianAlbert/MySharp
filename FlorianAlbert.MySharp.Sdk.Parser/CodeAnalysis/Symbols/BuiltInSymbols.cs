@@ -5,5 +5,5 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 public abstract class BuiltInSymbols<TSymbol>
      where TSymbol : Symbol
 {
-    public abstract ImmutableArray<TSymbol> GetAll();
+    public abstract ImmutableHashSet<TSymbol> GetAll();
 }

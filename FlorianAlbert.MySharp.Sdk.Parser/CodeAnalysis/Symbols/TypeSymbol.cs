@@ -16,14 +16,25 @@ public sealed class TypeSymbol : SymbolWithBuiltIns<TypeSymbol, TypeSymbol.Built
 
     public class BuiltInTypes : BuiltInSymbols<TypeSymbol>
     {
-        public readonly TypeSymbol Bool = new("bool");
+        public BuiltInTypes()
+        {
+            Bool = new("bool");
+            Int32 = new("int32");
+            String = new("string");
+            Character = new("char");
 
-        public readonly TypeSymbol Int32 = new("int32");
+            _all = [Bool, Int32, String, Character];
+        }
 
-        public readonly TypeSymbol String = new("string");
+        public readonly TypeSymbol Bool;
 
-        public readonly TypeSymbol Character = new("char");
+        public readonly TypeSymbol Int32;
 
-        public override ImmutableArray<TypeSymbol> GetAll() => [Bool, Int32, String, Character];
+        public readonly TypeSymbol String;
+
+        public readonly TypeSymbol Character;
+
+        private readonly ImmutableHashSet<TypeSymbol> _all;
+        public override ImmutableHashSet<TypeSymbol> GetAll() => _all;
     }
 }

@@ -62,6 +62,15 @@ internal sealed partial class MySharpRepl : Repl
     private void EvaluateMetaCommand_Dump(string symbolName)
     {
         FunctionSymbol? function = _previousCompilation?.Functions.SingleOrDefault(symbol => symbol.Name.Equals(symbolName, StringComparison.Ordinal));
+
+        if (function is not null)
+        {
+            _previousCompilation!.EmitTree(function, Console.Out);
+            return;
+        }
+
+        function = FunctionSymbol.BuiltIns.GetAll().SingleOrDefault(symbol => symbol.Name.Equals(symbolName, StringComparison.Ordinal));
+
         if (function is null)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -70,7 +79,8 @@ internal sealed partial class MySharpRepl : Repl
             return;
         }
 
-        _previousCompilation!.EmitTree(function, Console.Out);
+        function.WriteTo(Console.Out);
+        Console.WriteLine();
     }
 
     [MetaCommand("load", "Loads and evaluates the MySharp code in the given file.")]
@@ -92,7 +102,7 @@ internal sealed partial class MySharpRepl : Repl
     [MetaCommand("ls", "Lists all loaded symbols.")]
     private void EvaluateMetaCommand_ListSymbols()
     {
-        ImmutableArray<Symbol> symbols = _previousCompilation?.Symbols ?? Symbol.BuiltIns.GetAll();
+        IEnumerable<Symbol> symbols = (IEnumerable<Symbol>?) _previousCompilation?.Symbols ?? Symbol.BuiltIns.GetAll();
         foreach (Symbol symbol in symbols.OrderBy(symbol => symbol.Kind).ThenBy(symbol => symbol.Name))
         {
             symbol.WriteTo(Console.Out);

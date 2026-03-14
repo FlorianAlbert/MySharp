@@ -19,15 +19,22 @@ public sealed class FunctionSymbol : SymbolWithBuiltIns<FunctionSymbol, Function
 
     public class BuiltInFunctions : BuiltInSymbols<FunctionSymbol>
     {
-        public readonly FunctionSymbol Print = new("print", [new("value", TypeSymbol.BuiltIns.String)], TypeSymbol.Void);
-
-        public readonly FunctionSymbol Input = new("input", [], TypeSymbol.BuiltIns.String);
-
-        public readonly FunctionSymbol Random = new("random", [new("min", TypeSymbol.BuiltIns.Int32), new("max", TypeSymbol.BuiltIns.Int32)], TypeSymbol.BuiltIns.Int32);
-
-        public override ImmutableArray<FunctionSymbol> GetAll()
+        public BuiltInFunctions()
         {
-            return [Print, Input, Random];
-        }
+            Print = new("print", [new("value", TypeSymbol.BuiltIns.String)], TypeSymbol.Void);
+            Input = new("input", [], TypeSymbol.BuiltIns.String);
+            Random = new("random", [new("min", TypeSymbol.BuiltIns.Int32), new("max", TypeSymbol.BuiltIns.Int32)], TypeSymbol.BuiltIns.Int32);
+
+            _all = [Print, Input, Random];
+    }
+
+        public readonly FunctionSymbol Print;
+
+        public readonly FunctionSymbol Input;
+
+        public readonly FunctionSymbol Random;
+
+        private readonly ImmutableHashSet<FunctionSymbol> _all;
+        public override ImmutableHashSet<FunctionSymbol> GetAll() => _all;
     }
 }
