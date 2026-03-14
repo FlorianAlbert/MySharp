@@ -11,16 +11,24 @@ namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis;
 
 public sealed class Compilation
 {
-    public Compilation(params IEnumerable<SyntaxTree> syntaxTrees)
-        : this(null, syntaxTrees)
+    private Compilation(bool isScript, Compilation? previous, IEnumerable<SyntaxTree> syntaxTrees)
     {
-    }
-
-    private Compilation(Compilation? previous, params IEnumerable<SyntaxTree> syntaxTrees)
-    {
+        IsScript = isScript;
         _Previous = previous;
         SyntaxTrees = [.. syntaxTrees];
     }
+
+    public static Compilation Create(params IEnumerable<SyntaxTree> syntaxTrees)
+    {
+        return new(false, null, syntaxTrees);
+    }
+
+    public static Compilation CreateScript(Compilation? previous, params IEnumerable<SyntaxTree> syntaxTrees)
+    {
+        return new(true, previous, syntaxTrees);
+    }
+
+    public bool IsScript { get; }
 
     private Compilation? _Previous { get; }
 
@@ -71,17 +79,12 @@ public sealed class Compilation
         {
             if (field is null)
             {
-                BoundCompilationUnit compilationUnit = Binder.BindCompilationUnit(_Previous?.CompilationUnit, SyntaxTrees);
+                BoundCompilationUnit compilationUnit = Binder.BindCompilationUnit(IsScript, _Previous?.CompilationUnit, SyntaxTrees);
                 Interlocked.CompareExchange(ref field, compilationUnit, null);
             }
 
             return field;
         }
-    }
-
-    public Compilation ContinueWith(SyntaxTree syntaxTree)
-    {
-        return new Compilation(this, syntaxTree);
     }
 
     public EvaluationResult Evaluate(Dictionary<VariableSymbol, object?> variables)

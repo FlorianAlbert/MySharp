@@ -427,7 +427,7 @@ public class EvaluatorTests
     private static void AssertValue(string expression, object expectedResult)
     {
         SyntaxTree syntaxTree = SyntaxTree.Parse(expression);
-        Compilation compilation = new(syntaxTree);
+        Compilation compilation = Compilation.CreateScript(null, syntaxTree);
 
         Dictionary<VariableSymbol, object?> variables = [];
 
@@ -441,7 +441,7 @@ public class EvaluatorTests
     {
         AnnotatedText annotatedText = AnnotatedText.Parse(text);
         SyntaxTree syntaxTree = SyntaxTree.Parse(annotatedText.Text);
-        Compilation compilation = new(syntaxTree);
+        Compilation compilation = Compilation.CreateScript(null, syntaxTree);
         EvaluationResult result = compilation.Evaluate([]);
 
         ImmutableArray<string> expectedDiagnostics = AnnotatedText.UnindentLines(expectedDiagnosticsText);

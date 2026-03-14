@@ -38,7 +38,7 @@ if (anyFileDoesNotExist)
     return 1;
 }
 
-Compilation compilation = new(syntaxTrees);
+Compilation compilation = Compilation.Create(syntaxTrees);
 
 if (compilation.HasDiagnostics)
 {

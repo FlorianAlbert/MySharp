@@ -7,6 +7,7 @@ using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Syntax.Statements;
 using FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Text;
 using FlorianAlbert.MySharp.Sdk.Parser.Extensions;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Binding;
 
@@ -14,13 +15,18 @@ internal sealed class Binder
 {
     private FunctionSymbol? _currentFunction;
 
+    private readonly bool _isScript;
     private BoundScope _scope;
     private readonly Stack<(BoundLabel BreakLabel, BoundLabel ContinueLabel)> _loopLabels = [];
     private int _labelCounter;
 
-    public Binder(BoundScope parent)
+    [MemberNotNullWhen(false, nameof(_currentFunction))]
+    private bool _IsBindingGlobalScope => _currentFunction is null;
+
+    public Binder(bool isScript, BoundScope parent)
     {
         _scope = new(parent);
+        _isScript = isScript;
     }
 
     public DiagnosticBag Diagnostics { get; } = [];
@@ -30,10 +36,10 @@ internal sealed class Binder
         return new BoundLabel($"<Binder_Label{_labelCounter++}>");
     }
 
-    public static BoundCompilationUnit BindCompilationUnit(BoundCompilationUnit? previous, ImmutableHashSet<SyntaxTree> syntaxTrees)
+    public static BoundCompilationUnit BindCompilationUnit(bool isScript, BoundCompilationUnit? previous, ImmutableHashSet<SyntaxTree> syntaxTrees)
     {
         BoundScope parentScope = CreateParentScope(previous);
-        Binder binder = new(parentScope);
+        Binder binder = new(isScript, parentScope);
 
         IEnumerable<FunctionDefinitionSyntax> functionDefinitions = syntaxTrees.SelectMany(syntaxTree => syntaxTree.Root.CompilationUnitMembers)
                                                                                .Where(member => member.Kind is SyntaxKind.FunctionDefinition)
@@ -172,7 +178,7 @@ internal sealed class Binder
             // function bodies of its predecessor Compilation units
             functionBodies.AddRange(previous.Program.FunctionBodies);
         }
-        
+
         foreach (FunctionDefinitionSyntax functionDefinition in functionDefinitions)
         {
             (FunctionSymbol, BoundBlockStatement)? functionBody = BindFunctionBody(functionDefinition);
@@ -221,7 +227,7 @@ internal sealed class Binder
 
     private BoundStatement BindStatement(StatementSyntax statementSyntax)
     {
-        return statementSyntax.Kind switch
+        BoundStatement boundStatement = statementSyntax.Kind switch
         {
             SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax) statementSyntax),
             SyntaxKind.VariableDeclarationStatement => BindVariableDeclarationStatement((VariableDeclarationStatementSyntax) statementSyntax),
@@ -234,6 +240,27 @@ internal sealed class Binder
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax) statementSyntax),
             _ => throw new Exception($"Unexpected syntax {statementSyntax.Kind}"),
         };
+
+        // We don't have to check the statement
+        if (_isScript && _IsBindingGlobalScope)
+        {
+            return boundStatement;
+        }
+
+        // We only check expression statements
+        if (boundStatement.Kind is not BoundNodeKind.ExpressionStatement)
+        {
+            return boundStatement;
+        }
+
+        BoundExpressionStatement expressionStatement = (BoundExpressionStatement) boundStatement;
+        if (expressionStatement.Expression.Kind is BoundNodeKind.ErrorExpression or BoundNodeKind.AssignmentExpression or BoundNodeKind.CallExpression)
+        {
+            return boundStatement;
+        }
+
+        Diagnostics.ReportUnusedExpression(statementSyntax.Location);
+        return BindErrorStatement();
     }
 
     private BoundBlockStatement BindBlockStatement(BlockStatementSyntax statementSyntax, ImmutableArray<VariableSymbol>? additionalScopeVariables = null)
@@ -383,7 +410,7 @@ internal sealed class Binder
 
     private BoundStatement BindReturnStatement(ReturnStatementSyntax statementSyntax)
     {
-        if (_currentFunction is null)
+        if (_IsBindingGlobalScope)
         {
             Diagnostics.ReportReturnOutsideOfFunction(statementSyntax.Location);
             return BindErrorStatement();

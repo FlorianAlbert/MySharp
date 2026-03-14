@@ -141,9 +141,7 @@ internal sealed partial class MySharpRepl : Repl
 
         SyntaxTree syntaxTree = SyntaxTree.Parse(text);
 
-        Compilation compilation = _previousCompilation is null ?
-            new(syntaxTree) :
-            _previousCompilation.ContinueWith(syntaxTree);
+        Compilation compilation = Compilation.CreateScript(_previousCompilation, syntaxTree);
 
         if (_showSyntaxTree)
         {

@@ -187,4 +187,10 @@ internal sealed class DiagnosticBag : IReadOnlyCollection<Diagnostic>
         string message = $"Not all code paths in function '{name}' return a value.";
         Report(location, message);
     }
+
+    internal void ReportUnusedExpression(TextLocation location)
+    {
+        string message = "The result of this expression is never used.";
+        Report(location, message);
+    }
 }
