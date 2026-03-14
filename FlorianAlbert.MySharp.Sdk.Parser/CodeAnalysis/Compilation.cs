@@ -34,14 +34,11 @@ public sealed class Compilation
 
     public ImmutableHashSet<SyntaxTree> SyntaxTrees { get; }
 
-    private ImmutableHashSet<Symbol>? _symbols;
-    public ImmutableHashSet<Symbol> Symbols => GetOrCreateCombinedSymbols(ref _symbols, CompilationUnit.GlobalScope.Symbols, _Previous?.Symbols ?? []);
+    public ImmutableHashSet<Symbol> Symbols => GetOrCreateCombinedSymbols(ref field, CompilationUnit.GlobalScope.Symbols, _Previous?.Symbols ?? []);
 
-    private ImmutableHashSet<FunctionSymbol>? _functions;
-    public ImmutableHashSet<FunctionSymbol> Functions => GetOrCreateCombinedSymbols(ref _functions, CompilationUnit.GlobalScope.Functions, _Previous?.Functions ?? []);
+    public ImmutableHashSet<FunctionSymbol> Functions => GetOrCreateCombinedSymbols(ref field, CompilationUnit.GlobalScope.Functions, _Previous?.Functions ?? []);
 
-    private ImmutableHashSet<VariableSymbol>? _variables;
-    public ImmutableHashSet<VariableSymbol> Variables => GetOrCreateCombinedSymbols(ref _variables, CompilationUnit.GlobalScope.Variables, _Previous?.Variables ?? []);
+    public ImmutableHashSet<VariableSymbol> Variables => GetOrCreateCombinedSymbols(ref field, CompilationUnit.GlobalScope.Variables, _Previous?.Variables ?? []);
 
     private ImmutableHashSet<TSymbol> GetOrCreateCombinedSymbols<TSymbol>(ref ImmutableHashSet<TSymbol>? field, ImmutableHashSet<TSymbol> currentCompilationUnitSymbols, ImmutableHashSet<TSymbol> previousCompilationUnitSymbols)
         where TSymbol : Symbol
