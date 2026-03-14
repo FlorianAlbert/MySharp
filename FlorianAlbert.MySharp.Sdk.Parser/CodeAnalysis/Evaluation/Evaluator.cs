@@ -305,7 +305,11 @@ internal sealed class Evaluator
     {
         object? value = EvaluateExpression(boundConversionExpression.Expression);
 
-        if (boundConversionExpression.Type == TypeSymbol.BuiltIns.Bool)
+        if (boundConversionExpression.Type == TypeSymbol.BuiltIns.Any)
+        {
+            return value;
+        }
+        else if (boundConversionExpression.Type == TypeSymbol.BuiltIns.Bool)
         {
             return Convert.ToBoolean(value);
         }

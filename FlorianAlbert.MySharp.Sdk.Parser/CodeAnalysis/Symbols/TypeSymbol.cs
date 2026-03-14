@@ -18,13 +18,16 @@ public sealed class TypeSymbol : SymbolWithBuiltIns<TypeSymbol, TypeSymbol.Built
     {
         public BuiltInTypes()
         {
+            Any = new("any");
             Bool = new("bool");
             Int32 = new("int32");
             String = new("string");
             Character = new("char");
 
-            _all = [Bool, Int32, String, Character];
+            _all = [Any, Bool, Int32, String, Character];
         }
+
+        public readonly TypeSymbol Any;
 
         public readonly TypeSymbol Bool;
 
