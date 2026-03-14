@@ -2,7 +2,7 @@
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 
-public sealed class TypeSymbol : Symbol
+public sealed class TypeSymbol : SymbolWithBuiltIns<TypeSymbol, TypeSymbol.BuiltInTypes>
 {
     private TypeSymbol(string name) : base(name)
     {
@@ -14,16 +14,16 @@ public sealed class TypeSymbol : Symbol
 
     public static readonly TypeSymbol Void = new("<void>");
 
-    public static class BuiltIns
+    public class BuiltInTypes : BuiltInSymbols<TypeSymbol>
     {
-        public static readonly TypeSymbol Bool = new("bool");
+        public readonly TypeSymbol Bool = new("bool");
 
-        public static readonly TypeSymbol Int32 = new("int32");
+        public readonly TypeSymbol Int32 = new("int32");
 
-        public static readonly TypeSymbol String = new("string");
+        public readonly TypeSymbol String = new("string");
 
-        public static readonly TypeSymbol Character = new("char");
+        public readonly TypeSymbol Character = new("char");
 
-        public static ImmutableArray<TypeSymbol> GetAll() => [Bool, Int32, String, Character];
+        public override ImmutableArray<TypeSymbol> GetAll() => [Bool, Int32, String, Character];
     }
 }

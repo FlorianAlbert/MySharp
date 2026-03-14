@@ -2,7 +2,7 @@
 
 namespace FlorianAlbert.MySharp.Sdk.Parser.CodeAnalysis.Symbols;
 
-public sealed class FunctionSymbol : Symbol
+public sealed class FunctionSymbol : SymbolWithBuiltIns<FunctionSymbol, FunctionSymbol.BuiltInFunctions>
 {
     internal FunctionSymbol(string name, ImmutableArray<ParameterSymbol> parameters, TypeSymbol returnType)
         : base(name)
@@ -17,14 +17,17 @@ public sealed class FunctionSymbol : Symbol
 
     public TypeSymbol ReturnType { get; }
 
-    public static class BuiltIns
+    public class BuiltInFunctions : BuiltInSymbols<FunctionSymbol>
     {
-        public static readonly FunctionSymbol Print = new("print", [new("value", TypeSymbol.BuiltIns.String)], TypeSymbol.Void);
+        public readonly FunctionSymbol Print = new("print", [new("value", TypeSymbol.BuiltIns.String)], TypeSymbol.Void);
 
-        public static readonly FunctionSymbol Input = new("input", [], TypeSymbol.BuiltIns.String);
+        public readonly FunctionSymbol Input = new("input", [], TypeSymbol.BuiltIns.String);
 
-        public static readonly FunctionSymbol Random = new("random", [new("min", TypeSymbol.BuiltIns.Int32), new("max", TypeSymbol.BuiltIns.Int32)], TypeSymbol.BuiltIns.Int32);
+        public readonly FunctionSymbol Random = new("random", [new("min", TypeSymbol.BuiltIns.Int32), new("max", TypeSymbol.BuiltIns.Int32)], TypeSymbol.BuiltIns.Int32);
 
-        public static ImmutableArray<FunctionSymbol> GetAll() => [Print, Input, Random];
+        public override ImmutableArray<FunctionSymbol> GetAll()
+        {
+            return [Print, Input, Random];
+        }
     }
 }
