@@ -121,7 +121,7 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
     private MetaCommandModel CreateMetaCommandModelFromMethodSymbol(IMethodSymbol methodSymbol)
     {
         string methodName = methodSymbol.Name;
-        IEnumerable<SpecialType> parameterTypes = methodSymbol.Parameters.Select(parameter => parameter.Type.SpecialType);
+        Dictionary<string, SpecialType> parameters = methodSymbol.Parameters.ToDictionary(parameter => parameter.Name, parameter => parameter.Type.SpecialType);
 
         AttributeData? metaCommandAttribute = methodSymbol.GetAttributes()
             .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == _MetaCommandAttributeFullName);
@@ -148,7 +148,7 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
             }
         }
 
-        return new MetaCommandModel(metaCommandName, metaCommandDescription, metaCommandAliases, methodName, parameterTypes, attributeLocation);
+        return new MetaCommandModel(metaCommandName, metaCommandDescription, metaCommandAliases, methodName, parameters, attributeLocation);
     }
 
     private static bool IsPartialHandlerMethodSignature(IMethodSymbol methodSymbol, string expectedHandlerMethodName)
@@ -197,7 +197,7 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
                     context.ReportMissingMetaCommandDescription(metaCommand.AttributeLocation, metaCommand.MethodName, metaCommandEvaluatorModel.EvaluatorTypeName);
                 }
 
-                if (metaCommand.ParameterTypes.Any(type => type != SpecialType.System_String))
+                if (metaCommand.Parameters.Any(parameter => parameter.Value != SpecialType.System_String))
                 {
                     context.ReportInvalidMetaCommandParameterTypes(metaCommand.AttributeLocation, metaCommand.MethodName, metaCommandEvaluatorModel.EvaluatorTypeName);
                 }
@@ -281,7 +281,7 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
                 condition.Append("\n" + indent + "    || string.Equals(commandName, \"" + alias + "\", global::System.StringComparison.OrdinalIgnoreCase)");
             }
 
-            int paramCount = metaCommand.ParameterTypes.Count();
+            int paramCount = metaCommand.Parameters.Count;
 
             sb.AppendLine(indent + "if (" + condition + ")");
             sb.AppendLine(indent + "{");
@@ -341,7 +341,10 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
                 sb.AppendLine(indent + "            string aliasText = info.Aliases.Length > 0");
                 sb.AppendLine(indent + "                ? \" (aliases: \" + string.Join(\", \", global::System.Linq.Enumerable.Select(info.Aliases, a => \"/\" + a)) + \")\"");
                 sb.AppendLine(indent + "                : \"\";");
-                sb.AppendLine(indent + "            string prefix = \"/\" + info.Name + aliasText;");
+                sb.AppendLine(indent + "            string parametersText = info.Parameters.Length > 0");
+                sb.AppendLine(indent + "                ? \" \" + string.Join(\" \", global::System.Linq.Enumerable.Select(info.Parameters, p => \"<\" + p + \">\"))");
+                sb.AppendLine(indent + "                : \"\";");
+                sb.AppendLine(indent + "            string prefix = \"/\" + info.Name + parametersText + aliasText;");
                 sb.AppendLine(indent + "            prefixes.Add(prefix);");
                 sb.AppendLine(indent + "            if (prefix.Length > maxLen) maxLen = prefix.Length;");
                 sb.AppendLine(indent + "        }");
@@ -379,22 +382,22 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
             {
                 sb.Append(" virtual");
             }
-            sb.AppendLine(" global::System.Collections.Generic.IEnumerable<(string Name, string Description, string[] Aliases)> " + metaCommandEvaluatorModel.InfoMethodName + "()");
+            sb.AppendLine(" global::System.Collections.Generic.IEnumerable<(string Name, string[] Parameters, string Description, string[] Aliases)> " + metaCommandEvaluatorModel.InfoMethodName + "()");
             sb.AppendLine("    {");
 
             if (metaCommandEvaluatorModel.IsHandlerMethodOverride)
             {
                 // Override: concat own commands onto base
                 sb.Append(indent + "return global::System.Linq.Enumerable.Concat(base." + metaCommandEvaluatorModel.InfoMethodName + "(), ");
-                sb.AppendLine("new (string Name, string Description, string[] Aliases)[]");
+                sb.AppendLine("new (string Name, string[] Parameters, string Description, string[] Aliases)[]");
                 sb.AppendLine(indent + "{");
             }
             else
             {
                 // Root: return own commands + hardcoded help entry
-                sb.AppendLine(indent + "return new (string Name, string Description, string[] Aliases)[]");
+                sb.AppendLine(indent + "return new (string Name, string[] Parameters, string Description, string[] Aliases)[]");
                 sb.AppendLine(indent + "{");
-                sb.AppendLine(indent + "    (\"help\", \"Lists all available meta commands.\", new string[] { }),");
+                sb.AppendLine(indent + "    (\"help\", new string[] { }, \"Lists all available meta commands.\", new string[] { }),");
             }
 
             foreach (MetaCommandModel metaCommand in metaCommandEvaluatorModel.MetaCommands)
@@ -414,7 +417,22 @@ public class MetaCommandEvaluatorGenerator : IIncrementalGenerator
                 }
                 aliasArray.Append(" }");
 
-                sb.AppendLine(indent + "    (\"" + metaCommand.Name + "\", \"" + metaCommand.Description + "\", " + aliasArray + "),");
+                StringBuilder parametersArray = new();
+                parametersArray.Append("new string[] { ");
+                bool firstParameter = true;
+                foreach (string parameter in metaCommand.Parameters.Keys)
+                {
+                    if (!firstParameter)
+                    {
+                        parametersArray.Append(", ");
+                    }
+
+                    parametersArray.Append("\"" + parameter + "\"");
+                    firstParameter = false;
+                }
+                parametersArray.Append(" }");
+
+                sb.AppendLine(indent + "    (\"" + metaCommand.Name + "\", " + parametersArray + ", \"" + metaCommand.Description + "\", " + aliasArray + "),");
             }
 
             if (metaCommandEvaluatorModel.IsHandlerMethodOverride)

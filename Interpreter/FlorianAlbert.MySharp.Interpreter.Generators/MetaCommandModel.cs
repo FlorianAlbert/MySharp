@@ -8,14 +8,14 @@ internal class MetaCommandModel
         string? description,
         IEnumerable<string> aliases,
         string methodName,
-        IEnumerable<SpecialType> parameterTypes,
+        Dictionary<string, SpecialType> parameters,
         Location attributeLocation)
     {
         Name = name;
         Description = description;
         Aliases = aliases;
         MethodName = methodName;
-        ParameterTypes = parameterTypes;
+        Parameters = parameters;
         AttributeLocation = attributeLocation;
     }
 
@@ -27,11 +27,11 @@ internal class MetaCommandModel
 
     public string MethodName { get; }
 
-    public IEnumerable<SpecialType> ParameterTypes { get; }
+    public Dictionary<string, SpecialType> Parameters { get; }
 
     public Location AttributeLocation { get; }
 
     public bool HasErrors => string.IsNullOrEmpty(Name) || 
         string.IsNullOrEmpty(Description) ||
-        ParameterTypes.Any(type => type is not SpecialType.System_String);
+        Parameters.Any(parameter => parameter.Value is not SpecialType.System_String);
 }
